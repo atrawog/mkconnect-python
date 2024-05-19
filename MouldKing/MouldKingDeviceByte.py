@@ -1,8 +1,11 @@
 __author__ = "J0EK3R"
 __version__ = "0.1"
 
-from MouldKing.MouldKingDevice import MouldKingDevice
-#from MouldKingCrypt import MouldKingCrypt
+# import hack for micro-python-simulator with flat filesystem
+try:
+    from MouldKing.MouldKingDevice import MouldKingDevice
+except ImportError:
+    from MouldKingDevice import MouldKingDevice
 
 class MouldKingDeviceByte(MouldKingDevice) :
     """
