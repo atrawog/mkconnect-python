@@ -5,7 +5,7 @@ At the moment we only are able to generate the rawdata-bytearrays to be advertis
 
 Just look in [main.py](https://github.com/J0EK3R/mkconnect-python/blob/main/main.py) for the current usage...
 
-Current output in [micropython-pi-pico-simulator](https://wokwi.com/projects/new/micropython-pi-pico)
+Current output in [https://wokwi.com/projects/new/micropython-pi-pico](https://wokwi.com/projects/398314618803830785)
 ...looks very good! :)
 ```
 connect-telegram
