@@ -1,4 +1,3 @@
-#!/usr/bin/python
 
 class MouldKingCrypt :
     """
@@ -18,7 +17,7 @@ class MouldKingCrypt :
 
         resultArray = bytearray(8 + cryptedArrayLen)
         resultArray[0] = cryptedArrayLen + 13 # len
-        resultArray[1] = 0x02                # flags
+        resultArray[1] = 0x02                 # flags
         resultArray[2] = 0x01
         resultArray[3] = 0x02
         resultArray[4] = cryptedArrayLen + 3 # len
@@ -39,43 +38,54 @@ class MouldKingCrypt :
         targetArrayLength = len(MouldKingCrypt.__Array_C1C2C3C4C5) + len(rawDataArray) + 20
 
         targetArray = bytearray(targetArrayLength)
-        targetArray[15] = 113
-        targetArray[16] = 15
-        targetArray[17] = 85
+        targetArray[15] = 113 # 0x71
+        targetArray[16] = 15  # 0x0f
+        targetArray[17] = 85  # 0x55
 
+        # copy firstDataArray reverse into targetArray with offset 18
         for index in range(len(MouldKingCrypt.__Array_C1C2C3C4C5)):
             targetArray[index + 18] = MouldKingCrypt.__Array_C1C2C3C4C5[(len(MouldKingCrypt.__Array_C1C2C3C4C5) - index) - 1]
 
-        targetArray[18 + len(MouldKingCrypt.__Array_C1C2C3C4C5):] = rawDataArray
+        # copy rawDataArray into targetArray with offset 18 + len(MouldKingCrypt.__Array_C1C2C3C4C5)
+        for index in range(len(rawDataArray)):
+            targetArray[18 + len(MouldKingCrypt.__Array_C1C2C3C4C5) + index] = rawDataArray[index]
 
+        # crypt bytes from position 15 to 22
         for index in range(15, len(MouldKingCrypt.__Array_C1C2C3C4C5) + 18):
-            targetArray[index] = MouldKingCrypt.revert_bits_byte(targetArray[index])
+            targetArray[index] = MouldKingCrypt.__revert_bits_byte(targetArray[index])
 
-        checksum = MouldKingCrypt.calc_checksum_from_arrays(MouldKingCrypt.__Array_C1C2C3C4C5, rawDataArray)
-        targetArray[len(MouldKingCrypt.__Array_C1C2C3C4C5) + 18 + len(rawDataArray):] = [(checksum & 255), ((checksum >> 8) & 255)]
+        # calc checksum und copy to array
+        checksum = MouldKingCrypt.__calc_checksum_from_arrays(MouldKingCrypt.__Array_C1C2C3C4C5, rawDataArray)
+        targetArray[len(MouldKingCrypt.__Array_C1C2C3C4C5) + 18 + len(rawDataArray) + 0] = (checksum & 255)
+        targetArray[len(MouldKingCrypt.__Array_C1C2C3C4C5) + 18 + len(rawDataArray) + 1] = ((checksum >> 8) & 255)
 
-        magicNumberArray_63 = MouldKingCrypt.create_magic_array(63, 7)
-        tempArrayLength = targetArrayLength - 18
-        tempArray = targetArray[18:].copy()
+        # crypt bytes from offset 18 to the end with magicNumberArray_63
+        magicNumberArray_63 = MouldKingCrypt.__create_magic_array(63, 7)
+        tempArray = bytearray(targetArrayLength - 18)
+        for index in range(len(tempArray)):
+            tempArray[index] = targetArray[index + 18]
 
-        MouldKingCrypt.crypt_array(tempArray, magicNumberArray_63)
+        MouldKingCrypt.__crypt_array(tempArray, magicNumberArray_63)
         targetArray[18:] = tempArray
 
-        magicNumberArray_37 = MouldKingCrypt.create_magic_array(37, 7)
-        MouldKingCrypt.crypt_array(targetArray, magicNumberArray_37)
+        # crypt complete array with magicNumberArray_37
+        magicNumberArray_37 = MouldKingCrypt.__create_magic_array(37, 7)
+        MouldKingCrypt.__crypt_array(targetArray, magicNumberArray_37)
 
+        # resulting advertisment array has a length of constant 24 bytes
         telegramArray = bytearray(24)
 
         lengthResultArray = len(MouldKingCrypt.__Array_C1C2C3C4C5) + len(rawDataArray) + 5
         telegramArray[:lengthResultArray] = targetArray[15:15 + lengthResultArray]
 
+        # fill rest of array
         for index in range(lengthResultArray, len(telegramArray)):
             telegramArray[index] = index + 1
 
         return telegramArray
 
     @staticmethod
-    def create_magic_array(magic_number, size):
+    def __create_magic_array(magic_number, size):
         magic_array = [0] * size
         magic_array[0] = 1
 
@@ -85,7 +95,7 @@ class MouldKingCrypt :
         return magic_array
 
     @staticmethod
-    def revert_bits_int(value):
+    def __revert_bits_int(value):
         result = 0
         for index_bit in range(16):
             if ((1 << index_bit) & value) != 0:
@@ -93,19 +103,19 @@ class MouldKingCrypt :
         return 65535 & result
 
     @staticmethod
-    def crypt_array(byte_array, magic_number_array):
+    def __crypt_array(byte_array, magic_number_array):
         # foreach byte of array
         for index_byte in range(len(byte_array)):
             current_byte = byte_array[index_byte]
             current_result = 0
             # foreach bit in byte
             for index_bit in range(8):
-                current_result += (((current_byte >> index_bit) & 1) ^ MouldKingCrypt.shift_magic_array(magic_number_array)) << index_bit
+                current_result += (((current_byte >> index_bit) & 1) ^ MouldKingCrypt.__shift_magic_array(magic_number_array)) << index_bit
             byte_array[index_byte] = current_result & 255
         return byte_array
 
     @staticmethod
-    def calc_checksum_from_arrays(first_array, second_array):
+    def __calc_checksum_from_arrays(first_array, second_array):
         result = 65535
         for first_array_index in range(len(first_array)):
             result = (result ^ (first_array[(len(first_array) - 1) - first_array_index] << 8)) & 65535
@@ -116,17 +126,17 @@ class MouldKingCrypt :
                     result ^= 4129
 
         for current_byte in second_array:
-            result = ((MouldKingCrypt.revert_bits_byte(current_byte) << 8) ^ result) & 65535
+            result = ((MouldKingCrypt.__revert_bits_byte(current_byte) << 8) ^ result) & 65535
             for index_bit in range(8):
                 current_result = result & 32768
                 result <<= 1
                 if current_result != 0:
                     result ^= 4129
 
-        return MouldKingCrypt.revert_bits_int(result) ^ 65535
+        return MouldKingCrypt.__revert_bits_int(result) ^ 65535
 
     @staticmethod
-    def shift_magic_array(i_arr):
+    def __shift_magic_array(i_arr):
         r1 = i_arr[3] ^ i_arr[6]
         i_arr[3] = i_arr[2]
         i_arr[2] = i_arr[1]
@@ -138,7 +148,7 @@ class MouldKingCrypt :
         return i_arr[0]
 
     @staticmethod
-    def revert_bits_byte(value):
+    def __revert_bits_byte(value):
         result = 0
         for index_bit in range(8):
             if ((1 << index_bit) & value) != 0:
