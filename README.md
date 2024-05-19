@@ -1,7 +1,9 @@
 # mkconnect-python
-some little code to connect to MouldKing bluetooth bricks
+...some little code to connect to MouldKing bluetooth bricks
 
-just look in [main.py](https://github.com/J0EK3R/mkconnect-python/blob/main/main.py) for the current usage...
+At the moment we only are able to generate the rawdata-bytearrays to be advertised over bluetooth - no bluetooth functionality yet.
+
+Just look in [main.py](https://github.com/J0EK3R/mkconnect-python/blob/main/main.py) for the current usage...
 
 Current output in [micropython-pi-pico-simulator](https://wokwi.com/projects/new/micropython-pi-pico)
 ...looks very good! :)
