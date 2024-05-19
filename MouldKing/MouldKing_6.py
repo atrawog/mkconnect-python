@@ -1,7 +1,7 @@
 __author__ = "J0EK3R"
 __version__ = "0.1"
 
-from MouldKingDeviceByte import MouldKingDeviceByte
+from MouldKing.MouldKingDeviceByte import MouldKingDeviceByte
 
 class MouldKing_6(MouldKingDeviceByte) :
     """
