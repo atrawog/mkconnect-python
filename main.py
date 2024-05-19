@@ -1,8 +1,12 @@
 #!/usr/bin/python
 
-import subprocess
-from MouldKing.MouldKingCrypt import MouldKingCrypt
-from MouldKing.MouldKing_6 import MouldKing_6
+# import hack for micro-python-simulator with flat filesystem
+try:
+  from MouldKing.MouldKingCrypt import MouldKingCrypt
+  from MouldKing.MouldKing_6 import MouldKing_6
+except ImportError:
+  from MouldKingCrypt import MouldKingCrypt
+  from MouldKing_6 import MouldKing_6
 
 # instantiate MouldKing_6-objects
 mk6_0 = MouldKing_6(0)
