@@ -1,7 +1,5 @@
 #!/usr/bin/python
 
-import array
-
 class MouldKingCrypt :
     """
     class with static methods to do MouldKing encryption
@@ -129,40 +127,15 @@ class MouldKingCrypt :
 
     @staticmethod
     def shift_magic_array(i_arr):
-        # i_arr[3] = i_arr[2]
-        # i_arr[2] = i_arr[1]
-        # i_arr[1] = i_arr[0]
-        # i_arr[0] = i_arr[6]
-        # i_arr[6] = i_arr[5]
-        # i_arr[5] = i_arr[4]
-        # i_arr[4] = i_arr[3] ^ i_arr[6]
-        # return i_arr[0]
-
-        r0 = 3
-        r1 = i_arr[r0]
-        r2 = 6
-        r3 = i_arr[r2]
-        r1 = r1 ^ r3
-        r3 = 2
-        r4 = i_arr[r3]
-        i_arr[r0] = r4
-        r0 = 1
-        r4 = i_arr[r0]
-        i_arr[r3] = r4
-        r3 = 0
-        r4 = i_arr[r3]
-        i_arr[r0] = r4
-        r0 = i_arr[r2]
-        i_arr[r3] = r0
-        r0 = 5
-        r4 = i_arr[r0]
-        i_arr[r2] = r4
-        r2 = 4
-        r4 = i_arr[r2]
-        i_arr[r0] = r4
-        i_arr[r2] = r1
-        r6 = i_arr[r3]
-        return r6
+        r1 = i_arr[3] ^ i_arr[6]
+        i_arr[3] = i_arr[2]
+        i_arr[2] = i_arr[1]
+        i_arr[1] = i_arr[0]
+        i_arr[0] = i_arr[6]
+        i_arr[6] = i_arr[5]
+        i_arr[5] = i_arr[4]
+        i_arr[4] = r1
+        return i_arr[0]
 
     @staticmethod
     def revert_bits_byte(value):
