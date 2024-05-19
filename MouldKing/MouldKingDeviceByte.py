@@ -30,10 +30,10 @@ class MouldKingDeviceByte(MouldKingDevice) :
         if self._NumberOfChannels >= 1 and channelDataLength >= currentChannelStartOffset:
             if self._Channel_A_Value < 0:
                 # Range [-1..0] -> 0x80 - [0x7F .. 0x00] = [0x01 .. 0x80]
-                currentData[currentChannelStartOffset] = (0x80 - min(-self._Channel_A_Value * 0x80, 0x80))
+                currentData[currentChannelStartOffset] = int(0x80 - min(-self._Channel_A_Value * 0x80, 0x80))
             elif self._Channel_A_Value > 0:
                 # Range [0..1] -> 0x80 + [0x00 .. 0x7F] = [0x80 .. 0xFF]
-                currentData[currentChannelStartOffset] = (0x80 + min(self._Channel_A_Value * 0x7F, 0x7F))
+                currentData[currentChannelStartOffset] = int(0x80 + min(self._Channel_A_Value * 0x7F, 0x7F))
             else:
                 currentData[currentChannelStartOffset] = 0x80
 
@@ -43,10 +43,10 @@ class MouldKingDeviceByte(MouldKingDevice) :
         if self._NumberOfChannels >= 1 and channelDataLength >= currentChannelStartOffset:
             if self._Channel_B_Value < 0:
                 # Range [-1..0] -> 0x80 - [0x7F .. 0x00] = [0x01 .. 0x80]
-                currentData[currentChannelStartOffset] = (0x80 - min(-self._Channel_B_Value * 0x80, 0x80))
+                currentData[currentChannelStartOffset] = int(0x80 - min(-self._Channel_B_Value * 0x80, 0x80))
             elif self._Channel_B_Value > 0:
                 # Range [0..1] -> 0x80 + [0x00 .. 0x7F] = [0x80 .. 0xFF]
-                currentData[currentChannelStartOffset] = (0x80 + min(self._Channel_B_Value * 0x7F, 0x7F))
+                currentData[currentChannelStartOffset] = int(0x80 + min(self._Channel_B_Value * 0x7F, 0x7F))
             else:
                 currentData[currentChannelStartOffset] = 0x80
 
@@ -56,10 +56,10 @@ class MouldKingDeviceByte(MouldKingDevice) :
         if self._NumberOfChannels >= 1 and channelDataLength >= currentChannelStartOffset:
             if self._Channel_C_Value < 0:
                 # Range [-1..0] -> 0x80 - [0x7F .. 0x00] = [0x01 .. 0x80]
-                currentData[currentChannelStartOffset] = (0x80 - min(-self._Channel_C_Value * 0x80, 0x80))
+                currentData[currentChannelStartOffset] = int(0x80 - min(-self._Channel_C_Value * 0x80, 0x80))
             elif self._Channel_C_Value > 0:
                 # Range [0..1] -> 0x80 + [0x00 .. 0x7F] = [0x80 .. 0xFF]
-                currentData[currentChannelStartOffset] = (0x80 + min(self._Channel_C_Value * 0x7F, 0x7F))
+                currentData[currentChannelStartOffset] = int(0x80 + min(self._Channel_C_Value * 0x7F, 0x7F))
             else:
                 currentData[currentChannelStartOffset] = 0x80
 
@@ -69,10 +69,10 @@ class MouldKingDeviceByte(MouldKingDevice) :
         if self._NumberOfChannels >= 1 and channelDataLength >= currentChannelStartOffset:
             if self._Channel_D_Value < 0:
                 # Range [-1..0] -> 0x80 - [0x7F .. 0x00] = [0x01 .. 0x80]
-                currentData[currentChannelStartOffset] = (0x80 - min(-self._Channel_D_Value * 0x80, 0x80))
+                currentData[currentChannelStartOffset] = int(0x80 - min(-self._Channel_D_Value * 0x80, 0x80))
             elif self._Channel_D_Value > 0:
                 # Range [0..1] -> 0x80 + [0x00 .. 0x7F] = [0x80 .. 0xFF]
-                currentData[currentChannelStartOffset] = (0x80 + min(self._Channel_D_Value * 0x7F, 0x7F))
+                currentData[currentChannelStartOffset] = int(0x80 + min(self._Channel_D_Value * 0x7F, 0x7F))
             else:
                 currentData[currentChannelStartOffset] = 0x80
 
@@ -82,10 +82,10 @@ class MouldKingDeviceByte(MouldKingDevice) :
         if self._NumberOfChannels >= 1 and channelDataLength >= currentChannelStartOffset:
             if self._Channel_E_Value < 0:
                 # Range [-1..0] -> 0x80 - [0x7F .. 0x00] = [0x01 .. 0x80]
-                currentData[currentChannelStartOffset] = (0x80 - min(-self._Channel_E_Value * 0x80, 0x80))
+                currentData[currentChannelStartOffset] = int(0x80 - min(-self._Channel_E_Value * 0x80, 0x80))
             elif self._Channel_E_Value > 0:
                 # Range [0..1] -> 0x80 + [0x00 .. 0x7F] = [0x80 .. 0xFF]
-                currentData[currentChannelStartOffset] = (0x80 + min(self._Channel_E_Value * 0x7F, 0x7F))
+                currentData[currentChannelStartOffset] = int(0x80 + min(self._Channel_E_Value * 0x7F, 0x7F))
             else:
                 currentData[currentChannelStartOffset] = 0x80
 
@@ -95,10 +95,10 @@ class MouldKingDeviceByte(MouldKingDevice) :
         if self._NumberOfChannels >= 1 and channelDataLength >= currentChannelStartOffset:
             if self._Channel_F_Value < 0:
                 # Range [-1..0] -> 0x80 - [0x7F .. 0x00] = [0x01 .. 0x80]
-                currentData[currentChannelStartOffset] = (0x80 - min(-self._Channel_F_Value * 0x80, 0x80))
+                currentData[currentChannelStartOffset] = int(0x80 - min(-self._Channel_F_Value * 0x80, 0x80))
             elif self._Channel_F_Value > 0:
                 # Range [0..1] -> 0x80 + [0x00 .. 0x7F] = [0x80 .. 0xFF]
-                currentData[currentChannelStartOffset] = (0x80 + min(self._Channel_F_Value * 0x7F, 0x7F))
+                currentData[currentChannelStartOffset] = int(0x80 + min(self._Channel_F_Value * 0x7F, 0x7F))
             else:
                 currentData[currentChannelStartOffset] = 0x80
 
