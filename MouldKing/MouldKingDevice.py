@@ -9,6 +9,10 @@ class MouldKingDevice :
     ManufacturerID = [0xFF, 0xF0]
 
     def __init__(self, numberOfChannels, channelStartOffset, channelEndOffset, telegram_connect, basetelegram):
+        """
+        initializes the object and defines the fields
+        """
+
         if numberOfChannels > 6:
             raise Exception("max 6 channels")
 
@@ -35,9 +39,17 @@ class MouldKingDevice :
         self._Channel_F_Value = 0
 
     def Connect(self):
-        pass
+        """
+        returns the telegram to switch the MouldKing brick to bluetooth mode
+        """
+
+        raise NotImplementedError # override this methode
 
     def Stop(self):
+        """
+        set internal stored value of all channels to zero and return the telegram
+        """
+
         # init channels        
         self._Channel_A_Value = 0
         self._Channel_B_Value = 0
@@ -49,6 +61,10 @@ class MouldKingDevice :
         return self.CreateTelegram();
 
     def SetChannel(self, channelId, value):
+        """
+        set internal stored value of channel with channelId to value and return the telegram
+        """
+
         if channelId > self._NumberOfChannels - 1:
             raise Exception("only channelId 0.." + int(self._NumberOfChannels - 1) + "are allowed")
         elif channelId == 0:
@@ -67,4 +83,8 @@ class MouldKingDevice :
         return self.CreateTelegram();
 
     def CreateTelegram(self):
-        pass
+        """
+        returns a telegram including the internal stored value from all channels
+        """
+        
+        raise NotImplementedError # override this methode

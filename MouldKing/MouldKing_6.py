@@ -20,6 +20,10 @@ class MouldKing_6(MouldKingDeviceByte) :
     __telegram_base_device_c = [0x63, 0x7B, 0xA7, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x9C] # byte array for base Telegram
 
     def __init__(self, deviceId):
+        """
+        initializes the object and defines the fields
+        """
+
         if deviceId == 0:
             basetelegram = MouldKing_6.__telegram_base_device_a
         elif deviceId == 1:

@@ -34,7 +34,7 @@ class MouldKingCrypt :
     @staticmethod
     def Crypt(rawDataArray):
         """
-        MouldKing encryption for the given byte-array and return the resulting byte-array 
+        do the MouldKing encryption for the given byte-array and return the resulting byte-array 
         """
 
         targetArrayLength = len(MouldKingCrypt.__Array_C1C2C3C4C5) + len(rawDataArray) + 20
