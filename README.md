@@ -1,5 +1,5 @@
 # mkconnect-python
-...some little code to connect to MouldKing bluetooth bricks
+...a bit of code to connect to MouldKing bluetooth bricks
 
 There is a testscript [consoletest.py](https://github.com/J0EK3R/mkconnect-python/blob/main/consoletest.py) to wich (on raspberry pi) uses **hcitoo**l to send the telegrams over bluetooth.
 
