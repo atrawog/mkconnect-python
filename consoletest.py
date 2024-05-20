@@ -14,6 +14,9 @@ import platform
 import time
 
 hcitool_path = '/usr/bin/hcitool'
+hub0 = MouldKing_6(0)
+hub1 = MouldKing_6(1)
+hub2 = MouldKing_6(2)
 
 def _getChannelId(channel):
     switch={
@@ -28,14 +31,13 @@ def _getChannelId(channel):
 
 def _getHubId(deviceId):
     if deviceId == 0:
-        hub = MouldKing_6(0)
+        return hub0
     elif deviceId == 1:
-        hub = MouldKing_6(1)
+        return hub1
     elif deviceId == 2:
-        hub = MouldKing_6(2)
+        return hub2
     else:
-        return
-    return hub
+        raise Exception("deviceId 0..2")
 
 def mkconnect(deviceId=0):
     hub = _getHubId(deviceId)
