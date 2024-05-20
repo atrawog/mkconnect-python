@@ -61,7 +61,7 @@ def mkconnect(deviceId=0):
 def mkstop(deviceId=0):
     hub = _getHubId(deviceId)
     rawdata = hub.Stop()
-    hcitool_args = hcitool_path + ' -i hci0 cmd 08 0008 ' + MouldKingCrypt.CreateTelegramForHCITool(MouldKingDevice.ManufacturerID, rawdata) + ' &> /dev/null'
+    hcitool_args = hcitool_path + ' -i hci0 cmd 08 0008 ' + MouldKingCrypt.CreateTelegramForHCITool(MouldKing_6.ManufacturerID, rawdata) + ' &> /dev/null'
 
     if platform.system() == 'Linux':
         subprocess.run(hcitool_args, shell=True, executable="/bin/bash")
@@ -76,7 +76,7 @@ def mkstop(deviceId=0):
 def mkcontrol(deviceId=0, channel=0, powerAndDirection=1):
     hub = _getHubId(deviceId)
     rawdata = hub.SetChannel(channel, powerAndDirection)
-    hcitool_args = hcitool_path + ' -i hci0 cmd 08 0008 ' + MouldKingCrypt.CreateTelegramForHCITool(MouldKingDevice.ManufacturerID, rawdata) + ' &> /dev/null'
+    hcitool_args = hcitool_path + ' -i hci0 cmd 08 0008 ' + MouldKingCrypt.CreateTelegramForHCITool(MouldKing_6.ManufacturerID, rawdata) + ' &> /dev/null'
 
     if platform.system() == 'Linux':
         subprocess.run(hcitool_args, shell=True, executable="/bin/bash")
