@@ -1,7 +1,7 @@
 # mkconnect-python
 ...a bit of code to connect to MouldKing bluetooth bricks in python
 
-There is a testscript [consoletest.py](https://github.com/J0EK3R/mkconnect-python/blob/main/consoletest.py) to wich (on raspberry pi) uses **hcitoo**l to send the telegrams over bluetooth.
+There is a testscript [consoletest.py](https://github.com/J0EK3R/mkconnect-python/blob/main/consoletest.py) where (on raspberry pi) **hcitool** is used to advertise telegrams over bluetooth.
 
 Maybe you habe to **sudo** the command:
 ```
@@ -19,9 +19,7 @@ ex: mkcontrol(0, 0, 0.5) ; mkcontrol(0, 'B', -1)
  the minus sign - indicate reverse motor direction
 ```
 
-At the moment we only are able to generate the rawdata-bytearrays to be advertised over bluetooth - no bluetooth functionality yet.
-
-Just look in [main.py](https://github.com/J0EK3R/mkconnect-python/blob/main/main.py) for the current usage...
+Just look in [main.py](https://github.com/J0EK3R/mkconnect-python/blob/main/main.py) for current usage...
 
 Current output in [https://wokwi.com/projects/new/micropython-pi-pico](https://wokwi.com/projects/398314618803830785)
 ...looks very good! :)
