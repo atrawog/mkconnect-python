@@ -39,8 +39,28 @@ def _getHubId(deviceId):
     else:
         raise Exception("deviceId 0..2")
 
-def mkconnect(deviceId=0):
-    hub = _getHubId(deviceId)
+def mkbtstop():
+    """
+    stop bluetooth advertising
+    """
+    hcitool_args1 = hcitool_path + ' -i hci0 cmd 0x08 0x000a 00' + ' &> /dev/null'
+
+    if platform.system() == 'Linux':
+        subprocess.run(hcitool_args1, shell=True, executable="/bin/bash")
+    elif platform.system() == 'Windows':
+        print('Connect command :')
+        print(hcitool_args1)
+    else:
+        print('Unsupported OS')
+
+    return
+
+def mkconnect():
+    """
+    send the bluetooth connect telegram to switch the MouldKing hubs in bluetooth mode
+    press the button on the hub(s) and the flashing of status led should switch from blue-green to blue
+    """
+    hub = _getHubId(0)
     rawdata = hub.Connect()
     hcitool_args1 = hcitool_path + ' -i hci0 cmd 08 0008 ' + MouldKingCrypt.CreateTelegramForHCITool(MouldKing_6.ManufacturerID, rawdata) + ' &> /dev/null'
     hcitool_args2 = hcitool_path + ' -i hci0 cmd 0x08 0x0006 A0 00 A0 00 03 00 00 00 00 00 00 00 00 07 00' + ' &> /dev/null'
@@ -91,6 +111,7 @@ def mkcontrol(deviceId=0, channel=0, powerAndDirection=1):
     return
 
 print("\nReady to execute commands\n")
+print("stop bluetooth advertising: mkbtstop()\n")
 print("For connecting: mkconnect(hubId) ex: mkconnect(0) or mkconnect(1) for the second hub\n")
 print(" Available commands: mkconnect(hubId)\n mkstop(hubId)\n mkcontrol(deviceId, channel, powerAndDirection)\n")
 print("ex: mkcontrol(0, 0, 0.5) ; mkcontrol(0, 'B', -1)\n the minus sign - indicate reverse motor direction\n")
