@@ -16,9 +16,9 @@ class MouldKingCrypt :
         """
         cryptedArray = MouldKingCrypt.Crypt(rawDataArray)
         cryptedArrayLen = len(cryptedArray)
-
+        
         resultArray = bytearray(8 + cryptedArrayLen)
-        resultArray[0] = cryptedArrayLen + 13 # len
+        resultArray[0] = cryptedArrayLen + 7 # len
         resultArray[1] = 0x02                 # flags
         resultArray[2] = 0x01
         resultArray[3] = 0x02
