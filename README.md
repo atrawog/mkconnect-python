@@ -6,7 +6,8 @@
 The MouldKing 6.0 hub has two modes:
 * rc mode to be controlled with the remotecontrol
 * bluetooth mode to be controlled with an app
-You can control a maximum of three 6.0 hubs at the same time with bluetooth.
+
+You can control a maximum of three MK6.0 hubs at the same time with bluetooth.
 > (Currently this project can send only one advertising telegram the same time - so only one hub can be controlled, all others will go in timeout-mode till next telegram with their device address is sent.)
 
 To switch the hubs device address to the next one (device 0, device 1, device 2) just press the button on the hub.
