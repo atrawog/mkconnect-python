@@ -28,6 +28,11 @@ Ready to execute commands
 
 ### mkconnect() - switch hubs in bluetooth mode
 If you power-on the hubs they will listen to telegrams to the **first device by default**.
+Call mkconnect() to switch all hubs in Bluetooth mode.
+By short-pressing the button on MK6.0 Hubs you can choose the hubId:
+* hubId=0 - one Led flash
+* hubId=1 - two Led flashs
+* hubId=2 - three Led flashs
 ```
 Ready to execute commands
 
