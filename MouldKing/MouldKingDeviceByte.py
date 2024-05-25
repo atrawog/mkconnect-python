@@ -4,8 +4,10 @@ __version__ = "0.1"
 # import hack for micro-python-simulator with flat filesystem
 try:
     from MouldKing.MouldKingDevice import MouldKingDevice
+    from MouldKing.MouldKingCrypt import MouldKingCrypt
 except ImportError:
     from MouldKingDevice import MouldKingDevice
+    from MouldKingCrypt import MouldKingCrypt
 
 class MouldKingDeviceByte(MouldKingDevice) :
     """
@@ -18,14 +20,15 @@ class MouldKingDeviceByte(MouldKingDevice) :
         """
 
         # call baseclass init and set number of channels
-        MouldKingDevice.__init__(self, numberOfChannels, channelStartOffset, channelEndOffset, telegram_connect, basetelegram)
+        super().__init__(numberOfChannels, channelStartOffset, channelEndOffset, telegram_connect, basetelegram)
 
     def Connect(self):
         """
         returns the telegram to switch the MouldKing brick in bluetooth mode
         """
 
-        # return MouldKingCrypt.Crypt(self._Telegram_connect)
+        self._Advertise(self._Telegram_connect)
+
         return self._Telegram_connect
 
     def CreateTelegram(self):
@@ -117,5 +120,6 @@ class MouldKingDeviceByte(MouldKingDevice) :
             else:
                 currentTelegramData[currentChannelStartOffset] = 0x80
 
-#        return MouldKingCrypt.Crypt(currentData)
+        self._Advertise(currentTelegramData)
+        
         return currentTelegramData

@@ -4,16 +4,25 @@
 try:
   from MouldKing.MouldKingCrypt import MouldKingCrypt
   from MouldKing.MouldKing_6 import MouldKing_6
+  from Advertiser.AdvertiserHCITool import AdvertiserHCITool
 except ImportError:
   from MouldKingCrypt import MouldKingCrypt
   from MouldKing_6 import MouldKing_6
+  from AdvertiserHCITool import AdvertiserHCITool
+
+advertiser = AdvertiserHCITool()
 
 # instantiate MouldKing_6-objects
 mk6_0 = MouldKing_6(0)
-mk6_1 = MouldKing_6(1)
-mk6_2 = MouldKing_6(2)
-#mk6_3 = MouldKing_6(3) # only 0..2 allowed - exception will be thrown
+mk6_0.SetAdvertiser(advertiser)
 
+mk6_1 = MouldKing_6(1)
+mk6_1.SetAdvertiser(advertiser)
+
+mk6_2 = MouldKing_6(2)
+mk6_2.SetAdvertiser(advertiser)
+
+############################################################################
 # get uncrypted connect-telegram as bytearray
 title = "connect-telegram"
 rawdata = mk6_0.Connect()
@@ -24,6 +33,7 @@ print("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))
 crypted = MouldKingCrypt.Crypt(rawdata) # get crypted data from rawdata
 print("crypted: " + ' '.join(f'{x:02x}' for x in crypted))
 
+############################################################################
 # get uncrypted stop-telegram as bytearray
 title = "stop-telegram"
 rawdata = mk6_0.Stop()
@@ -34,6 +44,7 @@ print("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))
 crypted = MouldKingCrypt.Crypt(rawdata) # get crypted data from rawdata
 print("crypted: " + ' '.join(f'{x:02x}' for x in crypted))
 
+############################################################################
 # get uncrypted telegram with channel 1 (indexer 0) fullspeed forwards
 title = "C1: fullspeed forwards"
 rawdata = mk6_0.SetChannel(0, 1)
@@ -44,6 +55,7 @@ print("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))
 crypted = MouldKingCrypt.Crypt(rawdata) # get crypted data from rawdata
 print("crypted: " + ' '.join(f'{x:02x}' for x in crypted))
 
+############################################################################
 # get uncrypted telegram with channel 1 (indexer 0) halfspeed forwards
 title = "C1: halfspeed forwards"
 print("\n" + title)
@@ -54,6 +66,7 @@ print("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))
 crypted = MouldKingCrypt.Crypt(rawdata) # get crypted data from rawdata
 print("crypted: " + ' '.join(f'{x:02x}' for x in crypted))
 
+############################################################################
 # get uncrypted telegram with channel 1 (indexer 0) halfspeed backwards
 title = "C1: halfspeed backwards"
 print("\n" + title)
@@ -64,6 +77,7 @@ print("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))
 crypted = MouldKingCrypt.Crypt(rawdata) # get crypted data from rawdata
 print("crypted: " + ' '.join(f'{x:02x}' for x in crypted))
 
+############################################################################
 # get uncrypted telegram with channel 1 (indexer 0) halfspeed backwards
 title = "C2: halfspeed backwards"
 print("\n" + title)
@@ -73,6 +87,12 @@ print("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))
 
 crypted = MouldKingCrypt.Crypt(rawdata) # get crypted data from rawdata
 print("crypted: " + ' '.join(f'{x:02x}' for x in crypted))
+
+############################################################################
+# stop Advertisment
+title = "Advertisement stop"
+print("\n" + title)
+advertiser.AdvertismentStop()
 
 #subprocess.call(["sudo", "hciconfig hci0 up"])
 #subprocess.call(["sudo", "hciconfig hci0 leadv 3"])
