@@ -5,20 +5,32 @@
 try:
   from MouldKing.MouldKingCrypt import MouldKingCrypt
   from MouldKing.MouldKing_6 import MouldKing_6
+  from Advertiser.AdvertisingDevice import AdvertisingDevice
+  from Advertiser.AdvertiserBase import AdvertiserBase
+  from Advertiser.AdvertiserHCITool import AdvertiserHCITool
 except ImportError:
   from MouldKingCrypt import MouldKingCrypt
   from MouldKing_6 import MouldKing_6
+  from AdvertisingDevice import AdvertisingDevice
+  from AdvertiserBase import AdvertiserBase
+  from AdvertiserHCITool import AdvertiserHCITool
 
-import subprocess
-import platform
 import time
 import numpy as np
-import sys
 
 hcitool_path = '/usr/bin/hcitool'
+
+advertiser = AdvertiserHCITool()
+
 hub0 = MouldKing_6(0)
+hub0.SetAdvertiser(advertiser)
+
 hub1 = MouldKing_6(1)
+hub1.SetAdvertiser(advertiser)
+
 hub2 = MouldKing_6(2)
+hub2.SetAdvertiser(advertiser)
+
 
 def _getChannelId(channel):
     switch={
@@ -67,15 +79,16 @@ def mkbtstop():
     """
     stop bluetooth advertising
     """
-    hcitool_args1 = hcitool_path + ' -i hci0 cmd 0x08 0x000a 00' + ' &> /dev/null'
+    advertiser.AdvertismentStop()
+    # hcitool_args1 = hcitool_path + ' -i hci0 cmd 0x08 0x000a 00' + ' &> /dev/null'
 
-    if platform.system() == 'Linux':
-        subprocess.run(hcitool_args1, shell=True, executable="/bin/bash")
-    elif platform.system() == 'Windows':
-        print('Connect command :')
-        print(hcitool_args1)
-    else:
-        print('Unsupported OS')
+    # if platform.system() == 'Linux':
+    #     subprocess.run(hcitool_args1, shell=True, executable="/bin/bash")
+    # elif platform.system() == 'Windows':
+    #     print('Connect command :')
+    #     print(hcitool_args1)
+    # else:
+    #     print('Unsupported OS')
 
     return
 
@@ -86,49 +99,49 @@ def mkconnect(debug=False):
     """
     hub = _getHubId(0)
     rawdata = hub.Connect()
-    hcitool_args1 = hcitool_path + ' -i hci0 cmd 0x08 0x0008 ' + MouldKingCrypt.CreateTelegramForHCITool(MouldKing_6.ManufacturerID, rawdata)
-    hcitool_args2 = hcitool_path + ' -i hci0 cmd 0x08 0x0006 A0 00 A0 00 03 00 00 00 00 00 00 00 00 07 00'
-    hcitool_args3 = hcitool_path + ' -i hci0 cmd 0x08 0x000a 01'
+    # hcitool_args1 = hcitool_path + ' -i hci0 cmd 0x08 0x0008 ' + MouldKingCrypt.CreateTelegramForHCITool(MouldKing_6.ManufacturerID, rawdata)
+    # hcitool_args2 = hcitool_path + ' -i hci0 cmd 0x08 0x0006 A0 00 A0 00 03 00 00 00 00 00 00 00 00 07 00'
+    # hcitool_args3 = hcitool_path + ' -i hci0 cmd 0x08 0x000a 01'
 
-    if platform.system() == 'Linux':
-        subprocess.run(hcitool_args1 + ' &> /dev/null', shell=True, executable="/bin/bash")
-        subprocess.run(hcitool_args2 + ' &> /dev/null', shell=True, executable="/bin/bash")
-        subprocess.run(hcitool_args3 + ' &> /dev/null', shell=True, executable="/bin/bash")
-    else:
-        print('Unsupported OS or debug mode, this is the command(s) that should be run :')
+    # if platform.system() == 'Linux':
+    #     subprocess.run(hcitool_args1 + ' &> /dev/null', shell=True, executable="/bin/bash")
+    #     subprocess.run(hcitool_args2 + ' &> /dev/null', shell=True, executable="/bin/bash")
+    #     subprocess.run(hcitool_args3 + ' &> /dev/null', shell=True, executable="/bin/bash")
+    # else:
+    #     print('Unsupported OS or debug mode, this is the command(s) that should be run :')
 
-    if (debug or platform.system() != 'Linux'):
-        print(str(hcitool_args1) + '\n' + str(hcitool_args2) + '\n' + str(hcitool_args3) + '\n')
+    # if (debug or platform.system() != 'Linux'):
+    #     print(str(hcitool_args1) + '\n' + str(hcitool_args2) + '\n' + str(hcitool_args3) + '\n')
 
     return
 
 def mkstop(deviceId=0, debug=False):
     hub = _getHubId(deviceId)
     rawdata = hub.Stop()
-    hcitool_args = hcitool_path + ' -i hci0 cmd 08 0008 ' + MouldKingCrypt.CreateTelegramForHCITool(MouldKing_6.ManufacturerID, rawdata)
+    # hcitool_args = hcitool_path + ' -i hci0 cmd 08 0008 ' + MouldKingCrypt.CreateTelegramForHCITool(MouldKing_6.ManufacturerID, rawdata)
 
-    if platform.system() == 'Linux':
-        subprocess.run(hcitool_args + ' &> /dev/null', shell=True, executable="/bin/bash")
-    else:
-        print('Unsupported OS or debug mode, this is the command that should be run :')
+    # if platform.system() == 'Linux':
+    #     subprocess.run(hcitool_args + ' &> /dev/null', shell=True, executable="/bin/bash")
+    # else:
+    #     print('Unsupported OS or debug mode, this is the command that should be run :')
 
-    if (debug or platform.system() != 'Linux'):
-        print(str(hcitool_args) + '\n')
+    # if (debug or platform.system() != 'Linux'):
+    #     print(str(hcitool_args) + '\n')
 
     return        
 
 def mkcontrol(deviceId=0, channel=0, powerAndDirection=1, debug=False):
     hub = _getHubId(deviceId)
     rawdata = hub.SetChannel(channel, powerAndDirection)
-    hcitool_args = hcitool_path + ' -i hci0 cmd 0x08 0x0008 ' + MouldKingCrypt.CreateTelegramForHCITool(MouldKing_6.ManufacturerID, rawdata)
+    # hcitool_args = hcitool_path + ' -i hci0 cmd 0x08 0x0008 ' + MouldKingCrypt.CreateTelegramForHCITool(MouldKing_6.ManufacturerID, rawdata)
 
-    if platform.system() == 'Linux':
-        subprocess.run(hcitool_args + ' &> /dev/null', shell=True, executable="/bin/bash")
-    else:
-        print('Unsupported OS or debug mode, this is the command that should be run :')
+    # if platform.system() == 'Linux':
+    #     subprocess.run(hcitool_args + ' &> /dev/null', shell=True, executable="/bin/bash")
+    # else:
+    #     print('Unsupported OS or debug mode, this is the command that should be run :')
 
-    if (debug or platform.system() != 'Linux'):
-        print(str(hcitool_args) + '\n')
+    # if (debug or platform.system() != 'Linux'):
+    #     print(str(hcitool_args) + '\n')
 
     return
 
