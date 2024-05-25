@@ -34,7 +34,7 @@ class MouldKing_6(MouldKingDeviceByte) :
             raise Exception('only deviceId 0..2 are allowed')
 
         # call baseclass init and set number of channels
-        MouldKingDeviceByte.__init__(self, 6, 3, 1, MouldKing_6.__telegram_connect, basetelegram)
+        super().__init__(6, 3, 1, MouldKing_6.__telegram_connect, basetelegram)
 
 
 

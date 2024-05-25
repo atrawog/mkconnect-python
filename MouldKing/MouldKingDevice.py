@@ -1,7 +1,15 @@
 __author__ = "J0EK3R"
 __version__ = "0.1"
 
-class MouldKingDevice :
+# import hack for micro-python-simulator with flat filesystem
+try:
+    from Advertiser.AdvertisingDevice import AdvertisingDevice
+    from MouldKing.MouldKingCrypt import MouldKingCrypt
+except ImportError:
+    from AdvertisingDevice import AdvertisingDevice
+    from MouldKingCrypt import MouldKingCrypt
+
+class MouldKingDevice(AdvertisingDevice) :
     """
     baseclass
     """
@@ -12,6 +20,8 @@ class MouldKingDevice :
         """
         initializes the object and defines the fields
         """
+
+        super().__init__()
 
         if numberOfChannels > 6:
             raise Exception("max 6 channels")
@@ -88,3 +98,15 @@ class MouldKingDevice :
         """
         
         raise NotImplementedError # override this methode
+    
+    def _Advertise(self, rawdata):
+        """
+        sends the data to the advertiser
+        """
+
+        if(self._advertiser != None):
+            cryptedData = MouldKingCrypt.Crypt(rawdata)
+            self._advertiser.AdvertismentStart(self.ManufacturerID, cryptedData)
+
+        return self._Telegram_connect
+
