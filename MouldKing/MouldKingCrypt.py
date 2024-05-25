@@ -32,6 +32,22 @@ class MouldKingCrypt :
         return ' '.join(f'{x:02x}' for x in resultArray)
 
     @staticmethod
+    def CreateTelegramForPicoW(rawDataArray):
+        """
+        Create input data for bluetooth lib for Pico W 
+        """
+        cryptedArray = MouldKingCrypt.Crypt(rawDataArray)
+        cryptedArrayLen = len(cryptedArray)
+
+        resultArray = bytearray(2 + cryptedArrayLen)
+        resultArray[0] = 0x00
+        resultArray[1] = 0xFF
+        for index in range(cryptedArrayLen):
+            resultArray[index + 2] = cryptedArray[index]
+
+        return resultArray
+
+    @staticmethod
     def Crypt(rawDataArray):
         """
         do the MouldKing encryption for the given byte-array and return the resulting byte-array 
