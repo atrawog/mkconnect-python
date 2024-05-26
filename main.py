@@ -2,25 +2,28 @@
 
 # import hack for micro-python-simulator with flat filesystem
 try:
+  from MouldKing.MouldKing import MouldKing
+  from MouldKing.Module6_0 import Module6_0
   from MouldKing.MouldKingCrypt import MouldKingCrypt
   from MouldKing.MouldKing_6 import MouldKing_6
   from Advertiser.AdvertiserHCITool import AdvertiserHCITool
 except ImportError:
+  from MouldKing import MouldKing
+  from Module6_0 import Module6_0
   from MouldKingCrypt import MouldKingCrypt
   from MouldKing_6 import MouldKing_6
   from AdvertiserHCITool import AdvertiserHCITool
 
+# instantiate Advertiser
 advertiser = AdvertiserHCITool()
 
-# instantiate MouldKing_6-objects
-mk6_0 = MouldKing_6(0)
-mk6_0.SetAdvertiser(advertiser)
+# Set Advertiser for all MouldKing Hubs 6.0
+MouldKing.Module6_0.SetAdvertiser(advertiser)
 
-mk6_1 = MouldKing_6(1)
-mk6_1.SetAdvertiser(advertiser)
-
-mk6_2 = MouldKing_6(2)
-mk6_2.SetAdvertiser(advertiser)
+# save pre-instantiated objects in local variables
+mk6_0 = MouldKing.Module6_0.Device0
+mk6_1 = MouldKing.Module6_0.Device1
+mk6_2 = MouldKing.Module6_0.Device2
 
 ############################################################################
 # get uncrypted connect-telegram as bytearray

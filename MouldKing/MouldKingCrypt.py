@@ -7,10 +7,10 @@ class MouldKingCrypt :
     """
 
     # static class variables
-    __Array_C1C2C3C4C5 = [0xC1, 0xC2, 0xC3, 0xC4, 0xC5]
+    __Array_C1C2C3C4C5 = bytes([0xC1, 0xC2, 0xC3, 0xC4, 0xC5])
 
     @staticmethod
-    def CreateTelegramForHCITool(manufacturerId, rawDataArray):
+    def CreateTelegramForHCITool(manufacturerId: bytes, rawDataArray: bytes) -> bytes:
         """
         Create input data for hcitool 
         """
@@ -32,7 +32,7 @@ class MouldKingCrypt :
         return ' '.join(f'{x:02x}' for x in resultArray)
 
     @staticmethod
-    def CreateTelegramForPicoW(rawDataArray):
+    def CreateTelegramForPicoW(rawDataArray: bytes) -> bytes:
         """
         Create input data for bluetooth lib for Pico W 
         """
@@ -48,7 +48,7 @@ class MouldKingCrypt :
         return resultArray
 
     @staticmethod
-    def Crypt(rawDataArray):
+    def Crypt(rawDataArray: bytes) -> bytes:
         """
         do the MouldKing encryption for the given byte-array and return the resulting byte-array 
         """
@@ -103,7 +103,7 @@ class MouldKingCrypt :
         return telegramArray
 
     @staticmethod
-    def __create_magic_array(magic_number, size):
+    def __create_magic_array(magic_number: int, size: int) -> bytes:
         magic_array = [0] * size
         magic_array[0] = 1
 
@@ -113,7 +113,15 @@ class MouldKingCrypt :
         return magic_array
 
     @staticmethod
-    def __revert_bits_int(value):
+    def __revert_bits_byte(value: int) -> int:
+        result = 0
+        for index_bit in range(8):
+            if ((1 << index_bit) & value) != 0:
+                result = result | (1 << (7 - index_bit))
+        return result
+
+    @staticmethod
+    def __revert_bits_int(value: int) -> int:
         result = 0
         for index_bit in range(16):
             if ((1 << index_bit) & value) != 0:
@@ -121,7 +129,7 @@ class MouldKingCrypt :
         return 65535 & result
 
     @staticmethod
-    def __crypt_array(byte_array, magic_number_array):
+    def __crypt_array(byte_array: bytes, magic_number_array: bytes) -> bytes:
         # foreach byte of array
         for index_byte in range(len(byte_array)):
             current_byte = byte_array[index_byte]
@@ -133,7 +141,7 @@ class MouldKingCrypt :
         return byte_array
 
     @staticmethod
-    def __calc_checksum_from_arrays(first_array, second_array):
+    def __calc_checksum_from_arrays(first_array: bytes, second_array: bytes) -> int:
         result = 65535
         for first_array_index in range(len(first_array)):
             result = (result ^ (first_array[(len(first_array) - 1) - first_array_index] << 8)) & 65535
@@ -154,7 +162,7 @@ class MouldKingCrypt :
         return MouldKingCrypt.__revert_bits_int(result) ^ 65535
 
     @staticmethod
-    def __shift_magic_array(i_arr):
+    def __shift_magic_array(i_arr: bytes) -> bytes:
         r1 = i_arr[3] ^ i_arr[6]
         i_arr[3] = i_arr[2]
         i_arr[2] = i_arr[1]
@@ -165,10 +173,3 @@ class MouldKingCrypt :
         i_arr[4] = r1
         return i_arr[0]
 
-    @staticmethod
-    def __revert_bits_byte(value):
-        result = 0
-        for index_bit in range(8):
-            if ((1 << index_bit) & value) != 0:
-                result = result | (1 << (7 - index_bit))
-        return result

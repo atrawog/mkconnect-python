@@ -22,7 +22,7 @@ class MouldKingDeviceByte(MouldKingDevice) :
         # call baseclass init and set number of channels
         super().__init__(numberOfChannels, channelStartOffset, channelEndOffset, telegram_connect, basetelegram)
 
-    def Connect(self):
+    def Connect(self) -> bytes:
         """
         returns the telegram to switch the MouldKing brick in bluetooth mode
         """
@@ -31,13 +31,13 @@ class MouldKingDeviceByte(MouldKingDevice) :
 
         return self._Telegram_connect
 
-    def CreateTelegram(self):
+    def CreateTelegram(self) -> bytes:
         """
         returns the telegram including the internal stored value from all channels
         """
         
         # make a copy of the basetelegram
-        currentTelegramData = self._Basetelegram.copy()
+        currentTelegramData = bytearray(self._Basetelegram)
 
         # calc the length to be used for channels
         channelDataLength = len(currentTelegramData) - self._ChannelEndOffset
