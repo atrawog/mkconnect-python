@@ -14,7 +14,7 @@ class MouldKingDevice(AdvertisingDevice) :
     baseclass
     """
 
-    ManufacturerID = [0xFF, 0xF0]
+    ManufacturerID = bytes([0xFF, 0xF0])
 
     def __init__(self, numberOfChannels, channelStartOffset, channelEndOffset, telegram_connect, basetelegram):
         """
@@ -48,29 +48,29 @@ class MouldKingDevice(AdvertisingDevice) :
         self._Channel_E_Value = 0
         self._Channel_F_Value = 0
 
-    def Connect(self):
+    def Connect(self) -> bytes:
         """
         returns the telegram to switch the MouldKing brick to bluetooth mode
         """
 
         raise NotImplementedError # override this methode
 
-    def Stop(self):
+    def Stop(self) -> bytes:
         """
         set internal stored value of all channels to zero and return the telegram
         """
 
         # init channels        
-        self._Channel_A_Value = 0
-        self._Channel_B_Value = 0
-        self._Channel_C_Value = 0
-        self._Channel_D_Value = 0
-        self._Channel_E_Value = 0
-        self._Channel_F_Value = 0
+        self._Channel_A_Value = float(0)
+        self._Channel_B_Value = float(0)
+        self._Channel_C_Value = float(0)
+        self._Channel_D_Value = float(0)
+        self._Channel_E_Value = float(0)
+        self._Channel_F_Value = float(0)
 
         return self.CreateTelegram();
 
-    def SetChannel(self, channelId, value):
+    def SetChannel(self, channelId: int, value: float) -> bytes:
         """
         set internal stored value of channel with channelId to value and return the telegram
         """
@@ -99,7 +99,7 @@ class MouldKingDevice(AdvertisingDevice) :
         
         raise NotImplementedError # override this methode
     
-    def _Advertise(self, rawdata):
+    def _Advertise(self, rawdata: bytes) -> bytes:
         """
         sends the data to the advertiser
         """

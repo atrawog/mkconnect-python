@@ -40,7 +40,7 @@ class AdvertiserHCITool(AdvertiserBase) :
 
         return
 
-    def AdvertismentStart(self, manufacturerId, rawdata, debug=False):
+    def AdvertismentStart(self, manufacturerId: bytes, rawdata: bytes, debug: bool=False):
         """
         send the bluetooth connect telegram to switch the MouldKing hubs in bluetooth mode
         press the button on the hub(s) and the flashing of status led should switch from blue-green to blue
@@ -63,7 +63,7 @@ class AdvertiserHCITool(AdvertiserBase) :
 
         return
 
-    def AdvertismentSet(self, manufacturerId, rawdata, debug=False):
+    def AdvertismentSet(self, manufacturerId: bytes, rawdata: bytes, debug: bool=False):
         hcitool_args = self._hcitool_path + ' -i hci0 cmd 0x08 0x0008 ' + self._CreateTelegramForHCITool(manufacturerId, rawdata)
 
         if platform.system() == 'Linux':
@@ -76,7 +76,7 @@ class AdvertiserHCITool(AdvertiserBase) :
 
         return
 
-    def _CreateTelegramForHCITool(self, manufacturerId, rawDataArray):
+    def _CreateTelegramForHCITool(self, manufacturerId: bytes, rawDataArray: bytes):
         """
         Create input data for hcitool 
         """
