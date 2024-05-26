@@ -1,33 +1,34 @@
 # mkconnect-python
-...a bit of code to connect to MouldKing bluetooth bricks in python
+...a bit of code to connect to MouldKing Bluetooth Hubs in python.
 
 # MouldKing Hubs
 ## MouldKing 6.0 Hub
-The MouldKing 6.0 hub has two modes:
-* rc mode to be controlled with the remotecontrol
-* bluetooth mode to be controlled with an app
+The MouldKing 6.0 Hub has two modes:
+* RC-Mode to be controlled with a MouldKing remotecontrol
+* Bluetooth-Mode to be controlled with an app
 
-You can control a maximum of three MK6.0 hubs at the same time with bluetooth.
+You can control a maximum of three MK6.0 Hubs at the same time with bluetooth.
 > (Currently this project can send only one advertising telegram the same time - so only one hub can be controlled, all others will go in timeout-mode till next telegram with their device address is sent.)
 
-To switch the hubs device address to the next one (device 0, device 1, device 2) just press the button on the hub.
+## Setting the address of the Hub
+To switch the Hub's device address to the next one (device 0, device 1, device 2) just press the button on the hub.
 
-> i.E.: If the script runs with mkcontrol(2,0,1) and nothing is happening, you have to short-press the button, perhaps again...)
+> i.E.: If the script runs with **mkcontrol(2,0,1)** (-> device2, channel0, full speed forward) and nothing is happening, you have to short-press the button, perhaps again...)
 
-## usage
+# usage
 Start the script [consoletest.py](https://github.com/J0EK3R/mkconnect-python/blob/main/consoletest.py) on your raspberry:
 ```
 pi@devpi:~/dev/mkconnect-python $ sudo python -i consoletest.py 
 ```
 
-### mkbtstop() - stop bluetooth advertising
+## mkbtstop() - stop bluetooth advertising
 ```
 Ready to execute commands
 
 >>> mkbtstop()
 ```
 
-### mkconnect() - switch hubs in bluetooth mode
+## mkconnect() - switch hubs in bluetooth mode
 If you power-on the hubs they will listen to telegrams to the **first device by default**.
 Call mkconnect() to switch all hubs in Bluetooth mode.
 By short-pressing the button on MK6.0 Hubs you can choose the hubId:
@@ -40,7 +41,7 @@ Ready to execute commands
 >>> mkconnect()
 ```
 
-### mkcontrol(deviceId, channel, power and powerAndDirection)
+## mkcontrol(deviceId, channel, power and powerAndDirection)
 i.E.: mkcontrol(0, 0, 1) - on first device (deviceId=0) run channel A (channel=0) with fullspeed (powerAndDirection=1)
 ```
 Ready to execute commands
@@ -48,7 +49,7 @@ Ready to execute commands
 >>> mkcontrol(0, 0, 1)
 ```
 
-### mkstop(deviceId)
+## mkstop(deviceId)
 Set all channels of device to zero
 ```
 Ready to execute commands
@@ -56,7 +57,7 @@ Ready to execute commands
 >>> mkstop(0)
 ```
 
-
+---
 # old stuff
 
 There is a testscript [consoletest.py](https://github.com/J0EK3R/mkconnect-python/blob/main/consoletest.py) where (on raspberry pi) **hcitool** is used to advertise telegrams over bluetooth.
