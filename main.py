@@ -2,12 +2,16 @@
 
 # import hack for micro-python-simulator with flat filesystem
 try:
+  from Tracer.Tracer import Tracer
+  from Tracer.TracerConsole import TracerConsole
   from MouldKing.MouldKing import MouldKing
   from MouldKing.Module6_0 import Module6_0
   from MouldKing.MouldKingCrypt import MouldKingCrypt
   from MouldKing.MouldKing_6 import MouldKing_6
   from Advertiser.AdvertiserHCITool import AdvertiserHCITool
 except ImportError:
+  from Tracer import Tracer
+  from TracerConsole import TracerConsole
   from MouldKing import MouldKing
   from Module6_0 import Module6_0
   from MouldKingCrypt import MouldKingCrypt
@@ -15,9 +19,15 @@ except ImportError:
   from AdvertiserHCITool import AdvertiserHCITool
 
 # instantiate Advertiser
+tracer = TracerConsole()
+
+# instantiate Advertiser
 advertiser = AdvertiserHCITool()
 
-# Set Advertiser for all MouldKing Hubs 6.0
+# Set Tracer for all MouldKing 6.0 Hubs
+MouldKing.Module6_0.SetTracer(tracer)
+
+# Set Advertiser for all MouldKing 6.0 Hubs
 MouldKing.Module6_0.SetAdvertiser(advertiser)
 
 # save pre-instantiated objects in local variables
@@ -95,7 +105,7 @@ print("crypted: " + ' '.join(f'{x:02x}' for x in crypted))
 # stop Advertisment
 title = "Advertisement stop"
 print("\n" + title)
-advertiser.AdvertismentStop()
+advertiser.AdvertismentStop(tracer)
 
 #subprocess.call(["sudo", "hciconfig hci0 up"])
 #subprocess.call(["sudo", "hciconfig hci0 leadv 3"])

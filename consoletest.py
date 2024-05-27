@@ -5,15 +5,25 @@
 try:
   from MouldKing.MouldKing import MouldKing
   from Advertiser.AdvertiserHCITool import AdvertiserHCITool
+  from Tracer.Tracer import Tracer
+  from Tracer.TracerConsole import TracerConsole
 except ImportError:
   from MouldKing import MouldKing
   from AdvertiserHCITool import AdvertiserHCITool
+  from Tracer import Tracer
+  from TracerConsole import TracerConsole
 
 import time
 import numpy as np
 
 # instantiate Advertiser
+tracer = TracerConsole()
+
+# instantiate Advertiser
 advertiser = AdvertiserHCITool()
+
+# Set Tracer for all MouldKing Hubs 6.0
+MouldKing.Module6_0.SetTracer(tracer)
 
 # Set Advertiser for all MouldKing Hubs 6.0
 MouldKing.Module6_0.SetAdvertiser(advertiser)

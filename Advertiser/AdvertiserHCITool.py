@@ -3,14 +3,16 @@ __version__ = "0.1"
 
 # import hack for micro-python-simulator with flat filesystem
 try:
-    from Advertiser.AdvertiserBase import AdvertiserBase
+    from Advertiser.Advertiser import Advertiser
+    from Tracer.Tracer import Tracer
 except ImportError:
-    from Advertiser import AdvertiserBase
+    from Advertiser import Advertiser
+    from Tracer import Tracer
 
 import subprocess
 import platform
 
-class AdvertiserHCITool(AdvertiserBase) :
+class AdvertiserHCITool(Advertiser) :
     """
     baseclass
     """
@@ -24,7 +26,7 @@ class AdvertiserHCITool(AdvertiserBase) :
         self._hcitool_path = '/usr/bin/hcitool'
 
 
-    def AdvertismentStop(self):
+    def AdvertismentStop(self, tracer: Tracer=None):
         """
         stop bluetooth advertising
         """
@@ -32,15 +34,14 @@ class AdvertiserHCITool(AdvertiserBase) :
 
         if platform.system() == 'Linux':
             subprocess.run(hcitool_args1, shell=True, executable="/bin/bash")
-        elif platform.system() == 'Windows':
-            print('Connect command :')
-            print(hcitool_args1)
-        else:
-            print('Unsupported OS')
+
+        if (tracer != None):
+            tracer.TraceInfo('Connect command :')
+            tracer.TraceInfo(hcitool_args1)
 
         return
 
-    def AdvertismentStart(self, manufacturerId: bytes, rawdata: bytes, debug: bool=False):
+    def AdvertismentStart(self, manufacturerId: bytes, rawdata: bytes, tracer: Tracer=None):
         """
         send the bluetooth connect telegram to switch the MouldKing hubs in bluetooth mode
         press the button on the hub(s) and the flashing of status led should switch from blue-green to blue
@@ -56,23 +57,24 @@ class AdvertiserHCITool(AdvertiserBase) :
         else:
             print('Unsupported OS or debug mode, this is the command(s) that should be run :')
 
-        if (debug or platform.system() != 'Linux'):
-            print(str(hcitool_args1))
-            print(str(hcitool_args2))
-            print(str(hcitool_args3))
+        if (tracer != None):
+            tracer.TraceInfo(str(hcitool_args1))
+            tracer.TraceInfo(str(hcitool_args2))
+            tracer.TraceInfo(str(hcitool_args3))
 
         return
 
-    def AdvertismentSet(self, manufacturerId: bytes, rawdata: bytes, debug: bool=False):
+    def AdvertismentSet(self, manufacturerId: bytes, rawdata: bytes, tracer: Tracer=None):
+        """
+        Set Advertisment data
+        """
         hcitool_args = self._hcitool_path + ' -i hci0 cmd 0x08 0x0008 ' + self._CreateTelegramForHCITool(manufacturerId, rawdata)
 
         if platform.system() == 'Linux':
             subprocess.run(hcitool_args + ' &> /dev/null', shell=True, executable="/bin/bash")
-        else:
-            print('Unsupported OS or debug mode, this is the command that should be run :')
 
-        if (debug or platform.system() != 'Linux'):
-            print(str(hcitool_args) + '\n')
+        if (tracer != None):
+            tracer.TraceInfo(str(hcitool_args) + '\n')
 
         return
 

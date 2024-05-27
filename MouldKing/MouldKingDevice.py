@@ -5,9 +5,11 @@ __version__ = "0.1"
 try:
     from Advertiser.AdvertisingDevice import AdvertisingDevice
     from MouldKing.MouldKingCrypt import MouldKingCrypt
+    from Tracer.Tracer import Tracer
 except ImportError:
     from AdvertisingDevice import AdvertisingDevice
     from MouldKingCrypt import MouldKingCrypt
+    from Tracer import Tracer
 
 class MouldKingDevice(AdvertisingDevice) :
     """
@@ -68,7 +70,7 @@ class MouldKingDevice(AdvertisingDevice) :
         self._Channel_E_Value = float(0)
         self._Channel_F_Value = float(0)
 
-        return self.CreateTelegram();
+        return self.CreateTelegram()
 
     def SetChannel(self, channelId: int, value: float) -> bytes:
         """
@@ -90,7 +92,7 @@ class MouldKingDevice(AdvertisingDevice) :
         elif channelId == 5:    
             self._Channel_F_Value = value
         
-        return self.CreateTelegram();
+        return self.CreateTelegram()
 
     def CreateTelegram(self):
         """
@@ -104,9 +106,12 @@ class MouldKingDevice(AdvertisingDevice) :
         sends the data to the advertiser
         """
 
+        if(self._tracer != None):
+            pass
+
         if(self._advertiser != None):
             cryptedData = MouldKingCrypt.Crypt(rawdata)
-            self._advertiser.AdvertismentStart(self.ManufacturerID, cryptedData)
+            self._advertiser.AdvertismentStart(self.ManufacturerID, cryptedData, self._tracer)
 
         return self._Telegram_connect
 
