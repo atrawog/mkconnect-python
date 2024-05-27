@@ -60,17 +60,17 @@ def _automate(deviceId: int, channel: int):
     if (userinput != str("y")):
         return
 
-    print("HUB: "+  str(deviceId) +", FORWARD : Power ramp up from 0 to 100% on channel :" + str(channel))
+    tracer.TraceInfo("HUB: "+  str(deviceId) +", FORWARD : Power ramp up from 0 to 100% on channel :" + str(channel))
     for i in np.arange(0, 1.1, 0.1):
-        print("Power : " + str(i))
+        tracer.TraceInfo("Power : " + str(i))
         mkcontrol(deviceId,channel,i)
         time.sleep(1)
 
     mkstop(deviceId)
 
-    print("HUB: "+  str(deviceId) +", REVERSE: Power ramp up from 0 to 100% on channel :" + str(channel))
+    tracer.TraceInfo("HUB: "+  str(deviceId) +", REVERSE: Power ramp up from 0 to 100% on channel :" + str(channel))
     for i in np.arange(-0, -1.1, -0.1):
-        print("Power : " + str(i) + "\n")
+        tracer.TraceInfo("Power : " + str(i) + "\n")
         mkcontrol(deviceId,channel,i)
         time.sleep(1)
 
@@ -113,45 +113,45 @@ def mkcontrol(deviceId: int=0, channel: int=0, powerAndDirection: float=1, debug
     return
 
 def test_hub(hubId: int=0):
-    print("HUB "+ str(hubId) +" connecting")
+    tracer.TraceInfo("HUB "+ str(hubId) +" connecting")
     mkconnect(hubId)
     time.sleep(1)
 
     for index in range(6):
         _automate(hubId, index) # start channel 0 = A
-        print("Channel change requested")
+        tracer.TraceInfo("Channel change requested")
         time.sleep(1)
 
 def help():
-    print("Available commands:")
-    print(" help()                                                    : print available commands")
-    print(" hints()                                                   : print hints and examples")
-    print(" mkconnect(debug=False)                                    : Initiate hub control by sending bluetooth connect telegram")
-    print(" mkstop(hubId, debug=False)                                : Stop ALL motors")
-    print(" mkcontrol(hubId, channel, powerAndDirection, debug=False) : Control a specific hub, channel, power and motor direction")
-    print(" test_hub(hubId)                                           : run automated tests on each channels")
-    print(" mkbtstop()                                                : stop bluetooth advertising")
+    tracer.TraceInfo("Available commands:")
+    tracer.TraceInfo(" help()                                                    : print available commands")
+    tracer.TraceInfo(" hints()                                                   : print hints and examples")
+    tracer.TraceInfo(" mkconnect(debug=False)                                    : Initiate hub control by sending bluetooth connect telegram")
+    tracer.TraceInfo(" mkstop(hubId, debug=False)                                : Stop ALL motors")
+    tracer.TraceInfo(" mkcontrol(hubId, channel, powerAndDirection, debug=False) : Control a specific hub, channel, power and motor direction")
+    tracer.TraceInfo(" test_hub(hubId)                                           : run automated tests on each channels")
+    tracer.TraceInfo(" mkbtstop()                                                : stop bluetooth advertising")
 
 def hints():
-    print("HINTS:")
-    print("If run on windows, commands are shown but not executed (hcitool dependency)")
-    print()
-    print("For connecting:")
-    print(" Switch MK6.0 Hubs on - led is flashing green/blue")
-    print(" mkconnect() to send the bluetooth connect telegram. All hubs switch to bluetooth mode")
-    print(" by short-pressing the button on MK6.0 Hubs you can choose the hubId")
-    print("  hubId=0 - one Led flash")
-    print("  hubId=1 - two Led flashs")
-    print("  hubId=2 - three Led flashs")
-    print()
-    print("ex: test_hub(0), mkcontrol(0, 0, 0.5); mkcontrol(0, 1, -1, True)")
-    print(" the minus sign - indicate reverse motor direction")
+    tracer.TraceInfo("HINTS:")
+    tracer.TraceInfo("If run on windows, commands are shown but not executed (hcitool dependency)")
+    tracer.TraceInfo()
+    tracer.TraceInfo("For connecting:")
+    tracer.TraceInfo(" Switch MK6.0 Hubs on - led is flashing green/blue")
+    tracer.TraceInfo(" mkconnect() to send the bluetooth connect telegram. All hubs switch to bluetooth mode")
+    tracer.TraceInfo(" by short-pressing the button on MK6.0 Hubs you can choose the hubId")
+    tracer.TraceInfo("  hubId=0 - one Led flash")
+    tracer.TraceInfo("  hubId=1 - two Led flashs")
+    tracer.TraceInfo("  hubId=2 - three Led flashs")
+    tracer.TraceInfo()
+    tracer.TraceInfo("ex: test_hub(0), mkcontrol(0, 0, 0.5); mkcontrol(0, 1, -1, True)")
+    tracer.TraceInfo(" the minus sign - indicate reverse motor direction")
 
 ##################################################################
 # Entry point when script is started by python -i consoletest.py
 help()
-print()
+tracer.TraceInfo()
 hints()
 
-print()
-print("Ready to execute commands\n")
+tracer.TraceInfo()
+tracer.TraceInfo("Ready to execute commands\n")

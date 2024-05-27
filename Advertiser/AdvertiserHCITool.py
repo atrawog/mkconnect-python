@@ -54,8 +54,6 @@ class AdvertiserHCITool(Advertiser) :
             subprocess.run(hcitool_args1 + ' &> /dev/null', shell=True, executable="/bin/bash")
             subprocess.run(hcitool_args2 + ' &> /dev/null', shell=True, executable="/bin/bash")
             subprocess.run(hcitool_args3 + ' &> /dev/null', shell=True, executable="/bin/bash")
-        else:
-            print('Unsupported OS or debug mode, this is the command(s) that should be run :')
 
         if (tracer != None):
             tracer.TraceInfo(str(hcitool_args1))
