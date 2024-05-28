@@ -411,7 +411,7 @@ class AdvertiserDBus(Advertiser) :
                     tracer.TraceInfo(exception)
                 pass
 
-        advertisement.manufacturer_data = {0xF0FF: rawdata}
+        advertisement.manufacturer_data = {int.from_bytes(manufacturerId): rawdata}
         advertisement.start()
 
         self._ad_manager.RegisterAdvertisement('(oa{sv})', advertisement.path, {})

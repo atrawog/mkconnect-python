@@ -163,7 +163,7 @@ class AdvertiserBluez(Advertiser) :
             #                                     0x26, 
             #                                     0x49, 0x5E, 
             #                                     0x13, 0x14, 0x15, 0x16, 0x17, 0x18])
-            self.add_manufacturer_data(0xfff0, manufacturer_data)
+            self.add_manufacturer_data(int.from_bytes(manufacturerId), manufacturer_data)
             #self.add_service_data('9999', [0x00, 0x01, 0x02, 0x03, 0x04])
             self.add_local_name('Advertisement_' + identifier)
             # self.include_tx_power = True
