@@ -23,8 +23,8 @@ class Advertiser :
         """
         pass
 
-    def AdvertismentStart(self, manufacturerId: bytes, rawdata: bytes, tracer: Tracer=None):
+    def AdvertisementStart(self, identifier: str, manufacturerId: bytes, rawdata: bytes, tracer: Tracer=None):
         pass
 
-    def AdvertismentSet(self, manufacturerId: bytes, rawdata: bytes, tracer: Tracer=None):
+    def AdvertisementSet(self, identifier: str, manufacturerId: bytes, rawdata: bytes, tracer: Tracer=None):
         pass

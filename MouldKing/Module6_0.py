@@ -34,7 +34,7 @@ class Module6_0 :
     """
 
     @staticmethod
-    def SetAdvertiser(advertiser: Advertiser):
+    def SetAdvertiser(advertiser: Advertiser) -> Advertiser:
         """
         Set Advertiser for all MouldKing 6.0 Hubs
         """
@@ -42,9 +42,10 @@ class Module6_0 :
         Module6_0.Device0.SetAdvertiser(advertiser)
         Module6_0.Device1.SetAdvertiser(advertiser)
         Module6_0.Device2.SetAdvertiser(advertiser)
+        return advertiser
 
     @staticmethod
-    def SetTracer(tracer: Tracer):
+    def SetTracer(tracer: Tracer) -> Tracer:
         """
         Set Tracer for all MouldKing 6.0 Hubs
         """
@@ -52,3 +53,4 @@ class Module6_0 :
         Module6_0.Device0.SetTracer(tracer)
         Module6_0.Device1.SetTracer(tracer)
         Module6_0.Device2.SetTracer(tracer)
+        return tracer

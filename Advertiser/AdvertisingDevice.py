@@ -14,34 +14,37 @@ class AdvertisingDevice :
     baseclass
     """
     
-    def __init__(self):
+    def __init__(self, identifier: str):
         """
         initializes the object and defines the fields
         """
 
         self._advertiser = None
         self._tracer = None
+        self._identifier = identifier
 
-    def SetAdvertiser(self, advertiser: Advertiser):
+    def SetAdvertiser(self, advertiser: Advertiser) -> Advertiser:
         """
         set advertiser object
         """
         self._advertiser = advertiser
+        return advertiser
 
-    def SetTracer(self, tracer: Tracer):
+    def SetTracer(self, tracer: Tracer) -> Tracer:
         """
         set tracer object
         """
         self._tracer = tracer
+        return tracer
 
-    def AdvertismentStart(self, manufacturerId: bytes, rawdata: bytes, tracer: Tracer=None):
+    def AdvertisementStart(self, manufacturerId: bytes, rawdata: bytes):
         """
         send the bluetooth connect telegram to switch the MouldKing hubs in bluetooth mode
         press the button on the hub(s) and the flashing of status led should switch from blue-green to blue
         """
         pass
 
-    def AdvertismentSet(self, manufacturerId: bytes, rawdata: bytes, tracer: Tracer=None):
+    def AdvertisementSet(self, manufacturerId: bytes, rawdata: bytes):
         """
         Set Advertisment data
         """

@@ -1,34 +1,44 @@
 #!/usr/bin/python
 
+import time
+import threading
+
 # import hack for micro-python-simulator with flat filesystem
 try:
   from Tracer.Tracer import Tracer
   from Tracer.TracerConsole import TracerConsole
+
+  from Advertiser.AdvertiserHCITool import AdvertiserHCITool
+  from Advertiser.AdvertiserBluez import AdvertiserBluez
+  from Advertiser.AdvertiserDBus import AdvertiserDBus
+
   from MouldKing.MouldKing import MouldKing
   from MouldKing.Module6_0 import Module6_0
   from MouldKing.MouldKingCrypt import MouldKingCrypt
   from MouldKing.MouldKing_6 import MouldKing_6
-  from Advertiser.AdvertiserHCITool import AdvertiserHCITool
 except ImportError:
   from Tracer import Tracer
   from TracerConsole import TracerConsole
+
+  from AdvertiserHCITool import AdvertiserHCITool
+  from AdvertiserBluez import AdvertiserBluez
+  from AdvertiserDBus import AdvertiserDBus
+
   from MouldKing import MouldKing
   from Module6_0 import Module6_0
   from MouldKingCrypt import MouldKingCrypt
   from MouldKing_6 import MouldKing_6
-  from AdvertiserHCITool import AdvertiserHCITool
 
 # instantiate Advertiser
 tracer = TracerConsole()
-
-# instantiate Advertiser
-advertiser = AdvertiserHCITool()
 
 # Set Tracer for all MouldKing 6.0 Hubs
 MouldKing.Module6_0.SetTracer(tracer)
 
 # Set Advertiser for all MouldKing 6.0 Hubs
-MouldKing.Module6_0.SetAdvertiser(advertiser)
+#advertiser = MouldKing.Module6_0.SetAdvertiser(AdvertiserHCITool())
+# advertiser = MouldKing.Module6_0.SetAdvertiser(AdvertiserBluez())
+advertiser = MouldKing.Module6_0.SetAdvertiser(AdvertiserDBus())
 
 # save pre-instantiated objects in local variables
 mk6_0 = MouldKing.Module6_0.Device0
@@ -39,6 +49,7 @@ mk6_2 = MouldKing.Module6_0.Device2
 # get uncrypted connect-telegram as bytearray
 title = "connect-telegram"
 rawdata = mk6_0.Connect()
+time.sleep(5)
 
 tracer.TraceInfo("\n" + title)
 tracer.TraceInfo("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))
@@ -50,6 +61,7 @@ tracer.TraceInfo("crypted: " + ' '.join(f'{x:02x}' for x in crypted))
 # get uncrypted stop-telegram as bytearray
 title = "stop-telegram"
 rawdata = mk6_0.Stop()
+time.sleep(5)
 
 tracer.TraceInfo("\n" + title)
 tracer.TraceInfo("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))
@@ -61,6 +73,7 @@ tracer.TraceInfo("crypted: " + ' '.join(f'{x:02x}' for x in crypted))
 # get uncrypted telegram with channel 1 (indexer 0) fullspeed forwards
 title = "C1: fullspeed forwards"
 rawdata = mk6_0.SetChannel(0, 1)
+time.sleep(5)
 
 tracer.TraceInfo("\n" + title)
 tracer.TraceInfo("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))

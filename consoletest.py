@@ -3,15 +3,21 @@
 # to run:  python -i consoletest.py
 
 try:
-  from MouldKing.MouldKing import MouldKing
-  from Advertiser.AdvertiserHCITool import AdvertiserHCITool
   from Tracer.Tracer import Tracer
   from Tracer.TracerConsole import TracerConsole
+
+  from Advertiser.AdvertiserHCITool import AdvertiserHCITool
+  from Advertiser.AdvertiserBluez import AdvertiserBluez
+
+  from MouldKing.MouldKing import MouldKing
 except ImportError:
-  from MouldKing import MouldKing
-  from AdvertiserHCITool import AdvertiserHCITool
   from Tracer import Tracer
   from TracerConsole import TracerConsole
+
+  from AdvertiserHCITool import AdvertiserHCITool
+  from AdvertiserBluez import AdvertiserBluez
+
+  from MouldKing import MouldKing
 
 import time
 import numpy as np
@@ -19,14 +25,12 @@ import numpy as np
 # instantiate Advertiser
 tracer = TracerConsole()
 
-# instantiate Advertiser
-advertiser = AdvertiserHCITool()
-
 # Set Tracer for all MouldKing Hubs 6.0
 MouldKing.Module6_0.SetTracer(tracer)
 
 # Set Advertiser for all MouldKing Hubs 6.0
-MouldKing.Module6_0.SetAdvertiser(advertiser)
+# advertiser = MouldKing.Module6_0.SetAdvertiser(AdvertiserHCITool())
+advertiser = MouldKing.Module6_0.SetAdvertiser(AdvertiserBluez())
 
 # save pre-instantiated objects in local variables
 hub0 = MouldKing.Module6_0.Device0

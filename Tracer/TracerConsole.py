@@ -20,7 +20,7 @@ class TracerConsole(Tracer) :
         super().__init__()
 
 
-    def TraceInfo(value: str):
+    def TraceInfo(self, value: str=""):
         """
         prints out
         """

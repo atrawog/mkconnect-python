@@ -1,8 +1,27 @@
-import logging
-import threading
+__author__ = "J0EK3R"
+__version__ = "0.1"
+
+# import hack for micro-python-simulator with flat filesystem
+try:
+    from Advertiser.Advertiser import Advertiser
+    from Tracer.Tracer import Tracer
+except ImportError:
+    from Advertiser import Advertiser
+    from Tracer import Tracer
+
 from typing import List, Dict, Union
 
-from gi.repository import Gio, GLib, GObject
+try:
+    from gi.repository import Gio, GLib, GObject  # python3
+except ImportError:
+    import gobject as GObject  # python2
+
+import dbus
+import dbus.exceptions
+import dbus.mainloop.glib
+import dbus.service
+import time
+import threading
 
 # DBus Information
 bus_type = Gio.BusType.SYSTEM
@@ -15,9 +34,6 @@ DEVICE_IFACE = 'org.bluez.Device1'
 LE_ADVERTISING_MANAGER_IFACE = 'org.bluez.LEAdvertisingManager1'
 # BlueZ DBus Advertisement Interface
 LE_ADVERTISEMENT_IFACE = 'org.bluez.LEAdvertisement1'
-
-logging.basicConfig(level=logging.DEBUG)
-logger = logging.getLogger('advert')
 
 introspection_xml = """
     <!DOCTYPE node PUBLIC
@@ -39,56 +55,6 @@ introspection_xml = """
         </interface>
     </node>
     """
-
-
-def _build_variant(name, py_data):
-    """
-    convert python native data types to D-Bus variant types by looking up
-    their type expected for that key.
-    """
-    type_lookup = {'Address': 's',
-                   'AddressType': 's',
-                   'Name': 's',
-                   'Icon': 's',
-                   'Class': 'u',
-                   'Appearance': 'q',
-                   'Alias': 's',
-                   'Paired': 'b',
-                   'Trusted': 'b',
-                   'Blocked': 'b',
-                   'LegacyPairing': 'b',
-                   'RSSI': 'n',
-                   'Connected': 'b',
-                   'UUIDs': 'as',
-                   'Adapter': 'o',
-                   'ManufacturerData': 'a{qay}',
-                   'ServiceData': 'a{say}',
-                   'TxPower': 'n',
-                   'ServicesResolved': 'b',
-                   'WakeAllowed': 'b',
-                   'Modalias': 's',
-                   'AdvertisingFlags': 'ay',
-                   'AdvertisingData': 'a{yay}',
-                   'Powered': 'b',
-                   'Discoverable': 'b',
-                   'Pairable': 'b',
-                   'PairableTimeout': 'u',
-                   'DiscoverableTimeout': 'u',
-                   'Discovering': 'b',
-                   'Roles': 'as',
-                   'ExperimentalFeatures': 'as',
-                   }
-    logger.debug('Create variant(%s, %s)', name, py_data)
-    return GLib.Variant(type_lookup[name], py_data)
-
-
-def _build_variant2(name, py_value):
-        s_data = GLib.VariantDict.new()
-        for key, value in py_value.items():
-            gvalue = GLib.Variant('ay', value)
-            s_data.insert_value(key, gvalue)
-        return s_data.end()
-
 
 def bluez_proxy(object_path, interface):
     """Create a BlueZ proxy object"""
@@ -206,9 +172,9 @@ class DbusService:
 class Advertisement(DbusService):
     """Advertisement data"""
 
-    def __init__(self, advert_id, ad_type):
+    def __init__(self, identifier: str, ad_type):
         # Setup D-Bus object paths
-        self.path = '/org/bluez/advertisement{0:04d}'.format(advert_id)
+        self.path = '/org/bluez/advertisement' + identifier
         super().__init__(introspection_xml=introspection_xml,
                          publish_path=self.path)
 
@@ -324,21 +290,89 @@ class Advertisement(DbusService):
         else:
             self.Appearance = None
 
+class AdvertiserDBus(Advertiser) :
+    """
+    AdvertiserDBus
+    """
 
-def main():
-    # Simple test
-    beacon = Advertisement(1, 'peripheral')
-    # beacon.service_UUIDs = ['FEAA']
-    beacon.manufacturer_data = {'FFF0': [0x10, 0x08, 0x03, 0x75, 0x6B,
-                                    0x42, 0x61, 0x7A, 0x2e, 0x67,
-                                    0x69, 0x74, 0x68, 0x75, 0x62,
-                                    0x2E, 0x69, 0x6F]}
-    beacon.start()
-    ad_manager = bluez_proxy(ADAPTER_PATH, LE_ADVERTISING_MANAGER_IFACE)
-    ad_manager.RegisterAdvertisement('(oa{sv})', beacon.path, {})
-    mainloop = GLib.MainLoop()
-    mainloop.run()
+    def __init__(self):
+        """
+        initializes the object and defines the fields
+        """
 
+        super().__init__()
 
-if __name__ == '__main__':
-    main()
+        self._ad_manager = bluez_proxy(ADAPTER_PATH, LE_ADVERTISING_MANAGER_IFACE)
+
+        self._advertisementTable = dict()
+
+    def AdvertismentStop(self, tracer: Tracer=None):
+        """
+        stop bluetooth advertising
+
+        """
+
+        for advertisement in self._advertisementTable.values():
+            advertisement.stop()
+            try:
+                self._ad_manager.UnregisterAdvertisement(advertisement)
+            except:
+                pass
+            try:
+                dbus.service.Object.remove_from_connection(advertisement)
+            except:
+                pass
+
+        # todo
+
+        if (tracer != None):
+            pass
+
+        return
+
+    def AdvertisementStart(self, identifier: str, manufacturerId: bytes, rawdata: bytes, tracer: Tracer=None):
+        """
+        send the bluetooth connect telegram to switch the MouldKing hubs in bluetooth mode
+        press the button on the hub(s) and the flashing of status led should switch from blue-green to blue
+        """
+
+        # advertisement = self._advertisementTable.get(identifier)
+        # if(advertisement == None):
+        #     advertisement = AdvertiserBluez.TestAdvertisement(self._bus, identifier, manufacturerId, rawdata)
+        #     self._advertisementTable[identifier] = advertisement
+
+        self.AdvertisementSet(identifier, manufacturerId, rawdata, tracer)
+
+        if (tracer != None):
+            pass
+
+        return
+
+    def AdvertisementSet(self, identifier: str, manufacturerId: bytes, rawdata: bytes, tracer: Tracer=None):
+        """
+        Set Advertisment data
+        """
+
+        advertisement = self._advertisementTable.get(identifier)
+
+        if(advertisement == None):
+            advertisement = Advertisement(identifier, 'peripheral')
+            self._advertisementTable[identifier] = advertisement
+        else:
+            advertisement.stop()
+            try:
+                self._ad_manager.UnregisterAdvertisement(advertisement.path)
+            except:
+                pass
+
+        advertisement.service_data = {'F0FF': rawdata}
+        advertisement.start()
+
+        self._ad_manager.RegisterAdvertisement('(oa{sv})', advertisement.path, {})
+
+        if (tracer != None):
+            pass
+
+        return
+    
+

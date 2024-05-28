@@ -18,12 +18,12 @@ class MouldKingDevice(AdvertisingDevice) :
 
     ManufacturerID = bytes([0xFF, 0xF0])
 
-    def __init__(self, numberOfChannels, channelStartOffset, channelEndOffset, telegram_connect, basetelegram):
+    def __init__(self, identifier: str, numberOfChannels, channelStartOffset, channelEndOffset, telegram_connect, basetelegram):
         """
         initializes the object and defines the fields
         """
 
-        super().__init__()
+        super().__init__(identifier)
 
         if numberOfChannels > 6:
             raise Exception("max 6 channels")
@@ -111,7 +111,7 @@ class MouldKingDevice(AdvertisingDevice) :
 
         if(self._advertiser != None):
             cryptedData = MouldKingCrypt.Crypt(rawdata)
-            self._advertiser.AdvertismentStart(self.ManufacturerID, cryptedData, self._tracer)
+            self._advertiser.AdvertisementStart(self._identifier, self.ManufacturerID, cryptedData, self._tracer)
 
         return self._Telegram_connect
 

@@ -25,6 +25,11 @@ class AdvertiserHCITool(Advertiser) :
         super().__init__()
         self._hcitool_path = '/usr/bin/hcitool'
 
+    def BlueToothStop(tracer: Tracer=None):
+        """
+        stop bluetooth advertising
+        """
+        pass
 
     def AdvertismentStop(self, tracer: Tracer=None):
         """
@@ -41,7 +46,7 @@ class AdvertiserHCITool(Advertiser) :
 
         return
 
-    def AdvertismentStart(self, manufacturerId: bytes, rawdata: bytes, tracer: Tracer=None):
+    def AdvertisementStart(self, identifier: str, manufacturerId: bytes, rawdata: bytes, tracer: Tracer=None):
         """
         send the bluetooth connect telegram to switch the MouldKing hubs in bluetooth mode
         press the button on the hub(s) and the flashing of status led should switch from blue-green to blue
@@ -62,7 +67,7 @@ class AdvertiserHCITool(Advertiser) :
 
         return
 
-    def AdvertismentSet(self, manufacturerId: bytes, rawdata: bytes, tracer: Tracer=None):
+    def AdvertisementSet(self, identifier: str, manufacturerId: bytes, rawdata: bytes, tracer: Tracer=None):
         """
         Set Advertisment data
         """

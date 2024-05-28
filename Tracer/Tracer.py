@@ -11,7 +11,7 @@ class Tracer :
         """
         pass
 
-    def TraceInfo(value: str):
+    def TraceInfo(self, value: str):
         """
         prints out
         """

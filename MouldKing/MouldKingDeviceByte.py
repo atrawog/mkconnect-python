@@ -14,13 +14,13 @@ class MouldKingDeviceByte(MouldKingDevice) :
     baseclass handling with byte channels
     """
 
-    def __init__(self, numberOfChannels, channelStartOffset, channelEndOffset, telegram_connect, basetelegram):
+    def __init__(self, identifier: str, numberOfChannels, channelStartOffset, channelEndOffset, telegram_connect, basetelegram):
         """
         initializes the object and defines the fields
         """
 
         # call baseclass init and set number of channels
-        super().__init__(numberOfChannels, channelStartOffset, channelEndOffset, telegram_connect, basetelegram)
+        super().__init__(identifier, numberOfChannels, channelStartOffset, channelEndOffset, telegram_connect, basetelegram)
 
     def Connect(self) -> bytes:
         """
