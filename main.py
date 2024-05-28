@@ -37,8 +37,8 @@ MouldKing.Module6_0.SetTracer(tracer)
 
 # Set Advertiser for all MouldKing 6.0 Hubs
 #advertiser = MouldKing.Module6_0.SetAdvertiser(AdvertiserHCITool())
-# advertiser = MouldKing.Module6_0.SetAdvertiser(AdvertiserBluez())
-advertiser = MouldKing.Module6_0.SetAdvertiser(AdvertiserDBus())
+advertiser = MouldKing.Module6_0.SetAdvertiser(AdvertiserBluez())
+# advertiser = MouldKing.Module6_0.SetAdvertiser(AdvertiserDBus())
 
 # save pre-instantiated objects in local variables
 mk6_0 = MouldKing.Module6_0.Device0
@@ -48,10 +48,11 @@ mk6_2 = MouldKing.Module6_0.Device2
 ############################################################################
 # get uncrypted connect-telegram as bytearray
 title = "connect-telegram"
+tracer.TraceInfo("\n" + title)
+
 rawdata = mk6_0.Connect()
 time.sleep(5)
 
-tracer.TraceInfo("\n" + title)
 tracer.TraceInfo("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))
 
 crypted = MouldKingCrypt.Crypt(rawdata) # get crypted data from rawdata
@@ -60,10 +61,11 @@ tracer.TraceInfo("crypted: " + ' '.join(f'{x:02x}' for x in crypted))
 ############################################################################
 # get uncrypted stop-telegram as bytearray
 title = "stop-telegram"
-rawdata = mk6_0.Stop()
-time.sleep(5)
-
 tracer.TraceInfo("\n" + title)
+
+rawdata = mk6_0.Stop()
+time.sleep(1)
+
 tracer.TraceInfo("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))
 
 crypted = MouldKingCrypt.Crypt(rawdata) # get crypted data from rawdata
@@ -72,10 +74,11 @@ tracer.TraceInfo("crypted: " + ' '.join(f'{x:02x}' for x in crypted))
 ############################################################################
 # get uncrypted telegram with channel 1 (indexer 0) fullspeed forwards
 title = "C1: fullspeed forwards"
-rawdata = mk6_0.SetChannel(0, 1)
-time.sleep(5)
-
 tracer.TraceInfo("\n" + title)
+
+rawdata = mk6_0.SetChannel(0, 1)
+time.sleep(1)
+
 tracer.TraceInfo("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))
 
 crypted = MouldKingCrypt.Crypt(rawdata) # get crypted data from rawdata
@@ -87,6 +90,8 @@ title = "C1: halfspeed forwards"
 tracer.TraceInfo("\n" + title)
 
 rawdata = mk6_0.SetChannel(0, 0.5)
+time.sleep(1)
+
 tracer.TraceInfo("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))
 
 crypted = MouldKingCrypt.Crypt(rawdata) # get crypted data from rawdata
@@ -98,6 +103,8 @@ title = "C1: halfspeed backwards"
 tracer.TraceInfo("\n" + title)
 
 rawdata = mk6_0.SetChannel(0, -0.5)
+time.sleep(1)
+
 tracer.TraceInfo("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))
 
 crypted = MouldKingCrypt.Crypt(rawdata) # get crypted data from rawdata
@@ -109,6 +116,8 @@ title = "C2: halfspeed backwards"
 tracer.TraceInfo("\n" + title)
 
 rawdata = mk6_0.SetChannel(1, -0.5)
+time.sleep(1)
+
 tracer.TraceInfo("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))
 
 crypted = MouldKingCrypt.Crypt(rawdata) # get crypted data from rawdata
@@ -119,6 +128,7 @@ tracer.TraceInfo("crypted: " + ' '.join(f'{x:02x}' for x in crypted))
 title = "Advertisement stop"
 tracer.TraceInfo("\n" + title)
 advertiser.AdvertismentStop(tracer)
+time.sleep(1)
 
 #subprocess.call(["sudo", "hciconfig hci0 up"])
 #subprocess.call(["sudo", "hciconfig hci0 leadv 3"])

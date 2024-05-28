@@ -56,6 +56,53 @@ introspection_xml = """
     </node>
     """
 
+def _build_variant(name, py_data):
+    """
+    convert python native data types to D-Bus variant types by looking up
+    their type expected for that key.
+    """
+    type_lookup = {'Address': 's',
+                   'AddressType': 's',
+                   'Name': 's',
+                   'Icon': 's',
+                   'Class': 'u',
+                   'Appearance': 'q',
+                   'Alias': 's',
+                   'Paired': 'b',
+                   'Trusted': 'b',
+                   'Blocked': 'b',
+                   'LegacyPairing': 'b',
+                   'RSSI': 'n',
+                   'Connected': 'b',
+                   'UUIDs': 'as',
+                   'Adapter': 'o',
+                   'ManufacturerData': 'a{qay}',
+                   'ServiceData': 'a{say}',
+                   'TxPower': 'n',
+                   'ServicesResolved': 'b',
+                   'WakeAllowed': 'b',
+                   'Modalias': 's',
+                   'AdvertisingFlags': 'ay',
+                   'AdvertisingData': 'a{yay}',
+                   'Powered': 'b',
+                   'Discoverable': 'b',
+                   'Pairable': 'b',
+                   'PairableTimeout': 'u',
+                   'DiscoverableTimeout': 'u',
+                   'Discovering': 'b',
+                   'Roles': 'as',
+                   'ExperimentalFeatures': 'as',
+                   }
+    #logger.debug('Create variant(%s, %s)', name, py_data)
+    return GLib.Variant(type_lookup[name], py_data)
+
+def _build_variant2(name, py_value):
+        s_data = GLib.VariantDict.new()
+        for key, value in py_value.items():
+            gvalue = GLib.Variant('ay', value)
+            s_data.insert_value(key, gvalue)
+        return s_data.end()
+
 def bluez_proxy(object_path, interface):
     """Create a BlueZ proxy object"""
     return Gio.DBusProxy.new_for_bus_sync(
@@ -70,8 +117,7 @@ def bluez_proxy(object_path, interface):
 
 class DbusService:
 
-    def __init__(self, introspection_xml, publish_path,
-                 own_name=None, sys_bus=True):
+    def __init__(self, introspection_xml, publish_path, own_name=None, sys_bus=True):
         self.node_info = Gio.DBusNodeInfo.new_for_xml(introspection_xml).interfaces[0]
         method_outargs = {}
         method_inargs = {}
@@ -131,7 +177,7 @@ class DbusService:
         outargs = ''.join([_.signature
                            for _ in invocation.get_method_info().out_args])
         send_result = GLib.Variant(f'({outargs})', result)
-        logger.debug('Method Call result: %s', repr(send_result))
+        #logger.debug('Method Call result: %s', repr(send_result))
         invocation.return_value(send_result)
 
     def prop_getter(self,
@@ -141,8 +187,7 @@ class DbusService:
                     iface: str,
                     name: str):
         """Mehtod for moving properties from Python Class to D-Bus"""
-        logger.debug('prop_getter, %s, %s, %s, %s, %s',
-                     connection, sender, object, iface, name)
+        #logger.debug('prop_getter, %s, %s, %s, %s, %s', connection, sender, object, iface, name)
         py_value = self.__getattribute__(name)
         signature = self.node_info.lookup_property(name).signature
         if 'v' in signature:
@@ -162,8 +207,7 @@ class DbusService:
                     name: str,
                     value: GLib.Variant):
         """Method for moving properties between D-Bus and Python Class"""
-        logger.debug('prop_setter %s, %s, %s, %s, %s, %s',
-                     connection, sender, object, iface, name, value)
+        #logger.debug('prop_setter %s, %s, %s, %s, %s, %s', connection, sender, object, iface, name, value)
         # x_value = GLib.Variant('as', ['test'])
         self.__setattr__(name, value.unpack())
         return True
@@ -361,11 +405,13 @@ class AdvertiserDBus(Advertiser) :
         else:
             advertisement.stop()
             try:
-                self._ad_manager.UnregisterAdvertisement(advertisement.path)
-            except:
+                self._ad_manager.UnregisterAdvertisement(advertisement)
+            except Exception as exception:
+                if (tracer != None):
+                    tracer.TraceInfo(exception)
                 pass
 
-        advertisement.service_data = {'F0FF': rawdata}
+        advertisement.manufacturer_data = {0xF0FF: rawdata}
         advertisement.start()
 
         self._ad_manager.RegisterAdvertisement('(oa{sv})', advertisement.path, {})

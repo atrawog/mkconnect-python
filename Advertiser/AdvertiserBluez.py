@@ -178,11 +178,6 @@ class AdvertiserBluez(Advertiser) :
             self.mainloop = GLib.MainLoop()
             self._ad_thread = None
 
-        @property
-        def service_data(self):
-            """Service Data to be broadcast"""
-            return self.ServiceData.unpack()
-
         def _publish(self):
             self.mainloop.run()
 
