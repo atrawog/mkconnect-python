@@ -1,13 +1,15 @@
 __author__ = "J0EK3R"
 __version__ = "0.1"
 
-# import hack for micro-python-simulator with flat filesystem
-try:
-    from Advertiser.Advertiser import Advertiser
-    from Tracer.Tracer import Tracer
-except ImportError:
-    from Advertiser import Advertiser
-    from Tracer import Tracer
+import sys
+
+sys.path.append("Tracer") 
+from Tracer.Tracer import Tracer
+
+sys.path.append("Advertiser") 
+from Advertiser.Advertiser import Advertiser
+
+import bluetooth
 
 class AdvertiserPicoWBluetooth(Advertiser) :
     """
@@ -20,6 +22,8 @@ class AdvertiserPicoWBluetooth(Advertiser) :
         """
 
         super().__init__()
+        self.BLE = bluetooth.BLE()
+        self.BLE.active(True)
 
     def AdvertismentStop(self, tracer: Tracer=None):
         """
@@ -27,7 +31,7 @@ class AdvertiserPicoWBluetooth(Advertiser) :
 
         """
 
-        # todo
+        self.BLE.active(False)
 
         if (tracer != None):
             pass
@@ -39,9 +43,7 @@ class AdvertiserPicoWBluetooth(Advertiser) :
         send the bluetooth connect telegram to switch the MouldKing hubs in bluetooth mode
         press the button on the hub(s) and the flashing of status led should switch from blue-green to blue
         """
-        data = self._CreateTelegramForPicoW(manufacturerId, rawdata)
-
-        # todo
+        self.AdvertisementSet(identifier, manufacturerId, rawdata, tracer)
 
         if (tracer != None):
             pass
@@ -54,10 +56,10 @@ class AdvertiserPicoWBluetooth(Advertiser) :
         """
         data = self._CreateTelegramForPicoW(manufacturerId, rawdata)
 
-        # todo
+        self.BLE.gap_advertise(100, data)
 
         if (tracer != None):
-            pass
+            tracer.TraceInfo("AdvertisementSet")
 
         return
     

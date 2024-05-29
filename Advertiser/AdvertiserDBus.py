@@ -1,13 +1,13 @@
 __author__ = "J0EK3R"
 __version__ = "0.1"
 
-# import hack for micro-python-simulator with flat filesystem
-try:
-    from Advertiser.Advertiser import Advertiser
-    from Tracer.Tracer import Tracer
-except ImportError:
-    from Advertiser import Advertiser
-    from Tracer import Tracer
+import sys
+
+sys.path.append("Tracer") 
+from Tracer.Tracer import Tracer
+
+sys.path.append("Advertiser") 
+from Advertiser.Advertiser import Advertiser
 
 from typing import List, Dict, Union
 

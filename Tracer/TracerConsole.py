@@ -1,11 +1,10 @@
 __author__ = "J0EK3R"
 __version__ = "0.1"
 
-# import hack for micro-python-simulator with flat filesystem
-try:
-    from Tracer.Tracer import Tracer
-except ImportError:
-    from Tracer import Tracer
+import sys
+
+sys.path.append("Tracer") 
+from Tracer.Tracer import Tracer
 
 class TracerConsole(Tracer) :
     """

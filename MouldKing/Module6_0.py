@@ -1,17 +1,16 @@
 __author__ = "J0EK3R"
 __version__ = "0.1"
 
-import abc
+import sys
 
-# import hack for micro-python-simulator with flat filesystem
-try:
-    from MouldKing.MouldKing_6 import MouldKing_6
-    from Advertiser.Advertiser import Advertiser
-    from Tracer.Tracer import Tracer
-except ImportError:
-    from MouldKing_6 import MouldKing_6
-    from Advertiser import Advertiser
-    from Tracer import Tracer
+sys.path.append("Tracer") 
+from Tracer.Tracer import Tracer
+
+sys.path.append("Advertiser") 
+from Advertiser.Advertiser import Advertiser
+
+sys.path.append("MouldKing") 
+from MouldKing.MouldKing_6 import MouldKing_6
 
 class Module6_0 :
     """

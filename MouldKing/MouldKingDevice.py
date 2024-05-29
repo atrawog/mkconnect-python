@@ -1,15 +1,16 @@
 __author__ = "J0EK3R"
 __version__ = "0.1"
 
-# import hack for micro-python-simulator with flat filesystem
-try:
-    from Advertiser.AdvertisingDevice import AdvertisingDevice
-    from MouldKing.MouldKingCrypt import MouldKingCrypt
-    from Tracer.Tracer import Tracer
-except ImportError:
-    from AdvertisingDevice import AdvertisingDevice
-    from MouldKingCrypt import MouldKingCrypt
-    from Tracer import Tracer
+import sys
+
+sys.path.append("Tracer") 
+from Tracer.Tracer import Tracer
+
+sys.path.append("Advertiser") 
+from Advertiser.AdvertisingDevice import AdvertisingDevice
+
+sys.path.append("MouldKing") 
+from MouldKing.MouldKingCrypt import MouldKingCrypt
 
 class MouldKingDevice(AdvertisingDevice) :
     """
