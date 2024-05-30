@@ -24,7 +24,7 @@ class Advertiser :
         self._tracer = tracer
         return tracer
 
-    def BlueToothStop():
+    def BlueToothStop(self):
         """
         stop bluetooth advertising
         """

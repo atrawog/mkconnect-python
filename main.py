@@ -121,7 +121,7 @@ tracer.TraceInfo("crypted: " + ' '.join(f'{x:02x}' for x in crypted))
 # stop Advertisment
 title = "Advertisement stop"
 tracer.TraceInfo("\n" + title)
-advertiser.AdvertismentStop(tracer)
+advertiser.BlueToothStop()
 time.sleep(1)
 
 #subprocess.call(["sudo", "hciconfig hci0 up"])
