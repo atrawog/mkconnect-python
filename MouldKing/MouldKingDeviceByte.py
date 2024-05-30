@@ -1,26 +1,24 @@
 __author__ = "J0EK3R"
 __version__ = "0.1"
 
-# import hack for micro-python-simulator with flat filesystem
-try:
-    from MouldKing.MouldKingDevice import MouldKingDevice
-    from MouldKing.MouldKingCrypt import MouldKingCrypt
-except ImportError:
-    from MouldKingDevice import MouldKingDevice
-    from MouldKingCrypt import MouldKingCrypt
+import sys
+
+sys.path.append("MouldKing") 
+from MouldKing.MouldKingDevice import MouldKingDevice
+from MouldKing.MouldKingCrypt import MouldKingCrypt
 
 class MouldKingDeviceByte(MouldKingDevice) :
     """
     baseclass handling with byte channels
     """
 
-    def __init__(self, numberOfChannels, channelStartOffset, channelEndOffset, telegram_connect, basetelegram):
+    def __init__(self, identifier: str, numberOfChannels, channelStartOffset, channelEndOffset, telegram_connect, basetelegram):
         """
         initializes the object and defines the fields
         """
 
         # call baseclass init and set number of channels
-        super().__init__(numberOfChannels, channelStartOffset, channelEndOffset, telegram_connect, basetelegram)
+        super().__init__(identifier, numberOfChannels, channelStartOffset, channelEndOffset, telegram_connect, basetelegram)
 
     def Connect(self) -> bytes:
         """

@@ -1,11 +1,11 @@
 __author__ = "J0EK3R"
 __version__ = "0.1"
 
-# import hack for micro-python-simulator with flat filesystem
-try:
-    from MouldKing.MouldKingDeviceByte import MouldKingDeviceByte
-except ImportError:
-    from MouldKingDeviceByte import MouldKingDeviceByte
+import sys
+
+sys.path.append("MouldKing") 
+from MouldKing.MouldKingDeviceByte import MouldKingDeviceByte
+
 
 class MouldKing_6(MouldKingDeviceByte) :
     """
@@ -34,7 +34,7 @@ class MouldKing_6(MouldKingDeviceByte) :
             raise Exception('only deviceId 0..2 are allowed')
 
         # call baseclass init and set number of channels
-        super().__init__(6, 3, 1, MouldKing_6.__telegram_connect, basetelegram)
+        super().__init__("MK6_" + str(deviceId), 6, 3, 1, MouldKing_6.__telegram_connect, basetelegram)
 
 
 

@@ -1,13 +1,16 @@
 __author__ = "J0EK3R"
 __version__ = "0.1"
 
-# import hack for micro-python-simulator with flat filesystem
-try:
-    from Advertiser.AdvertisingDevice import AdvertisingDevice
-    from MouldKing.MouldKingCrypt import MouldKingCrypt
-except ImportError:
-    from AdvertisingDevice import AdvertisingDevice
-    from MouldKingCrypt import MouldKingCrypt
+import sys
+
+sys.path.append("Tracer") 
+from Tracer.Tracer import Tracer
+
+sys.path.append("Advertiser") 
+from Advertiser.AdvertisingDevice import AdvertisingDevice
+
+sys.path.append("MouldKing") 
+from MouldKing.MouldKingCrypt import MouldKingCrypt
 
 class MouldKingDevice(AdvertisingDevice) :
     """
@@ -16,12 +19,12 @@ class MouldKingDevice(AdvertisingDevice) :
 
     ManufacturerID = bytes([0xFF, 0xF0])
 
-    def __init__(self, numberOfChannels, channelStartOffset, channelEndOffset, telegram_connect, basetelegram):
+    def __init__(self, identifier: str, numberOfChannels, channelStartOffset, channelEndOffset, telegram_connect, basetelegram):
         """
         initializes the object and defines the fields
         """
 
-        super().__init__()
+        super().__init__(identifier)
 
         if numberOfChannels > 6:
             raise Exception("max 6 channels")
@@ -68,7 +71,7 @@ class MouldKingDevice(AdvertisingDevice) :
         self._Channel_E_Value = float(0)
         self._Channel_F_Value = float(0)
 
-        return self.CreateTelegram();
+        return self.CreateTelegram()
 
     def SetChannel(self, channelId: int, value: float) -> bytes:
         """
@@ -90,7 +93,7 @@ class MouldKingDevice(AdvertisingDevice) :
         elif channelId == 5:    
             self._Channel_F_Value = value
         
-        return self.CreateTelegram();
+        return self.CreateTelegram()
 
     def CreateTelegram(self):
         """
@@ -104,9 +107,12 @@ class MouldKingDevice(AdvertisingDevice) :
         sends the data to the advertiser
         """
 
+        if(self._tracer != None):
+            pass
+
         if(self._advertiser != None):
             cryptedData = MouldKingCrypt.Crypt(rawdata)
-            self._advertiser.AdvertismentStart(self.ManufacturerID, cryptedData)
+            self._advertiser.AdvertisementStart(self._identifier, self.ManufacturerID, cryptedData)
 
         return self._Telegram_connect
 

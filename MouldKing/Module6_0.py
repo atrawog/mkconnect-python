@@ -1,15 +1,16 @@
 __author__ = "J0EK3R"
 __version__ = "0.1"
 
-import abc
+import sys
 
-# import hack for micro-python-simulator with flat filesystem
-try:
-    from MouldKing.MouldKing_6 import MouldKing_6
-    from Advertiser.AdvertiserBase import AdvertiserBase
-except ImportError:
-    from MouldKing_6 import MouldKing_6
-    from AdvertiserBase import AdvertiserBase
+sys.path.append("Tracer") 
+from Tracer.Tracer import Tracer
+
+sys.path.append("Advertiser") 
+from Advertiser.Advertiser import Advertiser
+
+sys.path.append("MouldKing") 
+from MouldKing.MouldKing_6 import MouldKing_6
 
 class Module6_0 :
     """
@@ -32,11 +33,23 @@ class Module6_0 :
     """
 
     @staticmethod
-    def SetAdvertiser(advertiser: AdvertiserBase):
+    def SetAdvertiser(advertiser: Advertiser) -> Advertiser:
         """
-        Set Advertiser for all MouldKing Hubs 6.0
+        Set Advertiser for all MouldKing 6.0 Hubs
         """
 
         Module6_0.Device0.SetAdvertiser(advertiser)
         Module6_0.Device1.SetAdvertiser(advertiser)
         Module6_0.Device2.SetAdvertiser(advertiser)
+        return advertiser
+
+    @staticmethod
+    def SetTracer(tracer: Tracer) -> Tracer:
+        """
+        Set Tracer for all MouldKing 6.0 Hubs
+        """
+
+        Module6_0.Device0.SetTracer(tracer)
+        Module6_0.Device1.SetTracer(tracer)
+        Module6_0.Device2.SetTracer(tracer)
+        return tracer

@@ -1,7 +1,7 @@
 __author__ = "J0EK3R"
 __version__ = "0.1"
 
-class AdvertiserBase :
+class Tracer :
     """
     baseclass
     """
@@ -11,8 +11,8 @@ class AdvertiserBase :
         """
         pass
 
-    def mkbtstop():
+    def TraceInfo(self, value: str):
         """
-        stop bluetooth advertising
+        prints out
         """
         pass

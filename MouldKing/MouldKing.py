@@ -1,13 +1,10 @@
 __author__ = "J0EK3R"
 __version__ = "0.1"
 
-import abc
+import sys
 
-# import hack for micro-python-simulator with flat filesystem
-try:
-    from MouldKing.Module6_0 import Module6_0
-except ImportError:
-    from Module6_0 import Module6_0
+sys.path.append("MouldKing") 
+from MouldKing.Module6_0 import Module6_0
 
 class MouldKing :
     """
