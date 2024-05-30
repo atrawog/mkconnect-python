@@ -41,6 +41,6 @@ class AdvertisingDevice :
 
     def AdvertisementSet(self, manufacturerId: bytes, rawdata: bytes):
         """
-        Set Advertisment data
+        Set Advertisement data
         """
         pass

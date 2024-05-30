@@ -27,6 +27,7 @@ tracer = TracerConsole()
 
 # instantiate Advertiser
 advertiser = Advertiser()
+advertiser.SetTracer(tracer)
 
 # Set Tracer for all MouldKing 6.0 Hubs
 MouldKing.Module6_0.SetTracer(tracer)
@@ -45,10 +46,10 @@ tracer.TraceInfo("\n" + title)
 rawdata = mk6_0.Connect()
 time.sleep(5)
 
-tracer.TraceInfo("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))
+#tracer.TraceInfo("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))
 
-crypted = MouldKingCrypt.Crypt(rawdata) # get crypted data from rawdata
-tracer.TraceInfo("crypted: " + ' '.join(f'{x:02x}' for x in crypted))
+#crypted = MouldKingCrypt.Crypt(rawdata) # get crypted data from rawdata
+#tracer.TraceInfo("crypted: " + ' '.join(f'{x:02x}' for x in crypted))
 
 ############################################################################
 # get uncrypted stop-telegram as bytearray
@@ -56,12 +57,13 @@ title = "stop-telegram"
 tracer.TraceInfo("\n" + title)
 
 rawdata = mk6_0.Stop()
+rawdata = mk6_1.Stop()
 time.sleep(1)
 
-tracer.TraceInfo("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))
+#tracer.TraceInfo("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))
 
-crypted = MouldKingCrypt.Crypt(rawdata) # get crypted data from rawdata
-tracer.TraceInfo("crypted: " + ' '.join(f'{x:02x}' for x in crypted))
+#crypted = MouldKingCrypt.Crypt(rawdata) # get crypted data from rawdata
+#tracer.TraceInfo("crypted: " + ' '.join(f'{x:02x}' for x in crypted))
 
 ############################################################################
 # get uncrypted telegram with channel 1 (indexer 0) fullspeed forwards
@@ -71,10 +73,10 @@ tracer.TraceInfo("\n" + title)
 rawdata = mk6_0.SetChannel(0, 1)
 time.sleep(1)
 
-tracer.TraceInfo("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))
+#tracer.TraceInfo("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))
 
-crypted = MouldKingCrypt.Crypt(rawdata) # get crypted data from rawdata
-tracer.TraceInfo("crypted: " + ' '.join(f'{x:02x}' for x in crypted))
+#crypted = MouldKingCrypt.Crypt(rawdata) # get crypted data from rawdata
+#tracer.TraceInfo("crypted: " + ' '.join(f'{x:02x}' for x in crypted))
 
 ############################################################################
 # get uncrypted telegram with channel 1 (indexer 0) halfspeed forwards
@@ -84,10 +86,23 @@ tracer.TraceInfo("\n" + title)
 rawdata = mk6_0.SetChannel(0, 0.5)
 time.sleep(1)
 
-tracer.TraceInfo("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))
+#tracer.TraceInfo("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))
 
-crypted = MouldKingCrypt.Crypt(rawdata) # get crypted data from rawdata
-tracer.TraceInfo("crypted: " + ' '.join(f'{x:02x}' for x in crypted))
+#crypted = MouldKingCrypt.Crypt(rawdata) # get crypted data from rawdata
+#tracer.TraceInfo("crypted: " + ' '.join(f'{x:02x}' for x in crypted))
+
+############################################################################
+# get uncrypted telegram with channel 1 (indexer 0) fullspeed forwards
+title = "C1: fullspeed forwards"
+tracer.TraceInfo("\n" + title)
+
+rawdata = mk6_1.SetChannel(0, 1)
+time.sleep(2)
+
+#tracer.TraceInfo("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))
+
+#crypted = MouldKingCrypt.Crypt(rawdata) # get crypted data from rawdata
+#tracer.TraceInfo("crypted: " + ' '.join(f'{x:02x}' for x in crypted))
 
 ############################################################################
 # get uncrypted telegram with channel 1 (indexer 0) halfspeed backwards
@@ -97,10 +112,10 @@ tracer.TraceInfo("\n" + title)
 rawdata = mk6_0.SetChannel(0, -0.5)
 time.sleep(1)
 
-tracer.TraceInfo("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))
+#tracer.TraceInfo("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))
 
-crypted = MouldKingCrypt.Crypt(rawdata) # get crypted data from rawdata
-tracer.TraceInfo("crypted: " + ' '.join(f'{x:02x}' for x in crypted))
+#crypted = MouldKingCrypt.Crypt(rawdata) # get crypted data from rawdata
+#tracer.TraceInfo("crypted: " + ' '.join(f'{x:02x}' for x in crypted))
 
 ############################################################################
 # get uncrypted telegram with channel 1 (indexer 0) halfspeed backwards
@@ -110,13 +125,13 @@ tracer.TraceInfo("\n" + title)
 rawdata = mk6_0.SetChannel(1, -0.5)
 time.sleep(1)
 
-tracer.TraceInfo("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))
+#tracer.TraceInfo("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))
 
-crypted = MouldKingCrypt.Crypt(rawdata) # get crypted data from rawdata
-tracer.TraceInfo("crypted: " + ' '.join(f'{x:02x}' for x in crypted))
+#crypted = MouldKingCrypt.Crypt(rawdata) # get crypted data from rawdata
+#tracer.TraceInfo("crypted: " + ' '.join(f'{x:02x}' for x in crypted))
 
 ############################################################################
-# stop Advertisment
+# stop Advertisement
 title = "Advertisement stop"
 tracer.TraceInfo("\n" + title)
 advertiser.AdvertisementStop()

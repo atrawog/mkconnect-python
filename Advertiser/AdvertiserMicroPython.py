@@ -45,30 +45,30 @@ class AdvertiserMicroPython(Advertiser) :
         if(self.ble is not None):
             self.ble.gap_advertise(None)
 
-            if (self._tracer != None):
+            if (self._tracer is not None):
                 self._tracer.TraceInfo("AdvertisementSet")
         else:
-            if (self._tracer != None):
+            if (self._tracer is not None):
                 self._tracer.TraceInfo("self.ble is None")
 
-        if (self._tracer != None):
+        if (self._tracer is not None):
             pass
 
         return
 
     def AdvertisementSet(self, identifier: str, manufacturerId: bytes, rawdata: bytes):
         """
-        Set Advertisment data
+        Set Advertisement data
         """
         data = self._CreateTelegramForPicoW(manufacturerId, rawdata)
 
         if(self.ble is not None):
             self.ble.gap_advertise(100, data)
 
-            if (self._tracer != None):
+            if (self._tracer is not None):
                 self._tracer.TraceInfo("AdvertisementSet")
         else:
-            if (self._tracer != None):
+            if (self._tracer is not None):
                 self._tracer.TraceInfo("self.ble is None")
 
         return

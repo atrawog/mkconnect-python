@@ -259,14 +259,14 @@ class AdvertiserBluez(Advertiser) :
 
         # todo
 
-        if (self._tracer != None):
+        if (self._tracer is not None):
             pass
 
         return
 
     def AdvertisementSet(self, identifier: str, manufacturerId: bytes, rawdata: bytes):
         """
-        Set Advertisment data
+        Set Advertisement data
         """
 
         advertisement = self._advertisementTable.get(identifier)
@@ -284,7 +284,7 @@ class AdvertiserBluez(Advertiser) :
                                         reply_handler=self.register_ad_cb,
                                         error_handler=self.register_ad_error_cb)
 
-        if (self._tracer != None):
+        if (self._tracer is not None):
             pass
 
         return

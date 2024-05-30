@@ -370,14 +370,14 @@ class AdvertiserDBus(Advertiser) :
 
         # todo
 
-        if (self._tracer != None):
+        if (self._tracer is not None):
             pass
 
         return
 
     def AdvertisementSet(self, identifier: str, manufacturerId: bytes, rawdata: bytes):
         """
-        Set Advertisment data
+        Set Advertisement data
         """
 
         advertisement = self._advertisementTable.get(identifier)
@@ -390,7 +390,7 @@ class AdvertiserDBus(Advertiser) :
             try:
                 self._ad_manager.UnregisterAdvertisement(advertisement)
             except Exception as exception:
-                if (self._tracer != None):
+                if (self._tracer is not None):
                     self._tracer.TraceInfo(str(exception))
                 pass
 
@@ -399,7 +399,7 @@ class AdvertiserDBus(Advertiser) :
 
         self._ad_manager.RegisterAdvertisement('(oa{sv})', advertisement.path, {})
 
-        if (self._tracer != None):
+        if (self._tracer is not None):
             pass
 
         return

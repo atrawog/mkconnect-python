@@ -107,10 +107,10 @@ class MouldKingDevice(AdvertisingDevice) :
         sends the data to the advertiser
         """
 
-        if(self._tracer != None):
-            pass
+        if(self._tracer is not None):
+            self._tracer.TraceInfo("Advertise")
 
-        if(self._advertiser != None):
+        if(self._advertiser is not None):
             cryptedData = MouldKingCrypt.Crypt(rawdata)
             self._advertiser.AdvertisementSet(self._identifier, self.ManufacturerID, cryptedData)
 

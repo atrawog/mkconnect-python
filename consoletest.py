@@ -6,6 +6,7 @@ print('consoletest')
 
 import sys
 import time
+import numpy as np
 
 sys.path.append("Tracer") 
 from Tracer.Tracer import Tracer
@@ -13,8 +14,8 @@ from Tracer.TracerConsole import TracerConsole
 
 sys.path.append("Advertiser") 
 # uncomment to choose advertiser
-#from Advertiser.AdvertiserHCITool import AdvertiserHCITool as Advertiser
-from Advertiser.AdvertiserBluez import AdvertiserBluez as Advertiser
+from Advertiser.AdvertiserHCITool import AdvertiserHCITool as Advertiser
+#from Advertiser.AdvertiserBluez import AdvertiserBluez as Advertiser
 #from Advertiser.AdvertiserDBus import AdvertiserDBus as Advertiser
 #from Advertiser.AdvertiserMicroPython import AdvertiserMicroPython as Advertiser
 
@@ -29,6 +30,7 @@ tracer = TracerConsole()
 
 # instantiate Advertiser
 advertiser = Advertiser()
+advertiser.SetTracer(tracer)
 
 # Set Tracer for all MouldKing Hubs 6.0
 MouldKing.Module6_0.SetTracer(tracer)
@@ -87,7 +89,7 @@ def mkbtstop():
     """
     stop bluetooth advertising
     """
-    advertiser.AdvertismentStop()
+    advertiser.AdvertisementStop()
     # hcitool_args1 = hcitool_path + ' -i hci0 cmd 0x08 0x000a 00' + ' &> /dev/null'
 
     # if platform.system() == 'Linux':
@@ -100,7 +102,7 @@ def mkbtstop():
 
     return
 
-def mkconnect(debug: bool=False):
+def mkconnect():
     """
     send the bluetooth connect telegram to switch the MouldKing hubs in bluetooth mode
     press the button on the hub(s) and the flashing of status led should switch from blue-green to blue
@@ -109,12 +111,12 @@ def mkconnect(debug: bool=False):
     rawdata = hub.Connect()
     return
 
-def mkstop(deviceId: int=0, debug: bool=False):
+def mkstop(deviceId: int=0):
     hub = _getHubId(deviceId)
     rawdata = hub.Stop()
     return        
 
-def mkcontrol(deviceId: int=0, channel: int=0, powerAndDirection: float=1, debug: bool=False):
+def mkcontrol(deviceId: int=0, channel: int=0, powerAndDirection: float=0):
     hub = _getHubId(deviceId)
     rawdata = hub.SetChannel(channel, powerAndDirection)
     return
@@ -133,9 +135,9 @@ def help():
     tracer.TraceInfo("Available commands:")
     tracer.TraceInfo(" help()                                                    : print available commands")
     tracer.TraceInfo(" hints()                                                   : print hints and examples")
-    tracer.TraceInfo(" mkconnect(debug=False)                                    : Initiate hub control by sending bluetooth connect telegram")
-    tracer.TraceInfo(" mkstop(hubId, debug=False)                                : Stop ALL motors")
-    tracer.TraceInfo(" mkcontrol(hubId, channel, powerAndDirection, debug=False) : Control a specific hub, channel, power and motor direction")
+    tracer.TraceInfo(" mkconnect()                                               : Initiate hub control by sending bluetooth connect telegram")
+    tracer.TraceInfo(" mkstop(hubId)                                             : Stop ALL motors")
+    tracer.TraceInfo(" mkcontrol(hubId, channel, powerAndDirection)              : Control a specific hub, channel, power and motor direction")
     tracer.TraceInfo(" test_hub(hubId)                                           : run automated tests on each channels")
     tracer.TraceInfo(" mkbtstop()                                                : stop bluetooth advertising")
 

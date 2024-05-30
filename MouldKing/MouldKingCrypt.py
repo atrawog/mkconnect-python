@@ -74,7 +74,7 @@ class MouldKingCrypt :
         magicNumberArray_37 = MouldKingCrypt.__create_magic_array(37, 7)
         MouldKingCrypt.__crypt_array(targetArray, magicNumberArray_37)
 
-        # resulting advertisment array has a length of constant 24 bytes
+        # resulting advertisement array has a length of constant 24 bytes
         telegramArray = bytearray(24)
 
         lengthResultArray = len(MouldKingCrypt.__Array_C1C2C3C4C5) + len(rawDataArray) + 5
