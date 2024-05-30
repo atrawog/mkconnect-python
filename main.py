@@ -11,8 +11,8 @@ from Tracer.TracerConsole import TracerConsole
 
 sys.path.append("Advertiser") 
 # uncomment to choose advertiser
-#from Advertiser.AdvertiserHCITool import AdvertiserHCITool as Advertiser
-from Advertiser.AdvertiserBluez import AdvertiserBluez as Advertiser
+from Advertiser.AdvertiserHCITool import AdvertiserHCITool as Advertiser
+#from Advertiser.AdvertiserBluez import AdvertiserBluez as Advertiser
 #from Advertiser.AdvertiserDBus import AdvertiserDBus as Advertiser
 #from Advertiser.AdvertiserMicroPython import AdvertiserMicroPython as Advertiser
 
@@ -119,7 +119,7 @@ tracer.TraceInfo("crypted: " + ' '.join(f'{x:02x}' for x in crypted))
 # stop Advertisment
 title = "Advertisement stop"
 tracer.TraceInfo("\n" + title)
-advertiser.BlueToothStop()
+advertiser.AdvertisementStop()
 time.sleep(1)
 
 #subprocess.call(["sudo", "hciconfig hci0 up"])

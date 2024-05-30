@@ -25,15 +25,12 @@ class AdvertiserHCITool(Advertiser) :
         """
 
         super().__init__()
+        
+        self._isInitialized = False
+
         return
 
-    def BlueToothStop():
-        """
-        stop bluetooth advertising
-        """
-        pass
-
-    def AdvertismentStop(self):
+    def AdvertisementStop(self):
         """
         stop bluetooth advertising
         """
@@ -52,27 +49,28 @@ class AdvertiserHCITool(Advertiser) :
         """
         Set Advertisment data
         """
-        hcitool_args1 = self.HCITool_path + ' -i hci0 cmd 0x08 0x0008 ' + self._CreateTelegramForHCITool(manufacturerId, rawdata)
-        hcitool_args2 = self.HCITool_path + ' -i hci0 cmd 0x08 0x0006 A0 00 A0 00 03 00 00 00 00 00 00 00 00 07 00'
-        hcitool_args3 = self.HCITool_path + ' -i hci0 cmd 0x08 0x000a 01'
+
+        if(not self._isInitialized):
+            hcitool_args_0x08_0x0006 = self.HCITool_path + ' -i hci0 cmd 0x08 0x0006 A0 00 A0 00 03 00 00 00 00 00 00 00 00 07 00'
+            hcitool_args_0x08_0x000a = self.HCITool_path + ' -i hci0 cmd 0x08 0x000a 01'
+
+            if platform.system() == 'Linux':
+                subprocess.run(hcitool_args_0x08_0x0006 + ' &> /dev/null', shell=True, executable="/bin/bash")
+                subprocess.run(hcitool_args_0x08_0x000a + ' &> /dev/null', shell=True, executable="/bin/bash")
+
+            if (self._tracer != None):
+                self._tracer.TraceInfo(str(hcitool_args_0x08_0x0006))
+                self._tracer.TraceInfo(str(hcitool_args_0x08_0x000a))
+            
+            self._isInitialized = True
+
+        hcitool_args_0x08_0x0008 = self.HCITool_path + ' -i hci0 cmd 0x08 0x0008 ' + self._CreateTelegramForHCITool(manufacturerId, rawdata)
 
         if platform.system() == 'Linux':
-            subprocess.run(hcitool_args1 + ' &> /dev/null', shell=True, executable="/bin/bash")
-            subprocess.run(hcitool_args2 + ' &> /dev/null', shell=True, executable="/bin/bash")
-            subprocess.run(hcitool_args3 + ' &> /dev/null', shell=True, executable="/bin/bash")
+            subprocess.run(hcitool_args_0x08_0x0008 + ' &> /dev/null', shell=True, executable="/bin/bash")
 
         if (self._tracer != None):
-            self._tracer.TraceInfo(str(hcitool_args1))
-            self._tracer.TraceInfo(str(hcitool_args2))
-            self._tracer.TraceInfo(str(hcitool_args3))
-
-        # hcitool_args = self.HCITool_path + ' -i hci0 cmd 0x08 0x0008 ' + self._CreateTelegramForHCITool(manufacturerId, rawdata)
-
-        # if platform.system() == 'Linux':
-        #     subprocess.run(hcitool_args + ' &> /dev/null', shell=True, executable="/bin/bash")
-
-        # if (self._tracer != None):
-        #     self._tracer.TraceInfo(str(hcitool_args) + '\n')
+            self._tracer.TraceInfo(str(hcitool_args_0x08_0x0008))
 
         return
 

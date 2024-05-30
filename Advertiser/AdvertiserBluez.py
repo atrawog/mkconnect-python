@@ -240,7 +240,7 @@ class AdvertiserBluez(Advertiser) :
         self._mainloop.quit()
 
 
-    def AdvertismentStop(self):
+    def AdvertisementStop(self):
         """
         stop bluetooth advertising
 

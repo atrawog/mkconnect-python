@@ -36,7 +36,7 @@ class AdvertiserMicroPython(Advertiser) :
 
         return
 
-    def AdvertismentStop(self):
+    def AdvertisementStop(self):
         """
         stop bluetooth advertising
 
