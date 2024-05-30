@@ -349,8 +349,9 @@ class AdvertiserDBus(Advertiser) :
         self._ad_manager = bluez_proxy(ADAPTER_PATH, LE_ADVERTISING_MANAGER_IFACE)
 
         self._advertisementTable = dict()
+        return
 
-    def AdvertismentStop(self, tracer: Tracer=None):
+    def AdvertismentStop(self):
         """
         stop bluetooth advertising
 
@@ -369,12 +370,12 @@ class AdvertiserDBus(Advertiser) :
 
         # todo
 
-        if (tracer != None):
+        if (self._tracer != None):
             pass
 
         return
 
-    def AdvertisementStart(self, identifier: str, manufacturerId: bytes, rawdata: bytes, tracer: Tracer=None):
+    def AdvertisementStart(self, identifier: str, manufacturerId: bytes, rawdata: bytes):
         """
         send the bluetooth connect telegram to switch the MouldKing hubs in bluetooth mode
         press the button on the hub(s) and the flashing of status led should switch from blue-green to blue
@@ -385,14 +386,14 @@ class AdvertiserDBus(Advertiser) :
         #     advertisement = AdvertiserBluez.TestAdvertisement(self._bus, identifier, manufacturerId, rawdata)
         #     self._advertisementTable[identifier] = advertisement
 
-        self.AdvertisementSet(identifier, manufacturerId, rawdata, tracer)
+        self.AdvertisementSet(identifier, manufacturerId, rawdata)
 
-        if (tracer != None):
+        if (self._tracer != None):
             pass
 
         return
 
-    def AdvertisementSet(self, identifier: str, manufacturerId: bytes, rawdata: bytes, tracer: Tracer=None):
+    def AdvertisementSet(self, identifier: str, manufacturerId: bytes, rawdata: bytes):
         """
         Set Advertisment data
         """
@@ -407,8 +408,8 @@ class AdvertiserDBus(Advertiser) :
             try:
                 self._ad_manager.UnregisterAdvertisement(advertisement)
             except Exception as exception:
-                if (tracer != None):
-                    tracer.TraceInfo(exception)
+                if (self._tracer != None):
+                    self._tracer.TraceInfo(str(exception))
                 pass
 
         advertisement.manufacturer_data = {int.from_bytes(manufacturerId): rawdata}
@@ -416,7 +417,7 @@ class AdvertiserDBus(Advertiser) :
 
         self._ad_manager.RegisterAdvertisement('(oa{sv})', advertisement.path, {})
 
-        if (tracer != None):
+        if (self._tracer != None):
             pass
 
         return

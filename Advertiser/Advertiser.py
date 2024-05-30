@@ -14,16 +14,24 @@ class Advertiser :
         """
         initializes the object and defines the fields
         """
-        pass
+        self._tracer = None
+        return
 
-    def BlueToothStop(tracer: Tracer=None):
+    def SetTracer(self, tracer: Tracer) -> Tracer:
+        """
+        set tracer object
+        """
+        self._tracer = tracer
+        return tracer
+
+    def BlueToothStop():
         """
         stop bluetooth advertising
         """
-        pass
+        return
 
-    def AdvertisementStart(self, identifier: str, manufacturerId: bytes, rawdata: bytes, tracer: Tracer=None):
-        pass
+    def AdvertisementStart(self, identifier: str, manufacturerId: bytes, rawdata: bytes):
+        return
 
-    def AdvertisementSet(self, identifier: str, manufacturerId: bytes, rawdata: bytes, tracer: Tracer=None):
-        pass
+    def AdvertisementSet(self, identifier: str, manufacturerId: bytes, rawdata: bytes):
+        return

@@ -14,7 +14,7 @@ sys.path.append("Advertiser")
 #from Advertiser.AdvertiserHCITool import AdvertiserHCITool
 #from Advertiser.AdvertiserBluez import AdvertiserBluez
 #from Advertiser.AdvertiserDBus import AdvertiserDBus
-from Advertiser.AdvertiserPicoWBluetooth import AdvertiserPicoWBluetooth
+from Advertiser.AdvertiserMicroPython import AdvertiserMicoPython
 
 sys.path.append("MouldKing") 
 from MouldKing.MouldKing import MouldKing
@@ -32,7 +32,7 @@ MouldKing.Module6_0.SetTracer(tracer)
 #advertiser = MouldKing.Module6_0.SetAdvertiser(AdvertiserHCITool())
 #advertiser = MouldKing.Module6_0.SetAdvertiser(AdvertiserBluez())
 #advertiser = MouldKing.Module6_0.SetAdvertiser(AdvertiserDBus())
-advertiser = MouldKing.Module6_0.SetAdvertiser(AdvertiserPicoWBluetooth())
+advertiser = MouldKing.Module6_0.SetAdvertiser(AdvertiserMicoPython())
 
 # save pre-instantiated objects in local variables
 mk6_0 = MouldKing.Module6_0.Device0

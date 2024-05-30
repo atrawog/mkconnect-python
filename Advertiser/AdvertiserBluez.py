@@ -219,6 +219,7 @@ class AdvertiserBluez(Advertiser) :
 
         self._ad_manager = dbus.Interface(self._bus.get_object(BLUEZ_SERVICE_NAME, self._adapter), LE_ADVERTISING_MANAGER_IFACE)
         self._advertisementTable = dict()
+        return
 
     def _find_adapter(bus):
         remote_om = dbus.Interface(bus.get_object(BLUEZ_SERVICE_NAME, '/'), DBUS_OM_IFACE)
@@ -239,7 +240,7 @@ class AdvertiserBluez(Advertiser) :
         self._mainloop.quit()
 
 
-    def AdvertismentStop(self, tracer: Tracer=None):
+    def AdvertismentStop(self):
         """
         stop bluetooth advertising
 
@@ -258,12 +259,12 @@ class AdvertiserBluez(Advertiser) :
 
         # todo
 
-        if (tracer != None):
+        if (self._tracer != None):
             pass
 
         return
 
-    def AdvertisementStart(self, identifier: str, manufacturerId: bytes, rawdata: bytes, tracer: Tracer=None):
+    def AdvertisementStart(self, identifier: str, manufacturerId: bytes, rawdata: bytes):
         """
         send the bluetooth connect telegram to switch the MouldKing hubs in bluetooth mode
         press the button on the hub(s) and the flashing of status led should switch from blue-green to blue
@@ -274,14 +275,14 @@ class AdvertiserBluez(Advertiser) :
         #     advertisement = AdvertiserBluez.TestAdvertisement(self._bus, identifier, manufacturerId, rawdata)
         #     self._advertisementTable[identifier] = advertisement
 
-        self.AdvertisementSet(identifier, manufacturerId, rawdata, tracer)
+        self.AdvertisementSet(identifier, manufacturerId, rawdata)
 
-        if (tracer != None):
+        if (self._tracer != None):
             pass
 
         return
 
-    def AdvertisementSet(self, identifier: str, manufacturerId: bytes, rawdata: bytes, tracer: Tracer=None):
+    def AdvertisementSet(self, identifier: str, manufacturerId: bytes, rawdata: bytes):
         """
         Set Advertisment data
         """
@@ -301,7 +302,7 @@ class AdvertiserBluez(Advertiser) :
                                         reply_handler=self.register_ad_cb,
                                         error_handler=self.register_ad_error_cb)
 
-        if (tracer != None):
+        if (self._tracer != None):
             pass
 
         return
