@@ -12,10 +12,11 @@ from Tracer.Tracer import Tracer
 from Tracer.TracerConsole import TracerConsole
 
 sys.path.append("Advertiser") 
-#from Advertiser.AdvertiserHCITool import AdvertiserHCITool
-#from Advertiser.AdvertiserBluez import AdvertiserBluez
-#from Advertiser.AdvertiserDBus import AdvertiserDBus
-from Advertiser.AdvertiserMicroPython import AdvertiserMicroPython
+# uncomment to choose advertiser
+#from Advertiser.AdvertiserHCITool import AdvertiserHCITool as Advertiser
+from Advertiser.AdvertiserBluez import AdvertiserBluez as Advertiser
+#from Advertiser.AdvertiserDBus import AdvertiserDBus as Advertiser
+#from Advertiser.AdvertiserMicroPython import AdvertiserMicroPython as Advertiser
 
 sys.path.append("MouldKing") 
 from MouldKing.MouldKing import MouldKing
@@ -23,16 +24,16 @@ from MouldKing.Module6_0 import Module6_0
 from MouldKing.MouldKingCrypt import MouldKingCrypt
 from MouldKing.MouldKing_6 import MouldKing_6
 
-# instantiate Advertiser
+# instantiate Tracer
 tracer = TracerConsole()
+
+# instantiate Advertiser
+advertiser = Advertiser()
 
 # Set Tracer for all MouldKing Hubs 6.0
 MouldKing.Module6_0.SetTracer(tracer)
+MouldKing.Module6_0.SetAdvertiser(advertiser)
 
-# Set Advertiser for all MouldKing Hubs 6.0
-#advertiser = MouldKing.Module6_0.SetAdvertiser(AdvertiserHCITool())
-#advertiser = MouldKing.Module6_0.SetAdvertiser(AdvertiserBluez())
-advertiser = MouldKing.Module6_0.SetAdvertiser(AdvertiserMicroPython())
 
 # save pre-instantiated objects in local variables
 hub0 = MouldKing.Module6_0.Device0
