@@ -29,9 +29,6 @@ class AdvertisingDevice :
         """
         self._advertiser = advertiser
 
-        if(self._tracer is not None):
-            self._advertiser.SetTracer(self._tracer)
-
         return advertiser
 
     def SetTracer(self, tracer: Tracer) -> Tracer:
@@ -39,9 +36,6 @@ class AdvertisingDevice :
         set tracer object
         """
         self._tracer = tracer
-
-        if(self._advertiser is not None):
-            self._advertiser.SetTracer(self._tracer)
 
         return tracer
 

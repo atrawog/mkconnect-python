@@ -12,7 +12,7 @@ from Advertiser.Advertiser import Advertiser
 try:
     import bluetooth
 except ImportError as err:
-    print("AdvertiserMicroPython: " + err)
+    print("AdvertiserMicroPython: " + str(err))
 
 class AdvertiserMicroPython(Advertiser) :
     """
@@ -32,7 +32,7 @@ class AdvertiserMicroPython(Advertiser) :
             self.ble.active(True)
         except Exception as exception:
             self.ble = None
-            print("AdvertiserMicroPython.init: " + exception)
+            print("AdvertiserMicroPython.init: " + str(exception))
 
         return
 
