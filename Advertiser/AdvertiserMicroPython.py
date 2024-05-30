@@ -14,7 +14,7 @@ try:
 except ImportError as err:
     print(err)
 
-class AdvertiserMicoPython(Advertiser) :
+class AdvertiserMicroPython(Advertiser) :
     """
     Advertiser using bluetooth library from MicroPython
     """

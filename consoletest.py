@@ -2,25 +2,26 @@
 
 # to run:  python -i consoletest.py
 
-try:
-  from Tracer.Tracer import Tracer
-  from Tracer.TracerConsole import TracerConsole
+print('consoletest')
 
-  from Advertiser.AdvertiserHCITool import AdvertiserHCITool
-  from Advertiser.AdvertiserBluez import AdvertiserBluez
-
-  from MouldKing.MouldKing import MouldKing
-except ImportError:
-  from Tracer import Tracer
-  from TracerConsole import TracerConsole
-
-  from AdvertiserHCITool import AdvertiserHCITool
-  from AdvertiserBluez import AdvertiserBluez
-
-  from MouldKing import MouldKing
-
+import sys
 import time
-import numpy as np
+
+sys.path.append("Tracer") 
+from Tracer.Tracer import Tracer
+from Tracer.TracerConsole import TracerConsole
+
+sys.path.append("Advertiser") 
+#from Advertiser.AdvertiserHCITool import AdvertiserHCITool
+#from Advertiser.AdvertiserBluez import AdvertiserBluez
+#from Advertiser.AdvertiserDBus import AdvertiserDBus
+from Advertiser.AdvertiserMicroPython import AdvertiserMicroPython
+
+sys.path.append("MouldKing") 
+from MouldKing.MouldKing import MouldKing
+from MouldKing.Module6_0 import Module6_0
+from MouldKing.MouldKingCrypt import MouldKingCrypt
+from MouldKing.MouldKing_6 import MouldKing_6
 
 # instantiate Advertiser
 tracer = TracerConsole()
@@ -29,8 +30,9 @@ tracer = TracerConsole()
 MouldKing.Module6_0.SetTracer(tracer)
 
 # Set Advertiser for all MouldKing Hubs 6.0
-# advertiser = MouldKing.Module6_0.SetAdvertiser(AdvertiserHCITool())
-advertiser = MouldKing.Module6_0.SetAdvertiser(AdvertiserBluez())
+#advertiser = MouldKing.Module6_0.SetAdvertiser(AdvertiserHCITool())
+#advertiser = MouldKing.Module6_0.SetAdvertiser(AdvertiserBluez())
+advertiser = MouldKing.Module6_0.SetAdvertiser(AdvertiserMicroPython())
 
 # save pre-instantiated objects in local variables
 hub0 = MouldKing.Module6_0.Device0

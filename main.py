@@ -4,7 +4,6 @@ print('testmain')
 
 import sys
 import time
-#import threading
 
 sys.path.append("Tracer") 
 from Tracer.Tracer import Tracer
@@ -14,7 +13,7 @@ sys.path.append("Advertiser")
 #from Advertiser.AdvertiserHCITool import AdvertiserHCITool
 #from Advertiser.AdvertiserBluez import AdvertiserBluez
 #from Advertiser.AdvertiserDBus import AdvertiserDBus
-from Advertiser.AdvertiserMicroPython import AdvertiserMicoPython
+from Advertiser.AdvertiserMicroPython import AdvertiserMicroPython
 
 sys.path.append("MouldKing") 
 from MouldKing.MouldKing import MouldKing
@@ -32,7 +31,7 @@ MouldKing.Module6_0.SetTracer(tracer)
 #advertiser = MouldKing.Module6_0.SetAdvertiser(AdvertiserHCITool())
 #advertiser = MouldKing.Module6_0.SetAdvertiser(AdvertiserBluez())
 #advertiser = MouldKing.Module6_0.SetAdvertiser(AdvertiserDBus())
-advertiser = MouldKing.Module6_0.SetAdvertiser(AdvertiserMicoPython())
+advertiser = MouldKing.Module6_0.SetAdvertiser(AdvertiserMicroPython())
 
 # save pre-instantiated objects in local variables
 mk6_0 = MouldKing.Module6_0.Device0
