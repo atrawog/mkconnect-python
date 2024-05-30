@@ -48,10 +48,9 @@ class AdvertiserHCITool(Advertiser) :
 
         return
 
-    def AdvertisementStart(self, identifier: str, manufacturerId: bytes, rawdata: bytes):
+    def AdvertisementSet(self, identifier: str, manufacturerId: bytes, rawdata: bytes):
         """
-        send the bluetooth connect telegram to switch the MouldKing hubs in bluetooth mode
-        press the button on the hub(s) and the flashing of status led should switch from blue-green to blue
+        Set Advertisment data
         """
         hcitool_args1 = self.HCITool_path + ' -i hci0 cmd 0x08 0x0008 ' + self._CreateTelegramForHCITool(manufacturerId, rawdata)
         hcitool_args2 = self.HCITool_path + ' -i hci0 cmd 0x08 0x0006 A0 00 A0 00 03 00 00 00 00 00 00 00 00 07 00'
@@ -67,19 +66,13 @@ class AdvertiserHCITool(Advertiser) :
             self._tracer.TraceInfo(str(hcitool_args2))
             self._tracer.TraceInfo(str(hcitool_args3))
 
-        return
+        # hcitool_args = self.HCITool_path + ' -i hci0 cmd 0x08 0x0008 ' + self._CreateTelegramForHCITool(manufacturerId, rawdata)
 
-    def AdvertisementSet(self, identifier: str, manufacturerId: bytes, rawdata: bytes):
-        """
-        Set Advertisment data
-        """
-        hcitool_args = self.HCITool_path + ' -i hci0 cmd 0x08 0x0008 ' + self._CreateTelegramForHCITool(manufacturerId, rawdata)
+        # if platform.system() == 'Linux':
+        #     subprocess.run(hcitool_args + ' &> /dev/null', shell=True, executable="/bin/bash")
 
-        if platform.system() == 'Linux':
-            subprocess.run(hcitool_args + ' &> /dev/null', shell=True, executable="/bin/bash")
-
-        if (self._tracer != None):
-            self._tracer.TraceInfo(str(hcitool_args) + '\n')
+        # if (self._tracer != None):
+        #     self._tracer.TraceInfo(str(hcitool_args) + '\n')
 
         return
 

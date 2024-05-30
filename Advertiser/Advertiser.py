@@ -30,8 +30,5 @@ class Advertiser :
         """
         return
 
-    def AdvertisementStart(self, identifier: str, manufacturerId: bytes, rawdata: bytes):
-        return
-
     def AdvertisementSet(self, identifier: str, manufacturerId: bytes, rawdata: bytes):
         return

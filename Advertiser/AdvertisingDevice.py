@@ -39,13 +39,6 @@ class AdvertisingDevice :
 
         return tracer
 
-    def AdvertisementStart(self, manufacturerId: bytes, rawdata: bytes):
-        """
-        send the bluetooth connect telegram to switch the MouldKing hubs in bluetooth mode
-        press the button on the hub(s) and the flashing of status led should switch from blue-green to blue
-        """
-        pass
-
     def AdvertisementSet(self, manufacturerId: bytes, rawdata: bytes):
         """
         Set Advertisment data

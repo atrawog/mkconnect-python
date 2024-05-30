@@ -56,18 +56,6 @@ class AdvertiserMicroPython(Advertiser) :
 
         return
 
-    def AdvertisementStart(self, identifier: str, manufacturerId: bytes, rawdata: bytes):
-        """
-        send the bluetooth connect telegram to switch the MouldKing hubs in bluetooth mode
-        press the button on the hub(s) and the flashing of status led should switch from blue-green to blue
-        """
-        self.AdvertisementSet(identifier, manufacturerId, rawdata)
-
-        if (self._tracer != None):
-            pass
-
-        return
-
     def AdvertisementSet(self, identifier: str, manufacturerId: bytes, rawdata: bytes):
         """
         Set Advertisment data

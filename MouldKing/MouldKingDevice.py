@@ -112,7 +112,7 @@ class MouldKingDevice(AdvertisingDevice) :
 
         if(self._advertiser != None):
             cryptedData = MouldKingCrypt.Crypt(rawdata)
-            self._advertiser.AdvertisementStart(self._identifier, self.ManufacturerID, cryptedData)
+            self._advertiser.AdvertisementSet(self._identifier, self.ManufacturerID, cryptedData)
 
         return self._Telegram_connect
 
