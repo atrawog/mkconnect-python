@@ -44,12 +44,11 @@ class MouldKingDevice(AdvertisingDevice) :
         self._Telegram_connect = telegram_connect
         self._Basetelegram = basetelegram
 
-        self._Channel_A_Value = 0
-        self._Channel_B_Value = 0
-        self._Channel_C_Value = 0
-        self._Channel_D_Value = 0
-        self._Channel_E_Value = 0
-        self._Channel_F_Value = 0
+        # create array 
+        self._ChannelValueList = [float(0)] * self._NumberOfChannels
+
+        return
+
 
     def Connect(self) -> bytes:
         """
@@ -64,13 +63,9 @@ class MouldKingDevice(AdvertisingDevice) :
         """
 
         # init channels        
-        self._Channel_A_Value = float(0)
-        self._Channel_B_Value = float(0)
-        self._Channel_C_Value = float(0)
-        self._Channel_D_Value = float(0)
-        self._Channel_E_Value = float(0)
-        self._Channel_F_Value = float(0)
-
+        for channelId in range(0, self._NumberOfChannels):
+            self._ChannelValueList[channelId] = float(0)
+        
         return self.CreateTelegram()
 
     def SetChannel(self, channelId: int, value: float) -> bytes:
@@ -80,18 +75,8 @@ class MouldKingDevice(AdvertisingDevice) :
 
         if channelId > self._NumberOfChannels - 1:
             raise Exception("only channelId 0.." + int(self._NumberOfChannels - 1) + "are allowed")
-        elif channelId == 0:
-            self._Channel_A_Value = value
-        elif channelId == 1:    
-            self._Channel_B_Value = value
-        elif channelId == 2:    
-            self._Channel_C_Value = value
-        elif channelId == 3:    
-            self._Channel_D_Value = value
-        elif channelId == 4:    
-            self._Channel_E_Value = value
-        elif channelId == 5:    
-            self._Channel_F_Value = value
+
+        self._ChannelValueList[channelId] = value
         
         return self.CreateTelegram()
 
