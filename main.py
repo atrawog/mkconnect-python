@@ -11,10 +11,16 @@ from Tracer.TracerConsole import TracerConsole
 
 sys.path.append("Advertiser") 
 # uncomment to choose advertiser
-from Advertiser.AdvertiserHCITool import AdvertiserHCITool as Advertiser
-#from Advertiser.AdvertiserBluez import AdvertiserBluez as Advertiser
-#from Advertiser.AdvertiserDBus import AdvertiserDBus as Advertiser
-#from Advertiser.AdvertiserMicroPython import AdvertiserMicroPython as Advertiser
+if (sys.platform == 'linux'):
+    from Advertiser.AdvertiserHCITool import AdvertiserHCITool as Advertiser
+    #from Advertiser.AdvertiserBluez import AdvertiserBluez as Advertiser      # don't work yet
+    #from Advertiser.AdvertiserDBus import AdvertiserDBus as Advertiser        # don't work yet
+    pass
+elif (sys.platform == 'rp2'):
+    #from Advertiser.AdvertiserMicroPython import AdvertiserMicroPython as Advertiser
+    pass
+else:
+    raise Exception('unsupported platform')
 
 sys.path.append("MouldKing") 
 from MouldKing.MouldKing import MouldKing

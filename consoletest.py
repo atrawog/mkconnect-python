@@ -1,12 +1,11 @@
 #!/usr/bin/python
 
-# to run:  python -i consoletest.py
+# to run: sudo python -i consoletest.py
 
 print('consoletest')
 
 import sys
 import time
-import numpy as np
 
 sys.path.append("Tracer") 
 from Tracer.Tracer import Tracer
@@ -14,10 +13,16 @@ from Tracer.TracerConsole import TracerConsole
 
 sys.path.append("Advertiser") 
 # uncomment to choose advertiser
-from Advertiser.AdvertiserHCITool import AdvertiserHCITool as Advertiser
-#from Advertiser.AdvertiserBluez import AdvertiserBluez as Advertiser
-#from Advertiser.AdvertiserDBus import AdvertiserDBus as Advertiser
-#from Advertiser.AdvertiserMicroPython import AdvertiserMicroPython as Advertiser
+if (sys.platform == 'linux'):
+    from Advertiser.AdvertiserHCITool import AdvertiserHCITool as Advertiser
+    #from Advertiser.AdvertiserBluez import AdvertiserBluez as Advertiser      # don't work yet
+    #from Advertiser.AdvertiserDBus import AdvertiserDBus as Advertiser        # don't work yet
+    pass
+elif (sys.platform == 'rp2'):
+    #from Advertiser.AdvertiserMicroPython import AdvertiserMicroPython as Advertiser
+    pass
+else:
+    raise Exception('unsupported platform')
 
 sys.path.append("MouldKing") 
 from MouldKing.MouldKing import MouldKing
@@ -70,17 +75,17 @@ def _automate(deviceId: int, channel: int):
         return
 
     tracer.TraceInfo("HUB: "+  str(deviceId) +", FORWARD : Power ramp up from 0 to 100% on channel :" + str(channel))
-    for i in np.arange(0, 1.1, 0.1):
-        tracer.TraceInfo("Power : " + str(i))
-        mkcontrol(deviceId,channel,i)
+    for percent in range(0, 110, 10):
+        tracer.TraceInfo("Power : " + str(percent) + "%")
+        mkcontrol(deviceId,channel, percent/100)
         time.sleep(1)
 
     mkstop(deviceId)
 
     tracer.TraceInfo("HUB: "+  str(deviceId) +", REVERSE: Power ramp up from 0 to 100% on channel :" + str(channel))
-    for i in np.arange(-0, -1.1, -0.1):
-        tracer.TraceInfo("Power : " + str(i) + "\n")
-        mkcontrol(deviceId,channel,i)
+    for percent in range(-0, -110, -10):
+        tracer.TraceInfo("Power : " + str(percent) + "%")
+        mkcontrol(deviceId,channel,percent/100)
         time.sleep(1)
 
     mkstop(deviceId)
@@ -123,7 +128,7 @@ def mkcontrol(deviceId: int=0, channel: int=0, powerAndDirection: float=0):
 
 def test_hub(hubId: int=0):
     tracer.TraceInfo("HUB "+ str(hubId) +" connecting")
-    mkconnect(hubId)
+    mkconnect()
     time.sleep(1)
 
     for index in range(6):
