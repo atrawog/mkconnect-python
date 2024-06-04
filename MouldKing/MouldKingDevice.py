@@ -19,23 +19,21 @@ class MouldKingDevice(AdvertisingDevice) :
 
     ManufacturerID = bytes([0xFF, 0xF0])
 
-    def __init__(self, identifier: str, numberOfChannels, channelStartOffset, channelEndOffset, telegram_connect, basetelegram):
+    def __init__(self, identifier: str, numberOfChannels: int, channelStartOffset: int, channelEndOffset: int, telegram_connect: bytes, basetelegram: bytes):
         """
         initializes the object and defines the fields
         """
 
         super().__init__(identifier)
 
-        if numberOfChannels > 6:
-            raise Exception("max 6 channels")
+        if telegram_connect is not None:
+            maxArrayOffset = len(telegram_connect) - 1
 
-        maxArrayOffset = len(telegram_connect) - 1
+            if channelStartOffset > maxArrayOffset:
+                raise Exception("max channelStartOffset:" + maxArrayOffset)
 
-        if channelStartOffset > maxArrayOffset:
-            raise Exception("max channelStartOffset:" + maxArrayOffset)
-
-        if channelEndOffset > (maxArrayOffset - 1):
-            raise Exception("max channelEndOffset:" + maxArrayOffset)
+            if channelEndOffset > (maxArrayOffset - 1):
+                raise Exception("max channelEndOffset:" + maxArrayOffset)
 
         self._NumberOfChannels = numberOfChannels
         self._ChannelStartOffset = channelStartOffset
@@ -52,7 +50,7 @@ class MouldKingDevice(AdvertisingDevice) :
 
     def Connect(self) -> bytes:
         """
-        returns the telegram to switch the MouldKing brick to bluetooth mode
+        returns the telegram to switch the MouldKing Hubs to bluetooth mode
         """
 
         raise NotImplementedError # override this methode

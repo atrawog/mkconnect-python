@@ -24,9 +24,6 @@ else:
 
 sys.path.append("MouldKing") 
 from MouldKing.MouldKing import MouldKing
-from MouldKing.Module6_0 import Module6_0
-from MouldKing.MouldKingCrypt import MouldKingCrypt
-from MouldKing.MouldKing_6 import MouldKing_6
 
 # instantiate Tracer
 tracer = TracerConsole()
@@ -35,21 +32,27 @@ tracer = TracerConsole()
 advertiser = Advertiser()
 advertiser.SetTracer(tracer)
 
-# Set Tracer for all MouldKing 6.0 Hubs
-MouldKing.Module6_0.SetTracer(tracer)
-MouldKing.Module6_0.SetAdvertiser(advertiser)
+# Set Tracer for all MouldKing Hubs
+MouldKing.SetTracer(tracer)
+MouldKing.SetAdvertiser(advertiser)
 
 # save pre-instantiated objects in local variables
-mk6_0 = MouldKing.Module6_0.Device0
-mk6_1 = MouldKing.Module6_0.Device1
-mk6_2 = MouldKing.Module6_0.Device2
+hub0 = MouldKing.Module6_0.Device0
+hub1 = MouldKing.Module6_0.Device1
+hub2 = MouldKing.Module6_0.Device2
+
+#hub0 = MouldKing.Module4_0.Device0
+#hub1 = MouldKing.Module4_0.Device0
+#hub2 = MouldKing.Module4_0.Device2
 
 ############################################################################
 # get uncrypted connect-telegram as bytearray
 title = "connect-telegram"
 tracer.TraceInfo("\n" + title)
 
-rawdata = mk6_0.Connect()
+rawdata = hub0.Connect()
+rawdata = hub1.Connect()
+rawdata = hub2.Connect()
 time.sleep(5)
 
 #tracer.TraceInfo("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))
@@ -62,8 +65,8 @@ time.sleep(5)
 title = "stop-telegram"
 tracer.TraceInfo("\n" + title)
 
-rawdata = mk6_0.Stop()
-rawdata = mk6_1.Stop()
+rawdata = hub0.Stop()
+rawdata = hub1.Stop()
 time.sleep(1)
 
 #tracer.TraceInfo("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))
@@ -76,7 +79,7 @@ time.sleep(1)
 title = "C1: fullspeed forwards"
 tracer.TraceInfo("\n" + title)
 
-rawdata = mk6_0.SetChannel(0, 1)
+rawdata = hub0.SetChannel(0, 1)
 time.sleep(1)
 
 #tracer.TraceInfo("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))
@@ -89,7 +92,7 @@ time.sleep(1)
 title = "C1: halfspeed forwards"
 tracer.TraceInfo("\n" + title)
 
-rawdata = mk6_0.SetChannel(0, 0.5)
+rawdata = hub0.SetChannel(0, 0.5)
 time.sleep(1)
 
 #tracer.TraceInfo("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))
@@ -102,7 +105,7 @@ time.sleep(1)
 title = "C1: fullspeed forwards"
 tracer.TraceInfo("\n" + title)
 
-rawdata = mk6_1.SetChannel(0, 1)
+rawdata = hub1.SetChannel(0, 1)
 time.sleep(2)
 
 #tracer.TraceInfo("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))
@@ -115,7 +118,7 @@ time.sleep(2)
 title = "C1: halfspeed backwards"
 tracer.TraceInfo("\n" + title)
 
-rawdata = mk6_0.SetChannel(0, -0.5)
+rawdata = hub0.SetChannel(0, -0.5)
 time.sleep(1)
 
 #tracer.TraceInfo("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))
@@ -128,7 +131,7 @@ time.sleep(1)
 title = "C2: halfspeed backwards"
 tracer.TraceInfo("\n" + title)
 
-rawdata = mk6_0.SetChannel(1, -0.5)
+rawdata = hub0.SetChannel(1, -0.5)
 time.sleep(1)
 
 #tracer.TraceInfo("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))

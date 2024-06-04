@@ -26,9 +26,6 @@ else:
 
 sys.path.append("MouldKing") 
 from MouldKing.MouldKing import MouldKing
-from MouldKing.Module6_0 import Module6_0
-from MouldKing.MouldKingCrypt import MouldKingCrypt
-from MouldKing.MouldKing_6 import MouldKing_6
 
 # instantiate Tracer
 tracer = TracerConsole()
@@ -37,15 +34,18 @@ tracer = TracerConsole()
 advertiser = Advertiser()
 advertiser.SetTracer(tracer)
 
-# Set Tracer for all MouldKing Hubs 6.0
-MouldKing.Module6_0.SetTracer(tracer)
-MouldKing.Module6_0.SetAdvertiser(advertiser)
-
+# Set Tracer for all MouldKing Hubs
+MouldKing.SetTracer(tracer)
+MouldKing.SetAdvertiser(advertiser)
 
 # save pre-instantiated objects in local variables
 hub0 = MouldKing.Module6_0.Device0
 hub1 = MouldKing.Module6_0.Device1
 hub2 = MouldKing.Module6_0.Device2
+
+hub3 = MouldKing.Module4_0.Device0
+hub4 = MouldKing.Module4_0.Device1
+hub5 = MouldKing.Module4_0.Device2
 
 def _getChannelId(channel):
     switch={
@@ -59,14 +59,22 @@ def _getChannelId(channel):
     return switch.get(channel,"")
 
 def _getHubId(deviceId):
+    # MK6
     if deviceId == 0:
         return hub0
     elif deviceId == 1:
         return hub1
     elif deviceId == 2:
         return hub2
+    # MK4
+    elif deviceId == 3:
+        return hub3
+    elif deviceId == 4:
+        return hub4
+    elif deviceId == 5:
+        return hub5
     else:
-        raise Exception("deviceId 0..2")
+        raise Exception("deviceId 0..5")
 
 def _automate(deviceId: int, channel: int):
     userinput = input("\nDo you want to test channel "+ str(channel) +" ? enter y/n\n")
@@ -107,12 +115,12 @@ def mkbtstop():
 
     return
 
-def mkconnect():
+def mkconnect(deviceId: int=0):
     """
     send the bluetooth connect telegram to switch the MouldKing hubs in bluetooth mode
     press the button on the hub(s) and the flashing of status led should switch from blue-green to blue
     """
-    hub = _getHubId(0)
+    hub = _getHubId(deviceId)
     rawdata = hub.Connect()
     return
 

@@ -22,7 +22,7 @@ class MouldKingDeviceByte(MouldKingDevice) :
 
     def Connect(self) -> bytes:
         """
-        returns the telegram to switch the MouldKing brick in bluetooth mode
+        returns the telegram to switch the MouldKing Hubs in bluetooth mode
         """
 
         self._Advertise(self._Telegram_connect)
