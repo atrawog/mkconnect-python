@@ -84,17 +84,21 @@ class AdvertiserHCITool(Advertiser) :
         while(self._ad_thread_Run):
             try:
                 self._ad_thread_Lock.acquire(blocking=True)
-                advertisementValues = self._advertisementTable.copy()
+                copy_of_advertisementTable = self._advertisementTable.copy()
                 self._ad_thread_Lock.release()
+                
+                # We want to repeat each command 
+                repetitionsPerSecond = 4
+                # timeSlot = 1 second / repetitionsPerSecond / len(copy_of_advertisementTable)
+                timeSlot = 1 / repetitionsPerSecond / max(1, len(copy_of_advertisementTable))
 
-                for advertisement in advertisementValues.values():
+                for key, advertisement in copy_of_advertisementTable.items():
+                    # stopp publishing?
                     if(not self._ad_thread_Run):
                         return
-                        
-                    subprocess.run(advertisement + ' &> /dev/null', shell=True, executable="/bin/bash")
 
-                    # if (self._tracer is not None):
-                    #     self._tracer.TraceInfo(str(advertisement))
+                    timeStart = time.time()    
+                    subprocess.run(advertisement + ' &> /dev/null', shell=True, executable="/bin/bash")
 
                     if(not self._isInitialized):
                         hcitool_args_0x08_0x0006 = self.HCITool_path + ' -i hci0 cmd 0x08 0x0006 A0 00 A0 00 03 00 00 00 00 00 00 00 00 07 00'
@@ -106,10 +110,21 @@ class AdvertiserHCITool(Advertiser) :
                         if (self._tracer is not None):
                             self._tracer.TraceInfo(str(hcitool_args_0x08_0x0006))
                             self._tracer.TraceInfo(str(hcitool_args_0x08_0x000a))
+                            self._tracer.TraceInfo()
                         
                         self._isInitialized = True
 
-                    time.sleep(0.05)
+                    timeEnd = time.time()    
+                    timeDelta = timeEnd - timeStart
+                    timeSlotRemain = max(0.001, timeSlot - timeDelta)
+
+                    # if (self._tracer is not None):
+                    #     self._tracer.TraceInfo(str(timeSlotRemain) + " " + str(key) + ": " + str(advertisement))
+                        
+                    # if (self._tracer is not None):
+                    #     self._tracer.TraceInfo(str(timeSlotRemain))
+
+                    time.sleep(timeSlotRemain)
             except:
                 pass
 
