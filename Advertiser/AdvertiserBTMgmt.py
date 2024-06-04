@@ -13,12 +13,12 @@ import subprocess
 import threading
 import time
 
-class AdvertiserHCITool(Advertiser) :
+class AdvertiserBTMgmt(Advertiser) :
     """
     baseclass
     """
 
-    HCITool_path = '/usr/bin/hcitool'
+    BTMgmt_path = '/usr/bin/btmgmt'
 
     def __init__(self):
         """
@@ -46,12 +46,12 @@ class AdvertiserHCITool(Advertiser) :
             self._ad_thread = None
             self._isInitialized = False
 
-        hcitool_args_0x08_0x000a = self.HCITool_path + ' -i hci0 cmd 0x08 0x000a 00' + ' &> /dev/null'
+        hcitool_args_0x08_0x000a = self.BTMgmt_path + ' rm-adv 1' + ' &> /dev/null'
 
         subprocess.run(hcitool_args_0x08_0x000a, shell=True, executable="/bin/bash")
 
         if (self._tracer is not None):
-            self._tracer.TraceInfo('AdvertiserHCITool.AdvertisementStop')
+            self._tracer.TraceInfo('AdvertiserBTMgmt.AdvertisementStop')
             self._tracer.TraceInfo(hcitool_args_0x08_0x000a)
 
         return
@@ -61,7 +61,7 @@ class AdvertiserHCITool(Advertiser) :
         Set Advertisement data
         """
 
-        advertisementCommand = self.HCITool_path + ' -i hci0 cmd 0x08 0x0008 ' + self._CreateTelegramForHCITool(manufacturerId, rawdata)
+        advertisementCommand = self.BTMgmt_path + ' add-adv -d ' + self._CreateTelegramForBTMgmmt(manufacturerId, rawdata) + ' --general-discov 1'
         self._ad_thread_Lock.acquire(blocking=True)
         self._advertisementTable[identifier] = advertisementCommand
         self._ad_thread_Lock.release()
@@ -73,13 +73,13 @@ class AdvertiserHCITool(Advertiser) :
             self._ad_thread_Run = True
 
         if (self._tracer is not None):
-            self._tracer.TraceInfo('AdvertiserHCITool.AdvertisementSet')
+            self._tracer.TraceInfo('AdvertiserBTMgmt.AdvertisementSet')
 
         return
 
     def _publish(self):
         if (self._tracer is not None):
-            self._tracer.TraceInfo('AdvertiserHCITool._publish')
+            self._tracer.TraceInfo('AdvertiserBTMgmt._publish')
 
         while(self._ad_thread_Run):
             try:
@@ -101,16 +101,16 @@ class AdvertiserHCITool(Advertiser) :
                     subprocess.run(advertisementCommand + ' &> /dev/null', shell=True, executable="/bin/bash")
 
                     if(not self._isInitialized):
-                        hcitool_args_0x08_0x0006 = self.HCITool_path + ' -i hci0 cmd 0x08 0x0006 A0 00 A0 00 03 00 00 00 00 00 00 00 00 07 00'
-                        hcitool_args_0x08_0x000a = self.HCITool_path + ' -i hci0 cmd 0x08 0x000a 01'
+                        # hcitool_args_0x08_0x0006 = self.BTMgmt_path + ' -i hci0 cmd 0x08 0x0006 A0 00 A0 00 03 00 00 00 00 00 00 00 00 07 00'
+                        # hcitool_args_0x08_0x000a = self.BTMgmt_path + ' -i hci0 cmd 0x08 0x000a 01'
 
-                        subprocess.run(hcitool_args_0x08_0x0006 + ' &> /dev/null', shell=True, executable="/bin/bash")
-                        subprocess.run(hcitool_args_0x08_0x000a + ' &> /dev/null', shell=True, executable="/bin/bash")
+                        # subprocess.run(hcitool_args_0x08_0x0006 + ' &> /dev/null', shell=True, executable="/bin/bash")
+                        # subprocess.run(hcitool_args_0x08_0x000a + ' &> /dev/null', shell=True, executable="/bin/bash")
 
-                        if (self._tracer is not None):
-                            self._tracer.TraceInfo(str(hcitool_args_0x08_0x0006))
-                            self._tracer.TraceInfo(str(hcitool_args_0x08_0x000a))
-                            self._tracer.TraceInfo()
+                        # if (self._tracer is not None):
+                        #     self._tracer.TraceInfo(str(hcitool_args_0x08_0x0006))
+                        #     self._tracer.TraceInfo(str(hcitool_args_0x08_0x000a))
+                        #     self._tracer.TraceInfo()
                         
                         self._isInitialized = True
 
@@ -128,22 +128,18 @@ class AdvertiserHCITool(Advertiser) :
             except:
                 pass
 
-    def _CreateTelegramForHCITool(self, manufacturerId: bytes, rawDataArray: bytes):
+    def _CreateTelegramForBTMgmmt(self, manufacturerId: bytes, rawDataArray: bytes):
         """
-        Create input data for hcitool 
+        Create input data for btmgmt 
         """
         rawDataArrayLen = len(rawDataArray)
         
-        resultArray = bytearray(8 + rawDataArrayLen)
-        resultArray[0] = rawDataArrayLen + 7 # len
-        resultArray[1] = 0x02                 # flags
-        resultArray[2] = 0x01
-        resultArray[3] = 0x02
-        resultArray[4] = rawDataArrayLen + 3 # len
-        resultArray[5] = 0xFF                # type manufacturer specific
-        resultArray[6] = manufacturerId[1]   # companyId
-        resultArray[7] = manufacturerId[0]   # companyId
+        resultArray = bytearray(4 + rawDataArrayLen)
+        resultArray[0] = rawDataArrayLen + 3 # len
+        resultArray[1] = 0xFF                # type manufacturer specific
+        resultArray[2] = manufacturerId[1]   # companyId
+        resultArray[3] = manufacturerId[0]   # companyId
         for index in range(rawDataArrayLen):
-            resultArray[index + 8] = rawDataArray[index]
+            resultArray[index + 4] = rawDataArray[index]
 
         return ' '.join(f'{x:02x}' for x in resultArray)
