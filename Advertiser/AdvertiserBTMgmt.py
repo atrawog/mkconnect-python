@@ -46,14 +46,17 @@ class AdvertiserBTMgmt(Advertiser) :
             self._ad_thread = None
             self._isInitialized = False
 
-        hcitool_args_0x08_0x000a = self.BTMgmt_path + ' rm-adv 1' + ' &> /dev/null'
-
-        subprocess.run(hcitool_args_0x08_0x000a, shell=True, executable="/bin/bash")
-
         if (self._tracer is not None):
             self._tracer.TraceInfo('AdvertiserBTMgmt.AdvertisementStop')
-            self._tracer.TraceInfo(hcitool_args_0x08_0x000a)
 
+        for key, advertisementNumber in self._advertisementTable.items():
+            advertisementCommand = self.BTMgmt_path + ' rm-adv ' + str(advertisementNumber)
+            subprocess.run(advertisementCommand + ' &> /dev/null', shell=True, executable="/bin/bash")
+
+            if (self._tracer is not None):
+                self._tracer.TraceInfo(advertisementCommand)
+
+        self._advertisementTable.clear()
         return
 
     def AdvertisementSet(self, identifier: str, manufacturerId: bytes, rawdata: bytes):
@@ -61,16 +64,24 @@ class AdvertiserBTMgmt(Advertiser) :
         Set Advertisement data
         """
 
-        advertisementCommand = self.BTMgmt_path + ' add-adv -d ' + self._CreateTelegramForBTMgmmt(manufacturerId, rawdata) + ' --general-discov 1'
         self._ad_thread_Lock.acquire(blocking=True)
-        self._advertisementTable[identifier] = advertisementCommand
+        advertisementNumber = self._advertisementTable.get(identifier)
+        if(advertisementNumber is None):
+            advertisementNumber = len(self._advertisementTable) + 1
+            self._advertisementTable[identifier] = advertisementNumber
         self._ad_thread_Lock.release()
 
-        if(not self._ad_thread_Run):
-            self._ad_thread = threading.Thread(target=self._publish)
-            self._ad_thread.daemon = True
-            self._ad_thread.start()
-            self._ad_thread_Run = True
+        advertisementCommand = self.BTMgmt_path + ' add-adv -d ' + self._CreateTelegramForBTMgmmt(manufacturerId, rawdata) + ' --general-discov ' + str(advertisementNumber)
+        subprocess.run(advertisementCommand + ' &> /dev/null', shell=True, executable="/bin/bash")
+
+        if (self._tracer is not None):
+            self._tracer.TraceInfo(advertisementCommand)
+
+        # if(not self._ad_thread_Run):
+        #     self._ad_thread = threading.Thread(target=self._publish)
+        #     self._ad_thread.daemon = True
+        #     self._ad_thread.start()
+        #     self._ad_thread_Run = True
 
         if (self._tracer is not None):
             self._tracer.TraceInfo('AdvertiserBTMgmt.AdvertisementSet')
@@ -142,4 +153,4 @@ class AdvertiserBTMgmt(Advertiser) :
         for index in range(rawDataArrayLen):
             resultArray[index + 4] = rawDataArray[index]
 
-        return ' '.join(f'{x:02x}' for x in resultArray)
+        return ''.join(f'{x:02x}' for x in resultArray)
