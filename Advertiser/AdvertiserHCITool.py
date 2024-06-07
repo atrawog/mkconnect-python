@@ -46,9 +46,9 @@ class AdvertiserHCITool(Advertiser) :
             self._ad_thread = None
             self._isInitialized = False
 
-        hcitool_args_0x08_0x000a = self.HCITool_path + ' -i hci0 cmd 0x08 0x000a 00' + ' &> /dev/null'
+        hcitool_args_0x08_0x000a = self.HCITool_path + ' -i hci0 cmd 0x08 0x000a 00'
 
-        subprocess.run(hcitool_args_0x08_0x000a, shell=True, executable="/bin/bash")
+        subprocess.run(hcitool_args_0x08_0x000a + ' &> /dev/null', shell=True, executable="/bin/bash")
 
         if (self._tracer is not None):
             self._tracer.TraceInfo('AdvertiserHCITool.AdvertisementStop')
