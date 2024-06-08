@@ -20,6 +20,7 @@ class AdvertisingDevice :
         """
 
         self._advertiser = None
+        self._advertiser_registered = False
         self._tracer = None
         self._identifier = identifier
 
@@ -38,6 +39,31 @@ class AdvertisingDevice :
         self._tracer = tracer
 
         return tracer
+
+    def Connect(self) -> bytes:
+        """
+        connects the device to the advertiser
+        """
+
+        if(self._advertiser is not None):
+            self._advertiser_registered = self._advertiser.TryRegisterDevice(self._identifier)
+
+        return
+
+    def Disconnect(self) -> bytes:
+        """
+        disconnects the device from the advertiser
+        """
+
+        if(self._advertiser is not None):
+            self._advertiser_registered = not self._advertiser.TryUnregisterDevice(self._identifier)
+
+    def Stop(self) -> bytes:
+        """
+        stops the device
+        """
+
+        raise NotImplementedError # override this methode
 
     def AdvertisementSet(self, manufacturerId: bytes, rawdata: bytes):
         """

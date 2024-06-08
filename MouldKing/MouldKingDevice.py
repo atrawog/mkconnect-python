@@ -47,14 +47,6 @@ class MouldKingDevice(AdvertisingDevice) :
 
         return
 
-
-    def Connect(self) -> bytes:
-        """
-        returns the telegram to switch the MouldKing Hubs to bluetooth mode
-        """
-
-        raise NotImplementedError # override this methode
-
     def Stop(self) -> bytes:
         """
         set internal stored value of all channels to zero and return the telegram

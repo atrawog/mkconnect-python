@@ -30,5 +30,17 @@ class Advertiser :
         """
         return
 
+    def TryRegisterDevice(self, identifier: str) -> bool:
+        """
+        try register device
+        """
+        return
+
+    def TryUnregisterDevice(self, identifier: str) -> bool:
+        """
+        try unregister device
+        """
+        return
+
     def AdvertisementSet(self, identifier: str, manufacturerId: bytes, rawdata: bytes):
         return
