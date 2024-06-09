@@ -7,6 +7,7 @@ sys.path.append("Tracer")
 from Tracer.Tracer import Tracer
 
 sys.path.append("Advertiser") 
+from IAdvertisingDevice import IAdvertisingDevice
 from Advertiser.Advertiser import Advertiser
 
 import subprocess
@@ -18,161 +19,233 @@ class AdvertiserBTMgmt(Advertiser) :
     baseclass
     """
 
-    BTMgmt_path = '/usr/bin/btmgmt'
+    # protected static field
+    _BTMgmt_path = '/usr/bin/btmgmt'
+
+    # Number of repetitions per second
+    _RepetitionsPerSecond = 4
 
     def __init__(self):
         """
-        initializes the object and defines the fields
+        initializes the object and defines the member fields
         """
 
-        super().__init__()
+        super().__init__() # call baseclass
         
-        self._isInitialized = False
-        self._ad_thread_Run = False
-        self._ad_thread = None
-        self._ad_thread_Lock = threading.Lock()
+        self._advertisement_thread_Run = False
+        self._advertisement_thread = None
+        self._advertisement_thread_Lock = threading.Lock()
+
+        # Table
+        # * key: AdvertisementIdentifier
+        # * value: advertisement-command for the call of btmgmt tool
         self._advertisementTable_thread_Lock = threading.Lock()
         self._advertisementTable = dict()
+        
         self._lastSetAdvertisementCommand = None
 
         return
 
-    def AdvertisementStop_(self):
+
+    def TryRegisterAdvertisingDevice(self, advertisingDevice: IAdvertisingDevice) -> bool:
         """
-        stop bluetooth advertising
+        try to register the given AdvertisingDevice
+        * returns True if the AdvertisingDevice was registered successfully
+        * returns False if the AdvertisingDevice wasn't registered successfully (because it still was registered)
         """
+        result = super().TryRegisterAdvertisingDevice(advertisingDevice)
 
-        self._ad_thread_Run = False
-        if(self._ad_thread is not None):
-            self._ad_thread.join()
-            self._ad_thread = None
-            self._isInitialized = False
+        # AdvertisingDevice was registered successfully in baseclass
+        if(result):
+            # register AdvertisindIdentifier -> only registered AdvertisindIdentifier will be sent
+            advertisementIdentifier = advertisingDevice.GetAdvertisementIdentifier()
+            self._RegisterAdvertisementIdentifier(advertisementIdentifier)
 
-        if (self._tracer is not None):
-            self._tracer.TraceInfo('AdvertiserBTMgmt.AdvertisementStop')
+        return result
 
-        for key, advertisementNumber in self._advertisementTable.items():
-            advertisementCommand = self.BTMgmt_path + ' rm-adv ' + str(advertisementNumber)
-            subprocess.run(advertisementCommand + ' &> /dev/null', shell=True, executable="/bin/bash")
 
-            if (self._tracer is not None):
-                self._tracer.TraceInfo(advertisementCommand)
-
-        self._advertisementTable.clear()
-        return
-
-    def _AdvertisementSet_(self, identifier: str, manufacturerId: bytes, rawdata: bytes):
+    def TryUnregisterAdvertisingDevice(self, advertisingDevice: IAdvertisingDevice) -> bool:
         """
-        Set Advertisement data
+        try to unregister the given AdvertisingDevice
+        * returns True if the AdvertisingDevice was unregistered successfully
+        * returns False if the AdvertisingDevice wasn't unregistered successfully
         """
+        result = super().TryUnregisterAdvertisingDevice(advertisingDevice)
 
-        try:
-            self._advertisementTable_thread_Lock.acquire(blocking=True)
-            advertisementNumber = self._advertisementTable.get(identifier)
-            if(advertisementNumber is None):
-                advertisementNumber = len(self._advertisementTable) + 1
-                self._advertisementTable[identifier] = advertisementNumber
-        finally:
-            self._advertisementTable_thread_Lock.release()
+        # AdvertisingDevice was unregistered successfully in baseclass
+        if(result):
+            # unregister AdvertisementIdentifier to remove from publishing
+            advertisementIdentifier = advertisingDevice.GetAdvertisementIdentifier()
+            self._UnregisterAdvertisementIdentifier(advertisementIdentifier)
 
-        advertisementCommand = self.BTMgmt_path + ' add-adv -d ' + self._CreateTelegramForBTMgmmt(manufacturerId, rawdata) + ' --general-discov ' + str(advertisementNumber)
-        subprocess.run(advertisementCommand + ' &> /dev/null', shell=True, executable="/bin/bash")
+        return result
 
-        if (self._tracer is not None):
-            self._tracer.TraceInfo(advertisementCommand)
-
-        # if(not self._ad_thread_Run):
-        #     self._ad_thread = threading.Thread(target=self._publish)
-        #     self._ad_thread.daemon = True
-        #     self._ad_thread.start()
-        #     self._ad_thread_Run = True
-
-        if (self._tracer is not None):
-            self._tracer.TraceInfo('AdvertiserBTMgmt.AdvertisementSet')
-
-        return
 
     def AdvertisementStop(self):
         """
         stop bluetooth advertising
         """
 
-        self._ad_thread_Run = False
-        if(self._ad_thread is not None):
-            self._ad_thread.join()
-            self._ad_thread = None
-            self._isInitialized = False
+        # stop publishing thread
+        self._advertisement_thread_Run = False
+        if(self._advertisement_thread is not None):
+            self._advertisement_thread.join()
+            self._advertisement_thread = None
 
-        self._advertisementTable.clear()
+        #self._advertisementTable.clear()
 
-        hcitool_args_0x08_0x000a = self.BTMgmt_path + ' rm-adv 1'
-
-        subprocess.run(hcitool_args_0x08_0x000a + ' &> /dev/null', shell=True, executable="/bin/bash")
+        advertisementCommand = self._BTMgmt_path + ' rm-adv 1' + ' &> /dev/null'
+        subprocess.run(advertisementCommand, shell=True, executable="/bin/bash")
 
         if (self._tracer is not None):
             self._tracer.TraceInfo('AdvertiserBTMgmnt.AdvertisementStop')
-            self._tracer.TraceInfo(hcitool_args_0x08_0x000a)
+            self._tracer.TraceInfo(advertisementCommand)
 
         return
 
-    def _AdvertisementSet(self, identifier: str, manufacturerId: bytes, rawdata: bytes):
+
+    def _RegisterAdvertisementIdentifier(self, advertisementIdentifier: str):
+        """
+        Register AdvertisementIdentifier
+        """
+
+        try:
+            self._advertisementTable_thread_Lock.acquire(blocking=True)
+
+            if(not advertisementIdentifier in self._advertisementTable):
+                self._advertisementTable[advertisementIdentifier] = None
+        finally:
+            self._advertisementTable_thread_Lock.release()
+
+        return
+
+
+    def _UnregisterAdvertisementIdentifier(self, advertisementIdentifier: str):
+        """
+        Unregister AdvertisementIdentifier
+        """
+        try:
+            self._registeredDeviceTable_Lock.acquire(blocking=True)
+
+            foundAdvertisementIdentifier = False
+
+            # there are devices wich share the same AdvertisementIdentifier
+            # check if AdvertisementIdentifier is still present
+            for currentAdvertisementIdentifier in self._registeredDeviceTable.values():
+                if(currentAdvertisementIdentifier == advertisementIdentifier):
+                    foundAdvertisementIdentifier = True
+                    break
+                    
+            if(not foundAdvertisementIdentifier):
+                self._RemoveAdvertisementIdentifier(advertisementIdentifier)
+
+        finally:
+            self._registeredDeviceTable_Lock.release()
+        return
+
+    def _RemoveAdvertisementIdentifier(self, advertisementIdentifier: str):
+        """
+        Remove AdvertisementIdentifier
+        """
+
+        try:
+            self._advertisementTable_thread_Lock.acquire(blocking=True)
+
+            if(advertisementIdentifier in self._advertisementTable):
+                self._advertisementTable.pop(advertisementIdentifier)
+            
+        finally:
+            self._advertisementTable_thread_Lock.release()
+
+        if(len(self._advertisementTable) == 0):
+            self.AdvertisementStop()
+
+        return
+
+    def AdvertisementDataSet(self, advertisementIdentifier: str, manufacturerId: bytes, rawdata: bytes):
         """
         Set Advertisement data
         """
 
-        advertisementCommand = self.BTMgmt_path + ' add-adv -d ' + self._CreateTelegramForBTMgmmt(manufacturerId, rawdata) + ' --general-discov 1' + ' &> /dev/null'
         try:
             self._advertisementTable_thread_Lock.acquire(blocking=True)
-            self._advertisementTable[identifier] = advertisementCommand
+            
+            # only registered AdvertisementIdentifier are handled
+            if(advertisementIdentifier in self._advertisementTable):
+                advertisementCommand = self._BTMgmt_path + ' add-adv -d ' + self._CreateTelegramForBTMgmmt(manufacturerId, rawdata) + ' --general-discov 1' + ' &> /dev/null'
+                self._advertisementTable[advertisementIdentifier] = advertisementCommand
+
+                # for quick change handle immediately
+                timeSlot = self._CalcTimeSlot()
+                self._Advertise(advertisementCommand, timeSlot)
         finally:
             self._advertisementTable_thread_Lock.release()
 
-        timeSlot = self._CalcTimeSlot()
-        self._Advertise(advertisementCommand, timeSlot)
-
-        if(not self._ad_thread_Run):
-            self._ad_thread = threading.Thread(target=self._publish)
-            self._ad_thread.daemon = True
-            self._ad_thread.start()
-            self._ad_thread_Run = True
+        # start publish thread if necessary
+        if(not self._advertisement_thread_Run):
+            self._advertisement_thread = threading.Thread(target=self._publish)
+            self._advertisement_thread.daemon = True
+            self._advertisement_thread.start()
+            self._advertisement_thread_Run = True
 
         if (self._tracer is not None):
             self._tracer.TraceInfo('AdvertiserBTMgmnt.AdvertisementSet')
 
         return
 
+
     def _publish(self):
+        """
+        publishing loop
+        """
+
         if (self._tracer is not None):
             self._tracer.TraceInfo('AdvertiserBTMgmnt._publish')
 
-        while(self._ad_thread_Run):
+        # loop while field is True
+        while(self._advertisement_thread_Run):
             try:
                 try:
                     self._advertisementTable_thread_Lock.acquire(blocking=True)
+
+                    # make a copy of the table to release the lock as quick as possible
                     copy_of_advertisementTable = self._advertisementTable.copy()
+
+                    # calc time for one publishing slot
+                    timeSlot = self._CalcTimeSlot()
                 finally:
                     self._advertisementTable_thread_Lock.release()
                 
-                timeSlot = self._CalcTimeSlot()
+                if(len(copy_of_advertisementTable) == 0):
+                    pass
+                else:
+                    for key, advertisementCommand in copy_of_advertisementTable.items():
+                        # stop publishing?
+                        if(not self._advertisement_thread_Run):
+                            return
 
-                for key, advertisementCommand in copy_of_advertisementTable.items():
-                    # stop publishing?
-                    if(not self._ad_thread_Run):
-                        return
-
-                    self._Advertise(advertisementCommand, timeSlot)
+                        self._Advertise(advertisementCommand, timeSlot)
             except:
                 pass
+
+
     def _CalcTimeSlot(self) -> float:
-        # We want to repeat each command 
-        repetitionsPerSecond = 4
+        """
+        Calculates the timespan in seconds for each timeslot
+        """
+
         # timeSlot = 1 second / repetitionsPerSecond / len(self._advertisementTable)
-        timeSlot = 1 / repetitionsPerSecond / max(1, len(self._advertisementTable))
+        timeSlot = 1 / self._RepetitionsPerSecond / max(1, len(self._advertisementTable))
         return timeSlot
 
+
     def _Advertise(self, advertisementCommand: str, timeSlot: float):
+        """
+        calls the btmgmt tool as subprocess
+        """
+
         try:
-            self._ad_thread_Lock.acquire(blocking=True)
+            self._advertisement_thread_Lock.acquire(blocking=True)
             timeStart = time.time()    
 
             if (self._lastSetAdvertisementCommand != advertisementCommand):
@@ -180,18 +253,15 @@ class AdvertiserBTMgmt(Advertiser) :
 
                 subprocess.run(advertisementCommand, shell=True, executable="/bin/bash")
 
-                if(not self._isInitialized):
-                    self._isInitialized = True
-
             timeEnd = time.time()    
             timeDelta = timeEnd - timeStart
             timeSlotRemain = max(0.001, timeSlot - timeDelta)
 
             # stop publishing?
-            if(self._ad_thread_Run):
+            if(self._advertisement_thread_Run):
                 time.sleep(timeSlotRemain)
         finally:
-            self._ad_thread_Lock.release()
+            self._advertisement_thread_Lock.release()
 
         return
 

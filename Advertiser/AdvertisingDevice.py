@@ -7,9 +7,10 @@ sys.path.append("Tracer")
 from Tracer.Tracer import Tracer
 
 sys.path.append("Advertiser") 
+from Advertiser.Advertiser import IAdvertisingDevice
 from Advertiser.Advertiser import Advertiser
 
-class AdvertisingDevice :
+class AdvertisingDevice(IAdvertisingDevice) :
     """
     baseclass
     """
@@ -19,6 +20,7 @@ class AdvertisingDevice :
         initializes the object and defines the fields
         """
 
+        self._connected = False
         self._advertiser = None
         self._advertiser_registered = False
         self._tracer = None
@@ -28,7 +30,21 @@ class AdvertisingDevice :
         """
         set advertiser object
         """
+        if(self._advertiser == advertiser):
+            return advertiser
+
+        reconnect = self._connected
+
+        # unregister
+        if(self._advertiser is not None and self._advertiser_registered):
+            self._advertiser_registered = not self._advertiser.TryUnregisterAdvertisingDevice(self)
+            self._connected = False
+
         self._advertiser = advertiser
+
+        # register
+        if(self._advertiser is not None and reconnect):
+            self._advertiser_registered = self._advertiser.TryRegisterAdvertisingDevice(self)
 
         return advertiser
 
@@ -40,23 +56,29 @@ class AdvertisingDevice :
 
         return tracer
 
-    def Connect(self) -> bytes:
+    def Connect(self):
         """
         connects the device to the advertiser
         """
 
-        if(self._advertiser is not None):
-            self._advertiser_registered = self._advertiser.TryRegisterDevice(self._identifier)
+        if(self._advertiser is not None and not self._advertiser_registered):
+            self._advertiser_registered = self._advertiser.TryRegisterAdvertisingDevice(self)
+
+        self._connected = True
 
         return
 
-    def Disconnect(self) -> bytes:
+    def Disconnect(self):
         """
         disconnects the device from the advertiser
         """
 
-        if(self._advertiser is not None):
-            self._advertiser_registered = not self._advertiser.TryUnregisterDevice(self._identifier)
+        if(self._advertiser is not None and self._advertiser_registered):
+            self._advertiser_registered = not self._advertiser.TryUnregisterAdvertisingDevice(self)
+
+        self._connected = False
+
+        return
 
     def Stop(self) -> bytes:
         """
@@ -70,3 +92,6 @@ class AdvertisingDevice :
         Set Advertisement data
         """
         pass
+
+    def GetAdvertisementIdentifier(self) -> str:
+        return self._identifier

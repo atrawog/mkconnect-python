@@ -56,7 +56,7 @@ class AdvertiserMicroPython(Advertiser) :
 
         return
 
-    def AdvertisementSet(self, identifier: str, manufacturerId: bytes, rawdata: bytes):
+    def AdvertisementDataSet(self, identifier: str, manufacturerId: bytes, rawdata: bytes):
         """
         Set Advertisement data
         """

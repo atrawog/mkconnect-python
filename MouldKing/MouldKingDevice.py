@@ -47,6 +47,29 @@ class MouldKingDevice(AdvertisingDevice) :
 
         return
 
+    def Connect(self) -> bytes:
+        """
+        returns the telegram to switch the MouldKing Hubs in bluetooth mode
+        """
+
+        # call baseClass to register at Advertiser
+        super().Connect()
+
+        self._Advertise(self._Telegram_connect)
+
+        return self._Telegram_connect
+
+    def Disconnect(self):
+        """
+        disconnects the device from the advertiser
+        """
+
+        self.Stop()
+        
+        super().Disconnect()
+
+        return
+    
     def Stop(self) -> bytes:
         """
         set internal stored value of all channels to zero and return the telegram
@@ -70,7 +93,7 @@ class MouldKingDevice(AdvertisingDevice) :
         
         return self.CreateTelegram()
 
-    def CreateTelegram(self):
+    def CreateTelegram(self) -> bytes:
         """
         returns a telegram including the internal stored value from all channels
         """
@@ -87,7 +110,7 @@ class MouldKingDevice(AdvertisingDevice) :
 
         if(self._advertiser is not None):
             cryptedData = MouldKingCrypt.Crypt(rawdata)
-            self._advertiser.AdvertisementSet(self._identifier, self.ManufacturerID, cryptedData)
+            self._advertiser.AdvertisementDataSet(self._identifier, self.ManufacturerID, cryptedData)
 
         return self._Telegram_connect
 

@@ -141,25 +141,18 @@ time.sleep(1)
 #tracer.TraceInfo("crypted: " + ' '.join(f'{x:02x}' for x in crypted))
 
 ############################################################################
+# disconnect from advertiser
+title = "Disconnect from advertiser"
+tracer.TraceInfo("\n" + title)
+
+rawdata = hub0.Disconnect()
+rawdata = hub1.Disconnect()
+rawdata = hub2.Disconnect()
+time.sleep(1)
+
+############################################################################
 # stop Advertisement
 title = "Advertisement stop"
 tracer.TraceInfo("\n" + title)
 advertiser.AdvertisementStop()
 time.sleep(1)
-
-#subprocess.call(["sudo", "hciconfig hci0 up"])
-#subprocess.call(["sudo", "hciconfig hci0 leadv 3"])
-# subprocess.call(["hcitool", "-i hci0 cmd 08 0008 25 02 01 02 1b ff f0 ff 6D B6 43 CF 7E 8F 47 11 88 66 59 38 D1 7A AA 26 49 5E 13 14 15 16 17 18"])
-
-#tracer.TraceInfo(command)
-#subprocess.call(["sudo", "hcitool -i hci0 cmd 08 0008 " + command])
-
-# result = mk6_0.SetChannel(0, 1)
-# tracer.TraceInfo(' '.join(f'{x:02x}' for x in result))
-
-# result = mk6_0.SetChannel(0, 10)
-# tracer.TraceInfo(' '.join(f'{x:02x}' for x in result))
-
-# result = mk6_0.SetChannel(0, -1)
-# tracer.TraceInfo(' '.join(f'{x:02x}' for x in result))
-
