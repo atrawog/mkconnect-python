@@ -16,8 +16,6 @@ if (sys.platform == 'linux'):
     #from Advertiser.AdvertiserHCITool import AdvertiserHCITool as Advertiser
     #from Advertiser.AdvertiserBTMgmt import AdvertiserBTMgmt as Advertiser
     from Advertiser.AdvertiserBTSocket import AdvertiserBTSocket as Advertiser
-    #from Advertiser.AdvertiserBluez import AdvertiserBluez as Advertiser      # don't work yet
-    #from Advertiser.AdvertiserDBus import AdvertiserDBus as Advertiser        # don't work yet
     pass
 elif (sys.platform == 'rp2'):
     from Advertiser.AdvertiserMicroPython import AdvertiserMicroPython as Advertiser
