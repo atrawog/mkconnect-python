@@ -16,6 +16,7 @@ sys.path.append("Advertiser")
 from IAdvertisingDevice import IAdvertisingDevice
 from Advertiser.Advertiser import Advertiser
 
+
 class AdvertiserBTSocket(Advertiser) :
     """
     baseclass
@@ -104,7 +105,7 @@ class AdvertiserBTSocket(Advertiser) :
             self._advertisement_thread.join()
             self._advertisement_thread = None
 
-        advertisementCommand = self._create_rm_advert_command(1)
+        advertisementCommand = AdvertiserBTSocket._create_rm_advert_command(1)
         self.sock.send(advertisementCommand)
 
         # if (self._tracer is not None):
@@ -185,7 +186,7 @@ class AdvertiserBTSocket(Advertiser) :
                 # advertisementCommand = self._BTMgmt_path + ' add-adv -d ' + self._CreateTelegramForBTMgmmt(manufacturerId, rawdata) + ' --general-discov 1' + ' &> /dev/null'
                 advertisingData = self._CreateAdvertisingDataString(manufacturerId, rawdata)
 
-                advertisementCommand = self._create_add_advert_command(
+                advertisementCommand = AdvertiserBTSocket._create_add_advert_command(
                     instance_id=1,
                     flags=AdvertiserBTSocket.Flags.GENERAL_DISCOVERABLE,
                     duration=0x00,  # zero means use default
@@ -303,11 +304,11 @@ class AdvertiserBTSocket(Advertiser) :
 
         return ''.join(f'{x:02x}' for x in resultArray)
 
-
+    @staticmethod
     def _little_bytes(value, size_of):
         return int(value).to_bytes(size_of, byteorder='little')
 
-
+    @staticmethod
     def _create_add_advert_command(instance_id, flags, duration, timeout, adv_data, scan_rsp):
         """ Add Advertising Command
 
@@ -442,21 +443,22 @@ class AdvertiserBTSocket(Advertiser) :
                     Invalid Parameters
                     Invalid Index
         """
-        cmd = little_bytes(0x003e, 2)
-        ctrl_idx = little_bytes(0x00, 2)
-        instance = little_bytes(instance_id, 1)  # (1 Octet)
-        flags = little_bytes(flags, 4)  # (4 Octets)
-        duration = little_bytes(duration, 2)  # (2 Octets)
-        timeout = little_bytes(timeout, 2)  # (2 Octets)
+        cmd = AdvertiserBTSocket._little_bytes(0x003e, 2)
+        ctrl_idx = AdvertiserBTSocket._little_bytes(0x00, 2)
+        instance = AdvertiserBTSocket._little_bytes(instance_id, 1)  # (1 Octet)
+        flags = AdvertiserBTSocket._little_bytes(flags, 4)  # (4 Octets)
+        duration = AdvertiserBTSocket._little_bytes(duration, 2)  # (2 Octets)
+        timeout = AdvertiserBTSocket._little_bytes(timeout, 2)  # (2 Octets)
         adv_data = bytes.fromhex(adv_data)  # (0-255 Octets)
-        adv_data_len = little_bytes(len(adv_data), 1)  # (1 Octet)
+        adv_data_len = AdvertiserBTSocket._little_bytes(len(adv_data), 1)  # (1 Octet)
         scan_rsp = bytes.fromhex(scan_rsp)  # (0-255 Octets)
-        scan_rsp_len = little_bytes(len(scan_rsp), 1)  # (1 Octet)
+        scan_rsp_len = AdvertiserBTSocket._little_bytes(len(scan_rsp), 1)  # (1 Octet)
         params = instance + flags + duration + timeout + adv_data_len + scan_rsp_len + adv_data + scan_rsp
-        param_len = little_bytes(len(params), 2)
+        param_len = AdvertiserBTSocket._little_bytes(len(params), 2)
 
         return cmd + ctrl_idx + param_len + params
 
+    @staticmethod
     def _create_rm_advert_command(instance_id):
         """ Remove Advertising Command
     
@@ -493,17 +495,10 @@ class AdvertiserBTSocket(Advertiser) :
                     Invalid Index
         """
 
-        cmd = little_bytes(0x003f, 2)
-        ctrl_idx = little_bytes(0x00, 2)
-        instance = little_bytes(instance_id, 1)  # (1 Octet)
-        # flags = little_bytes(flags, 4)  # (4 Octets)
-        # duration = little_bytes(duration, 2)  # (2 Octets)
-        # timeout = little_bytes(timeout, 2)  # (2 Octets)
-        # adv_data = bytes.fromhex(adv_data)  # (0-255 Octets)
-        # adv_data_len = little_bytes(len(adv_data), 1)  # (1 Octet)
-        # scan_rsp = bytes.fromhex(scan_rsp)  # (0-255 Octets)
-        # scan_rsp_len = little_bytes(len(scan_rsp), 1)  # (1 Octet)
-        params = instance #+ flags + duration + timeout + adv_data_len + scan_rsp_len + adv_data + scan_rsp
-        param_len = little_bytes(len(params), 2)
+        cmd = AdvertiserBTSocket._little_bytes(0x003f, 2)
+        ctrl_idx = AdvertiserBTSocket._little_bytes(0x00, 2)
+        instance = AdvertiserBTSocket._little_bytes(instance_id, 1)  # (1 Octet)
+        params = instance
+        param_len = AdvertiserBTSocket._little_bytes(len(params), 2)
 
         return cmd + ctrl_idx + param_len + params
