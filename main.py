@@ -1,9 +1,10 @@
 #!/usr/bin/python
 
-print('testmain')
-
 import sys
 import time
+
+print('Script: main.py')
+print('Platform: ' + sys.platform)
 
 sys.path.append("Tracer") 
 from Tracer.Tracer import Tracer
@@ -18,8 +19,10 @@ if (sys.platform == 'linux'):
     #from Advertiser.AdvertiserDBus import AdvertiserDBus as Advertiser        # don't work yet
     pass
 elif (sys.platform == 'rp2'):
-    #from Advertiser.AdvertiserMicroPython import AdvertiserMicroPython as Advertiser
+    from Advertiser.AdvertiserMicroPython import AdvertiserMicroPython as Advertiser
     pass
+elif (sys.platform == 'win32'):
+    from Advertiser.AdvertiserDummy import AdvertiserDummy as Advertiser
 else:
     raise Exception('unsupported platform')
 
@@ -80,7 +83,7 @@ time.sleep(1)
 title = "C1: fullspeed forwards"
 tracer.TraceInfo("\n" + title)
 
-rawdata = hub0.SubDevice_SetChannel(0, 1)
+rawdata = hub0.SetChannel(0, 1)
 time.sleep(1)
 
 #tracer.TraceInfo("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))
@@ -93,7 +96,7 @@ time.sleep(1)
 title = "C1: halfspeed forwards"
 tracer.TraceInfo("\n" + title)
 
-rawdata = hub0.SubDevice_SetChannel(0, 0.5)
+rawdata = hub0.SetChannel(0, 0.5)
 time.sleep(1)
 
 #tracer.TraceInfo("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))
@@ -106,7 +109,7 @@ time.sleep(1)
 title = "C1: fullspeed forwards"
 tracer.TraceInfo("\n" + title)
 
-rawdata = hub1.SubDevice_SetChannel(0, 1)
+rawdata = hub1.SetChannel(0, 1)
 time.sleep(2)
 
 #tracer.TraceInfo("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))
@@ -119,7 +122,7 @@ time.sleep(2)
 title = "C1: halfspeed backwards"
 tracer.TraceInfo("\n" + title)
 
-rawdata = hub0.SubDevice_SetChannel(0, -0.5)
+rawdata = hub0.SetChannel(0, -0.5)
 time.sleep(1)
 
 #tracer.TraceInfo("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))
@@ -132,7 +135,7 @@ time.sleep(1)
 title = "C2: halfspeed backwards"
 tracer.TraceInfo("\n" + title)
 
-rawdata = hub0.SubDevice_SetChannel(1, -0.5)
+rawdata = hub0.SetChannel(1, -0.5)
 time.sleep(1)
 
 #tracer.TraceInfo("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))

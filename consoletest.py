@@ -2,10 +2,11 @@
 
 # to run: sudo python -i consoletest.py
 
-print('consoletest')
-
 import sys
 import time
+
+print('Script: consoletest.py')
+print('Platform: ' + sys.platform)
 
 sys.path.append("Tracer") 
 from Tracer.Tracer import Tracer
@@ -22,6 +23,8 @@ if (sys.platform == 'linux'):
 elif (sys.platform == 'rp2'):
     #from Advertiser.AdvertiserMicroPython import AdvertiserMicroPython as Advertiser
     pass
+elif (sys.platform == 'win32'):
+    from Advertiser.AdvertiserDummy import AdvertiserDummy as Advertiser
 else:
     raise Exception('unsupported platform')
 
@@ -132,7 +135,7 @@ def mkstop(deviceId: int=0):
 
 def mkcontrol(deviceId: int=0, channel: int=0, powerAndDirection: float=0):
     hub = _getHubId(deviceId)
-    rawdata = hub.SubDevice_SetChannel(channel, powerAndDirection)
+    rawdata = hub.SetChannel(channel, powerAndDirection)
     return
 
 def test_hub(hubId: int=0):
