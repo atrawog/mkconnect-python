@@ -7,9 +7,9 @@ sys.path.append("Advertiser")
 from Advertiser.IAdvertisingDevice import IAdvertisingDevice
 
 sys.path.append("MouldKing") 
-from MouldKing.MouldKingDeviceNibble import MouldKingDeviceNibble
+from MouldKing.MouldKingHub_Nibble import MouldKingHub_Nibble
 
-class MouldKing_4_12Ch_Hubs(MouldKingDeviceNibble) :
+class MouldKing_Hubs_4_12Ch(MouldKingHub_Nibble) :
     """
     class handling 3 x MouldKing 4.0 Module
     Only one telegram addresses all possible 3 x MK4 the same time
@@ -26,7 +26,7 @@ class MouldKing_4_12Ch_Hubs(MouldKingDeviceNibble) :
         initializes the object and defines the fields
         """
         # call baseclass init and set number of channels
-        super().__init__("MK4", 12, 3, 1, MouldKing_4_12Ch_Hubs.__telegram_connect, MouldKing_4_12Ch_Hubs.__telegram_base)
+        super().__init__("MK4", 12, 3, 1, MouldKing_Hubs_4_12Ch.__telegram_connect, MouldKing_Hubs_4_12Ch.__telegram_base)
 
         self._connectedSubDevices = list()
 

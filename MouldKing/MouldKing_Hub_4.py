@@ -11,12 +11,12 @@ from Advertiser.IAdvertisingDevice import IAdvertisingDevice
 
 sys.path.append("MouldKing") 
 #from MouldKing.MouldKingDevice import MouldKingDevice
-from MouldKing.MouldKing_4_12Ch_Hubs import MouldKing_4_12Ch_Hubs
+from MouldKing.MouldKing_Hubs_4_12Ch import MouldKing_Hubs_4_12Ch
 
-class MouldKing_4_Hub(IAdvertisingDevice) :
+class MouldKing_Hub_4(IAdvertisingDevice) :
 
     # static fields/constants
-    _MouldKing_4_Hubs = MouldKing_4_12Ch_Hubs()
+    _MouldKing_4_Hubs = MouldKing_Hubs_4_12Ch()
 
 
     def __init__(self, deviceId: int):
@@ -45,7 +45,7 @@ class MouldKing_4_Hub(IAdvertisingDevice) :
         """
         returns the telegram to switch the MouldKing Hubs in bluetooth mode
         """
-        MouldKing_4_Hub._MouldKing_4_Hubs.SubDevice_Register(self)   
+        MouldKing_Hub_4._MouldKing_4_Hubs.SubDevice_Register(self)   
 
         return 
 
@@ -54,7 +54,7 @@ class MouldKing_4_Hub(IAdvertisingDevice) :
         """
         disconnects the device from the advertiser
         """
-        MouldKing_4_Hub._MouldKing_4_Hubs.SubDevice_Unregister(self)
+        MouldKing_Hub_4._MouldKing_4_Hubs.SubDevice_Unregister(self)
 
         return 
 
@@ -64,10 +64,10 @@ class MouldKing_4_Hub(IAdvertisingDevice) :
         set internal stored value of all channels to zero and return the telegram
         """
 
-        return MouldKing_4_Hub._MouldKing_4_Hubs.SubDevice_Stop(self._deviceId, self._NumberOfChannels)
+        return MouldKing_Hub_4._MouldKing_4_Hubs.SubDevice_Stop(self._deviceId, self._NumberOfChannels)
 
 
-    def SubDevice_SetChannel(self, channelId: int, value: float) -> bytes:
+    def SetChannel(self, channelId: int, value: float) -> bytes:
         """
         set internal stored value of channel with channelId to value and return the telegram
         """
@@ -75,5 +75,5 @@ class MouldKing_4_Hub(IAdvertisingDevice) :
         if channelId > self._NumberOfChannels - 1:
             raise Exception("only channelId 0.." + int(self._NumberOfChannels - 1) + "are allowed")
 
-        return MouldKing_4_Hub._MouldKing_4_Hubs.SubDevice_SetChannel(self._deviceId, self._NumberOfChannels, channelId, value)
+        return MouldKing_Hub_4._MouldKing_4_Hubs.SubDevice_SetChannel(self._deviceId, self._NumberOfChannels, channelId, value)
 

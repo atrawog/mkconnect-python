@@ -4,10 +4,10 @@ __version__ = "0.1"
 import sys
 
 sys.path.append("MouldKing") 
-from MouldKing.MouldKingDeviceByte import MouldKingDeviceByte
+from MouldKing.MouldKingHub_Byte import MouldKingHub_Byte
 
 
-class MouldKing_6_Hub(MouldKingDeviceByte) :
+class MouldKing_Hub_6(MouldKingHub_Byte) :
     """
     class handling the MouldKing 6.0 Module
     """
@@ -26,16 +26,16 @@ class MouldKing_6_Hub(MouldKingDeviceByte) :
         """
 
         if deviceId == 0:
-            basetelegram = MouldKing_6_Hub.__telegram_base_device_a
+            basetelegram = MouldKing_Hub_6.__telegram_base_device_a
         elif deviceId == 1:
-            basetelegram = MouldKing_6_Hub.__telegram_base_device_b
+            basetelegram = MouldKing_Hub_6.__telegram_base_device_b
         elif deviceId == 2:
-            basetelegram = MouldKing_6_Hub.__telegram_base_device_c
+            basetelegram = MouldKing_Hub_6.__telegram_base_device_c
         else:
             raise Exception('only deviceId 0..2 are allowed')
 
         # call baseclass init and set number of channels
-        super().__init__("MK6_" + str(deviceId), 6, 3, 1, MouldKing_6_Hub.__telegram_connect, basetelegram)
+        super().__init__("MK6_" + str(deviceId), 6, 3, 1, MouldKing_Hub_6.__telegram_connect, basetelegram)
 
 
 

@@ -10,8 +10,8 @@ sys.path.append("Advertiser")
 from Advertiser.Advertiser import Advertiser
 
 sys.path.append("MouldKing") 
-from MouldKing.MouldKing_4_Hub import MouldKing_4_Hub
-from MouldKing.MouldKing_6_Hub import MouldKing_6_Hub
+from MouldKing.MouldKing_Hub_4 import MouldKing_Hub_4
+from MouldKing.MouldKing_Hub_6 import MouldKing_Hub_6
 
 class MouldKing :
     """
@@ -23,17 +23,17 @@ class MouldKing :
         abstract class to store the static objects
         """
 
-        Device0 = MouldKing_4_Hub(0)
+        Device0 = MouldKing_Hub_4(0)
         """
         MouldKing Hub 4.0 with address 1
         """
 
-        Device1 = MouldKing_4_Hub(1)
+        Device1 = MouldKing_Hub_4(1)
         """
         MouldKing Hub 4.0 with address 2
         """
 
-        Device2 = MouldKing_4_Hub(2)
+        Device2 = MouldKing_Hub_4(2)
         """
         MouldKing Hub 4.0 with address 3
         """
@@ -66,17 +66,17 @@ class MouldKing :
         abstract class to store the static objects
         """
 
-        Device0 = MouldKing_6_Hub(0)
+        Device0 = MouldKing_Hub_6(0)
         """
         MouldKing Hub 6.0 with address 1
         """
 
-        Device1 = MouldKing_6_Hub(1)
+        Device1 = MouldKing_Hub_6(1)
         """
         MouldKing Hub 6.0 with address 2
         """
 
-        Device2 = MouldKing_6_Hub(2)
+        Device2 = MouldKing_Hub_6(2)
         """
         MouldKing Hub 6.0 with address 3
         """

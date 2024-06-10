@@ -12,7 +12,7 @@ from Advertiser.AdvertisingDevice import AdvertisingDevice
 sys.path.append("MouldKing") 
 from MouldKing.MouldKingCrypt import MouldKingCrypt
 
-class MouldKingDevice(AdvertisingDevice) :
+class MouldKingHub(AdvertisingDevice) :
     """
     baseclass
     """
@@ -86,7 +86,7 @@ class MouldKingDevice(AdvertisingDevice) :
         return self.CreateTelegram()
 
 
-    def SubDevice_SetChannel(self, channelId: int, value: float) -> bytes:
+    def SetChannel(self, channelId: int, value: float) -> bytes:
         """
         set internal stored value of channel with channelId to value and return the telegram
         """

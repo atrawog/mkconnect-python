@@ -4,9 +4,9 @@ __version__ = "0.1"
 import sys
 
 sys.path.append("MouldKing") 
-from MouldKing.MouldKingDevice import MouldKingDevice
+from MouldKing.MouldKingHub import MouldKingHub
 
-class MouldKingDeviceByte(MouldKingDevice) :
+class MouldKingHub_Byte(MouldKingHub) :
     """
     baseclass handling with byte channels
     """
