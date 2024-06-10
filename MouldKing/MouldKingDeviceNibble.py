@@ -20,14 +20,6 @@ class MouldKingDeviceNibble(MouldKingDevice) :
         # call baseclass init and set number of channels
         super().__init__(identifier, numberOfChannels, channelStartOffset, channelEndOffset, telegram_connect, basetelegram)
 
-    def Connect(self) -> bytes:
-        """
-        returns the telegram to switch the MouldKing Hubs in bluetooth mode
-        """
-
-        self._Advertise(self._Telegram_connect)
-
-        return self._Telegram_connect
 
     def CreateTelegram(self) -> bytes:
         """

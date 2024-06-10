@@ -25,6 +25,7 @@ class MouldKing_4_Hubs(MouldKingDeviceNibble) :
         # call baseclass init and set number of channels
         super().__init__("MK4", 12, 3, 1, MouldKing_4_Hubs.__telegram_connect, MouldKing_4_Hubs.__telegram_base)
 
+
     def Stop(self, hubDeviceId: int, hubNumberOfChannels: int) -> bytes:
         """
         set internal stored value of all channels to zero and return the telegram
@@ -43,6 +44,7 @@ class MouldKing_4_Hubs(MouldKingDeviceNibble) :
                 self._ChannelValueList[channelId] = float(0)
         
         return self.CreateTelegram()
+    
 
     def SetChannel(self, hubDeviceId: int, hubNumberOfChannels: int, hubChannelId: int, value: float) -> bytes:
         """

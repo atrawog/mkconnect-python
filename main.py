@@ -38,11 +38,11 @@ MouldKing.SetTracer(tracer)
 MouldKing.SetAdvertiser(advertiser)
 
 # save pre-instantiated objects in local variables
-hub0 = MouldKing.Module6_0.Device0
+#hub0 = MouldKing.Module6_0.Device0
 hub1 = MouldKing.Module6_0.Device1
 hub2 = MouldKing.Module6_0.Device2
 
-#hub0 = MouldKing.Module4_0.Device0
+hub0 = MouldKing.Module4_0.Device0
 #hub1 = MouldKing.Module4_0.Device0
 #hub2 = MouldKing.Module4_0.Device2
 
@@ -50,6 +50,11 @@ hub2 = MouldKing.Module6_0.Device2
 # get uncrypted connect-telegram as bytearray
 title = "connect-telegram"
 tracer.TraceInfo("\n" + title)
+
+rawdata = hub0.Connect()
+rawdata = hub0.Disconnect()
+time.sleep(5)
+
 
 rawdata = hub0.Connect()
 rawdata = hub1.Connect()

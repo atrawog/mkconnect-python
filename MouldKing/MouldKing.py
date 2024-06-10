@@ -45,7 +45,7 @@ class MouldKing :
             """
 
             # MouldKing_4_Hubs is the same instance for all MouldKing_4_Hub-Instances
-            MouldKing.Module4_0.Device0.MouldKing_4_Hubs.SetAdvertiser(advertiser)
+            MouldKing.Module4_0.Device0._MouldKing_4_Hubs.SetAdvertiser(advertiser)
             # MouldKing.Module4_0.Device1.MouldKing_4_Hubs.SetAdvertiser(advertiser)
             # MouldKing.Module4_0.Device2.MouldKing_4_Hubs.SetAdvertiser(advertiser)
             return advertiser

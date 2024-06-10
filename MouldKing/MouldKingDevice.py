@@ -47,6 +47,30 @@ class MouldKingDevice(AdvertisingDevice) :
 
         return
 
+    def Register(self, ) -> bytes:
+        """
+        returns the telegram to switch the MouldKing Hubs in bluetooth mode
+        """
+
+        # call baseClass to register at Advertiser
+        super().Connect()
+
+        self._Advertise(self._Telegram_connect)
+
+        return self._Telegram_connect
+
+    def Unregister(self):
+        """
+        disconnects the device from the advertiser
+        """
+
+        self.Stop()
+        
+        super().Disconnect()
+
+        return
+    
+
     def Connect(self) -> bytes:
         """
         returns the telegram to switch the MouldKing Hubs in bluetooth mode
