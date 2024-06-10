@@ -19,6 +19,7 @@ class MouldKingDevice(AdvertisingDevice) :
 
     ManufacturerID = bytes([0xFF, 0xF0])
 
+
     def __init__(self, identifier: str, numberOfChannels: int, channelStartOffset: int, channelEndOffset: int, telegram_connect: bytes, basetelegram: bytes):
         """
         initializes the object and defines the fields
@@ -47,7 +48,8 @@ class MouldKingDevice(AdvertisingDevice) :
 
         return
 
-    def Register(self, ) -> bytes:
+
+    def Connect(self) -> None:
         """
         returns the telegram to switch the MouldKing Hubs in bluetooth mode
         """
@@ -57,9 +59,10 @@ class MouldKingDevice(AdvertisingDevice) :
 
         self._Advertise(self._Telegram_connect)
 
-        return self._Telegram_connect
+        return
 
-    def Unregister(self):
+
+    def Disconnect(self) -> None:
         """
         disconnects the device from the advertiser
         """
@@ -71,29 +74,6 @@ class MouldKingDevice(AdvertisingDevice) :
         return
     
 
-    def Connect(self) -> bytes:
-        """
-        returns the telegram to switch the MouldKing Hubs in bluetooth mode
-        """
-
-        # call baseClass to register at Advertiser
-        super().Connect()
-
-        self._Advertise(self._Telegram_connect)
-
-        return self._Telegram_connect
-
-    def Disconnect(self):
-        """
-        disconnects the device from the advertiser
-        """
-
-        self.Stop()
-        
-        super().Disconnect()
-
-        return
-    
     def Stop(self) -> bytes:
         """
         set internal stored value of all channels to zero and return the telegram
@@ -105,7 +85,8 @@ class MouldKingDevice(AdvertisingDevice) :
         
         return self.CreateTelegram()
 
-    def SetChannel(self, channelId: int, value: float) -> bytes:
+
+    def SubDevice_SetChannel(self, channelId: int, value: float) -> bytes:
         """
         set internal stored value of channel with channelId to value and return the telegram
         """
@@ -117,6 +98,7 @@ class MouldKingDevice(AdvertisingDevice) :
         
         return self.CreateTelegram()
 
+
     def CreateTelegram(self) -> bytes:
         """
         returns a telegram including the internal stored value from all channels
@@ -124,6 +106,7 @@ class MouldKingDevice(AdvertisingDevice) :
         
         raise NotImplementedError # override this methode
     
+
     def _Advertise(self, rawdata: bytes) -> bytes:
         """
         sends the data to the advertiser

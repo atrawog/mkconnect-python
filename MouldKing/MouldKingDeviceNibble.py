@@ -5,12 +5,12 @@ import sys
 
 sys.path.append("MouldKing") 
 from MouldKing.MouldKingDevice import MouldKingDevice
-from MouldKing.MouldKingCrypt import MouldKingCrypt
 
 class MouldKingDeviceNibble(MouldKingDevice) :
     """
     baseclass handling with nibble channels
     """
+
 
     def __init__(self, identifier: str, numberOfChannels, channelStartOffset, channelEndOffset, telegram_connect, basetelegram):
         """

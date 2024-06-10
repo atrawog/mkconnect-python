@@ -19,6 +19,7 @@ class MouldKing_6_Hub(MouldKingDeviceByte) :
     __telegram_base_device_b = bytes([0x62, 0x7B, 0xA7, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x9D]) # byte array for base Telegram
     __telegram_base_device_c = bytes([0x63, 0x7B, 0xA7, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x9C]) # byte array for base Telegram
 
+
     def __init__(self, deviceId: int):
         """
         initializes the object and defines the fields

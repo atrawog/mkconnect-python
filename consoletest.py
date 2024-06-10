@@ -132,7 +132,7 @@ def mkstop(deviceId: int=0):
 
 def mkcontrol(deviceId: int=0, channel: int=0, powerAndDirection: float=0):
     hub = _getHubId(deviceId)
-    rawdata = hub.SetChannel(channel, powerAndDirection)
+    rawdata = hub.SubDevice_SetChannel(channel, powerAndDirection)
     return
 
 def test_hub(hubId: int=0):

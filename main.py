@@ -51,14 +51,14 @@ hub0 = MouldKing.Module4_0.Device0
 title = "connect-telegram"
 tracer.TraceInfo("\n" + title)
 
-rawdata = hub0.Connect()
-rawdata = hub0.Disconnect()
+hub0.Connect()
+hub0.Disconnect()
 time.sleep(5)
 
 
-rawdata = hub0.Connect()
-rawdata = hub1.Connect()
-rawdata = hub2.Connect()
+hub0.Connect()
+hub1.Connect()
+hub2.Connect()
 time.sleep(5)
 
 #tracer.TraceInfo("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))
@@ -85,7 +85,7 @@ time.sleep(1)
 title = "C1: fullspeed forwards"
 tracer.TraceInfo("\n" + title)
 
-rawdata = hub0.SetChannel(0, 1)
+rawdata = hub0.SubDevice_SetChannel(0, 1)
 time.sleep(1)
 
 #tracer.TraceInfo("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))
@@ -98,7 +98,7 @@ time.sleep(1)
 title = "C1: halfspeed forwards"
 tracer.TraceInfo("\n" + title)
 
-rawdata = hub0.SetChannel(0, 0.5)
+rawdata = hub0.SubDevice_SetChannel(0, 0.5)
 time.sleep(1)
 
 #tracer.TraceInfo("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))
@@ -111,7 +111,7 @@ time.sleep(1)
 title = "C1: fullspeed forwards"
 tracer.TraceInfo("\n" + title)
 
-rawdata = hub1.SetChannel(0, 1)
+rawdata = hub1.SubDevice_SetChannel(0, 1)
 time.sleep(2)
 
 #tracer.TraceInfo("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))
@@ -124,7 +124,7 @@ time.sleep(2)
 title = "C1: halfspeed backwards"
 tracer.TraceInfo("\n" + title)
 
-rawdata = hub0.SetChannel(0, -0.5)
+rawdata = hub0.SubDevice_SetChannel(0, -0.5)
 time.sleep(1)
 
 #tracer.TraceInfo("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))
@@ -137,7 +137,7 @@ time.sleep(1)
 title = "C2: halfspeed backwards"
 tracer.TraceInfo("\n" + title)
 
-rawdata = hub0.SetChannel(1, -0.5)
+rawdata = hub0.SubDevice_SetChannel(1, -0.5)
 time.sleep(1)
 
 #tracer.TraceInfo("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))
@@ -150,9 +150,9 @@ time.sleep(1)
 title = "Disconnect from advertiser"
 tracer.TraceInfo("\n" + title)
 
-rawdata = hub0.Disconnect()
-rawdata = hub1.Disconnect()
-rawdata = hub2.Disconnect()
+hub0.Disconnect()
+hub1.Disconnect()
+hub2.Disconnect()
 time.sleep(1)
 
 ############################################################################

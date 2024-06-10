@@ -5,12 +5,12 @@ import sys
 
 sys.path.append("MouldKing") 
 from MouldKing.MouldKingDevice import MouldKingDevice
-from MouldKing.MouldKingCrypt import MouldKingCrypt
 
 class MouldKingDeviceByte(MouldKingDevice) :
     """
     baseclass handling with byte channels
     """
+
 
     def __init__(self, identifier: str, numberOfChannels, channelStartOffset, channelEndOffset, telegram_connect, basetelegram):
         """
@@ -19,6 +19,7 @@ class MouldKingDeviceByte(MouldKingDevice) :
 
         # call baseclass init and set number of channels
         super().__init__(identifier, numberOfChannels, channelStartOffset, channelEndOffset, telegram_connect, basetelegram)
+
 
     def CreateTelegram(self) -> bytes:
         """

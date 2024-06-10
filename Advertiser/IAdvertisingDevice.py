@@ -19,3 +19,30 @@ class IAdvertisingDevice :
         """
         raise NotImplementedError # override this methode
 
+
+    def Connect(self):
+        """
+        connects the device to the advertiser
+        """
+        raise NotImplementedError # override this methode
+
+
+    def Disconnect(self):
+        """
+        disconnects the device from the advertiser
+        """
+        raise NotImplementedError # override this methode
+
+
+    def Stop(self) -> bytes:
+        """
+        stops the device
+        """
+        raise NotImplementedError # override this methode
+    
+
+    def SubDevice_SetChannel(self, channelId: int, value: float) -> bytes:
+        """
+        set internal stored value of channel with channelId to value and return the telegram
+        """
+        raise NotImplementedError # override this methode

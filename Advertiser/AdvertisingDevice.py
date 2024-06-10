@@ -26,6 +26,7 @@ class AdvertisingDevice(IAdvertisingDevice) :
         self._tracer = None
         self._identifier = identifier
 
+
     def SetAdvertiser(self, advertiser: Advertiser) -> Advertiser:
         """
         set advertiser object
@@ -48,6 +49,7 @@ class AdvertisingDevice(IAdvertisingDevice) :
 
         return advertiser
 
+
     def SetTracer(self, tracer: Tracer) -> Tracer:
         """
         set tracer object
@@ -55,6 +57,7 @@ class AdvertisingDevice(IAdvertisingDevice) :
         self._tracer = tracer
 
         return tracer
+
 
     def Connect(self):
         """
@@ -68,6 +71,7 @@ class AdvertisingDevice(IAdvertisingDevice) :
 
         return
 
+
     def Disconnect(self):
         """
         disconnects the device from the advertiser
@@ -80,6 +84,7 @@ class AdvertisingDevice(IAdvertisingDevice) :
 
         return
 
+
     def Stop(self) -> bytes:
         """
         stops the device
@@ -87,11 +92,13 @@ class AdvertisingDevice(IAdvertisingDevice) :
 
         raise NotImplementedError # override this methode
 
+
     def AdvertisementSet(self, manufacturerId: bytes, rawdata: bytes):
         """
         Set Advertisement data
         """
         pass
+
 
     def GetAdvertisementIdentifier(self) -> str:
         return self._identifier
