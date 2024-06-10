@@ -11,8 +11,8 @@ from MouldKing.MouldKingHub_Nibble import MouldKingHub_Nibble
 
 class MouldKing_Hubs_4_12Ch(MouldKingHub_Nibble) :
     """
-    class handling 3 x MouldKing 4.0 Module
-    Only one telegram addresses all possible 3 x MK4 the same time
+    class handling 3 x MouldKing 4.0 Hubs
+    Only one telegram addresses all possible 3 x MK4 hubs the same time
     """
 
     # static fields/constants

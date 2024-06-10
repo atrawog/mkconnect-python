@@ -36,7 +36,7 @@ class AdvertiserMicroPython(Advertiser) :
 
         return
 
-    def AdvertisementStop(self):
+    def AdvertisementStop(self) -> None:
         """
         stop bluetooth advertising
 
@@ -56,7 +56,7 @@ class AdvertiserMicroPython(Advertiser) :
 
         return
 
-    def AdvertisementDataSet(self, identifier: str, manufacturerId: bytes, rawdata: bytes):
+    def AdvertisementDataSet(self, identifier: str, manufacturerId: bytes, rawdata: bytes) -> None:
         """
         Set Advertisement data
         """

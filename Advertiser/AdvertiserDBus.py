@@ -351,7 +351,7 @@ class AdvertiserDBus(Advertiser) :
         self._advertisementTable = dict()
         return
 
-    def AdvertisementStop(self):
+    def AdvertisementStop(self) -> None:
         """
         stop bluetooth advertising
 
@@ -375,7 +375,7 @@ class AdvertiserDBus(Advertiser) :
 
         return
 
-    def AdvertisementDataSet(self, identifier: str, manufacturerId: bytes, rawdata: bytes):
+    def AdvertisementDataSet(self, identifier: str, manufacturerId: bytes, rawdata: bytes) -> None:
         """
         Set Advertisement data
         """

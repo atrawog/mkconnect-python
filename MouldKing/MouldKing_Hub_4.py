@@ -14,6 +14,9 @@ sys.path.append("MouldKing")
 from MouldKing.MouldKing_Hubs_4_12Ch import MouldKing_Hubs_4_12Ch
 
 class MouldKing_Hub_4(IAdvertisingDevice) :
+    """
+    class handling a MouldKing 4.0 Hub
+    """
 
     # static fields/constants
     _MouldKing_4_Hubs = MouldKing_Hubs_4_12Ch()

@@ -72,7 +72,7 @@ class AdvertisingDevice(IAdvertisingDevice) :
         return
 
 
-    def Disconnect(self):
+    def Disconnect(self) -> None:
         """
         disconnects the device from the advertiser
         """
@@ -93,7 +93,7 @@ class AdvertisingDevice(IAdvertisingDevice) :
         raise NotImplementedError # override this methode
 
 
-    def AdvertisementSet(self, manufacturerId: bytes, rawdata: bytes):
+    def AdvertisementSet(self, manufacturerId: bytes, rawdata: bytes) -> None:
         """
         Set Advertisement data
         """

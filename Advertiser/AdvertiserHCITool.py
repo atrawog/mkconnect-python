@@ -35,7 +35,7 @@ class AdvertiserHCITool(Advertiser) :
 
         return
 
-    def AdvertisementStop(self):
+    def AdvertisementStop(self) -> None:
         """
         stop bluetooth advertising
         """
@@ -56,7 +56,7 @@ class AdvertiserHCITool(Advertiser) :
 
         return
 
-    def AdvertisementDataSet(self, identifier: str, manufacturerId: bytes, rawdata: bytes):
+    def AdvertisementDataSet(self, identifier: str, manufacturerId: bytes, rawdata: bytes) -> None:
         """
         Set Advertisement data
         """
@@ -77,7 +77,7 @@ class AdvertiserHCITool(Advertiser) :
 
         return
 
-    def _publish(self):
+    def _publish(self) -> None:
         if (self._tracer is not None):
             self._tracer.TraceInfo('AdvertiserHCITool._publish')
 
@@ -128,7 +128,7 @@ class AdvertiserHCITool(Advertiser) :
             except:
                 pass
 
-    def _CreateTelegramForHCITool(self, manufacturerId: bytes, rawDataArray: bytes):
+    def _CreateTelegramForHCITool(self, manufacturerId: bytes, rawDataArray: bytes) -> str:
         """
         Create input data for hcitool 
         """

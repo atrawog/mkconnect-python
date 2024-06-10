@@ -81,7 +81,7 @@ class AdvertiserBTMgmt(Advertiser) :
         return result
 
 
-    def AdvertisementStop(self):
+    def AdvertisementStop(self) -> None:
         """
         stop bluetooth advertising
         """
@@ -104,7 +104,7 @@ class AdvertiserBTMgmt(Advertiser) :
         return
 
 
-    def _RegisterAdvertisementIdentifier(self, advertisementIdentifier: str):
+    def _RegisterAdvertisementIdentifier(self, advertisementIdentifier: str) -> None:
         """
         Register AdvertisementIdentifier
         """
@@ -120,7 +120,7 @@ class AdvertiserBTMgmt(Advertiser) :
         return
 
 
-    def _UnregisterAdvertisementIdentifier(self, advertisementIdentifier: str):
+    def _UnregisterAdvertisementIdentifier(self, advertisementIdentifier: str) -> None:
         """
         Unregister AdvertisementIdentifier
         """
@@ -143,7 +143,7 @@ class AdvertiserBTMgmt(Advertiser) :
             self._registeredDeviceTable_Lock.release()
         return
 
-    def _RemoveAdvertisementIdentifier(self, advertisementIdentifier: str):
+    def _RemoveAdvertisementIdentifier(self, advertisementIdentifier: str) -> None:
         """
         Remove AdvertisementIdentifier
         """
@@ -162,7 +162,7 @@ class AdvertiserBTMgmt(Advertiser) :
 
         return
 
-    def AdvertisementDataSet(self, advertisementIdentifier: str, manufacturerId: bytes, rawdata: bytes):
+    def AdvertisementDataSet(self, advertisementIdentifier: str, manufacturerId: bytes, rawdata: bytes) -> None:
         """
         Set Advertisement data
         """
@@ -194,7 +194,7 @@ class AdvertiserBTMgmt(Advertiser) :
         return
 
 
-    def _publish(self):
+    def _publish(self) -> None:
         """
         publishing loop
         """
@@ -239,7 +239,7 @@ class AdvertiserBTMgmt(Advertiser) :
         return timeSlot
 
 
-    def _Advertise(self, advertisementCommand: str, timeSlot: float):
+    def _Advertise(self, advertisementCommand: str, timeSlot: float) -> None:
         """
         calls the btmgmt tool as subprocess
         """
@@ -265,7 +265,7 @@ class AdvertiserBTMgmt(Advertiser) :
 
         return
 
-    def _CreateTelegramForBTMgmmt(self, manufacturerId: bytes, rawDataArray: bytes):
+    def _CreateTelegramForBTMgmmt(self, manufacturerId: bytes, rawDataArray: bytes) -> str:
         """
         Create input data for btmgmt 
         """

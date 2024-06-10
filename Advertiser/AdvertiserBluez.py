@@ -178,20 +178,20 @@ class AdvertiserBluez(Advertiser) :
             self.mainloop = GLib.MainLoop()
             self._ad_thread = None
 
-        def _publish(self):
+        def _publish(self) -> None:
             self.mainloop.run()
 
-        def Start(self):
+        def Start(self) -> None:
             """Start GLib event loop"""
             self._ad_thread = threading.Thread(target=self._publish)
             self._ad_thread.daemon = True
             self._ad_thread.start()
 
-        def Stop(self):
+        def Stop(self) -> None:
             """Stop GLib event loop"""
             self.mainloop.quit()
 
-        def Release(self):  # pylint: disable=invalid-name
+        def Release(self) -> None:  # pylint: disable=invalid-name
             """
             This method gets called when the service daemon
             removes the Advertisement. A client can use it to do
@@ -202,7 +202,7 @@ class AdvertiserBluez(Advertiser) :
             """
             pass
 
-    def __init__(self):
+    def __init__(self) -> None:
         """
         initializes the object and defines the fields
         """
@@ -231,16 +231,16 @@ class AdvertiserBluez(Advertiser) :
 
         return None
     
-    def register_ad_cb(self):
+    def register_ad_cb(self) -> None:
         print('Advertisement registered')
 
 
-    def register_ad_error_cb(self, error):
+    def register_ad_error_cb(self, error) -> None:
         print('Failed to register advertisement: ' + str(error))
         self._mainloop.quit()
 
 
-    def AdvertisementStop(self):
+    def AdvertisementStop(self) -> None:
         """
         stop bluetooth advertising
 
@@ -264,7 +264,7 @@ class AdvertiserBluez(Advertiser) :
 
         return
 
-    def AdvertisementDataSet(self, identifier: str, manufacturerId: bytes, rawdata: bytes):
+    def AdvertisementDataSet(self, identifier: str, manufacturerId: bytes, rawdata: bytes) -> None:
         """
         Set Advertisement data
         """

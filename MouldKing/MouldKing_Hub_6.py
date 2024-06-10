@@ -9,7 +9,7 @@ from MouldKing.MouldKingHub_Byte import MouldKingHub_Byte
 
 class MouldKing_Hub_6(MouldKingHub_Byte) :
     """
-    class handling the MouldKing 6.0 Module
+    class handling the MouldKing 6.0 Hub
     """
 
     # static fields/constants
