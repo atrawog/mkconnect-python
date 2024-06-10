@@ -11,12 +11,12 @@ from Advertiser.IAdvertisingDevice import IAdvertisingDevice
 
 sys.path.append("MouldKing") 
 #from MouldKing.MouldKingDevice import MouldKingDevice
-from MouldKing.MouldKing_4_Hubs import MouldKing_4_Hubs
+from MouldKing.MouldKing_4_12Ch_Hubs import MouldKing_4_12Ch_Hubs
 
 class MouldKing_4_Hub(IAdvertisingDevice) :
 
     # static fields/constants
-    _MouldKing_4_Hubs = MouldKing_4_Hubs()
+    _MouldKing_4_Hubs = MouldKing_4_12Ch_Hubs()
 
 
     def __init__(self, deviceId: int):
@@ -28,7 +28,7 @@ class MouldKing_4_Hub(IAdvertisingDevice) :
             raise Exception('only deviceId 0..2 are allowed')
         
         self._deviceId = deviceId
-        self._NumberOfChannels = 3
+        self._NumberOfChannels = 4
         self._tracer = None
 
 
