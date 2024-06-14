@@ -36,6 +36,7 @@ class AdvertiserMicroPython(Advertiser) :
 
         return
 
+
     def AdvertisementStop(self) -> None:
         """
         stop bluetooth advertising
@@ -56,6 +57,7 @@ class AdvertiserMicroPython(Advertiser) :
 
         return
 
+
     def AdvertisementDataSet(self, identifier: str, manufacturerId: bytes, rawdata: bytes) -> None:
         """
         Set Advertisement data
@@ -72,6 +74,7 @@ class AdvertiserMicroPython(Advertiser) :
                 self._tracer.TraceInfo("self.ble is None")
 
         return
+
     
     def _CreateTelegramForPicoW(self, manufacturerId: bytes, rawDataArray: bytes) -> bytes:
         """

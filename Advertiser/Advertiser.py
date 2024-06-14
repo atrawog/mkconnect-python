@@ -2,7 +2,11 @@ __author__ = "J0EK3R"
 __version__ = "0.1"
 
 import sys
-import threading
+
+if (sys.platform == 'rp2'):
+    import _thread as thread
+else:
+    import threading as thread
 
 from IAdvertiser import IAdvertiser
 from IAdvertisingDevice import IAdvertisingDevice
@@ -26,7 +30,11 @@ class Advertiser(IAdvertiser) :
         # * key is the instance of the AdvertisingDevice
         # * value is the AdvertisementIdentifier of the AdvertisingDevice
         self._registeredDeviceTable = dict()
-        self._registeredDeviceTable_Lock = threading.Lock()
+
+        if (sys.platform == 'rp2'):
+            self._registeredDeviceTable_Lock = thread.allocate_lock()
+        else:
+            self._registeredDeviceTable_Lock = thread.Lock()
         return
 
 
@@ -56,7 +64,8 @@ class Advertiser(IAdvertiser) :
 
         try:
             # acquire lock for table
-            self._registeredDeviceTable_Lock.acquire(blocking=True)
+            #self._registeredDeviceTable_Lock.acquire(blocking=True)
+            self._registeredDeviceTable_Lock.acquire()
 
             if(advertisingDevice in self._registeredDeviceTable):
                 return False
@@ -79,7 +88,8 @@ class Advertiser(IAdvertiser) :
 
         try:
             # acquire lock for table
-            self._registeredDeviceTable_Lock.acquire(blocking=True)
+            #self._registeredDeviceTable_Lock.acquire(blocking=True)
+            self._registeredDeviceTable_Lock.acquire()
 
             if(advertisingDevice in self._registeredDeviceTable):
                 self._registeredDeviceTable.pop(advertisingDevice)
