@@ -57,7 +57,7 @@ class AdvertiserBTMgmt(Advertiser) :
 
         # AdvertisingDevice was registered successfully in baseclass
         if(result):
-            # register AdvertisindIdentifier -> only registered AdvertisindIdentifier will be sent
+            # register AdvertisingIdentifier -> only registered AdvertisingIdentifier will be sent
             advertisementIdentifier = advertisingDevice.GetAdvertisementIdentifier()
             self._RegisterAdvertisementIdentifier(advertisementIdentifier)
 
