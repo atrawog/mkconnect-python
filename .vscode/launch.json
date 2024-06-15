@@ -8,7 +8,7 @@
             "name": "Raspberry - Python Debugger: main.py",
             "type": "debugpy",
             "request": "launch",
-            "program": "main.py",
+            "program": "maintest.py",
             "console": "integratedTerminal",
             "sudo": true,
         },
@@ -24,7 +24,7 @@
             "name": "Windows - Python Debugger: main.py",
             "type": "debugpy",
             "request": "launch",
-            "program": "main.py",
+            "program": "maintest.py",
             "console": "integratedTerminal",
         },
         {
