@@ -3,6 +3,7 @@ __version__ = "0.1"
 
 import sys
 import logging
+import asyncio
 
 logger = logging.getLogger(__name__)
 
@@ -11,7 +12,6 @@ from IAdvertisingDevice import IAdvertisingDevice
 from Advertiser.Advertiser import Advertiser
 
 import subprocess
-import threading
 import time
 
 class AdvertiserBTMgmt(Advertiser) :
@@ -33,14 +33,14 @@ class AdvertiserBTMgmt(Advertiser) :
 
         logger.debug("AdvertiserBTMgmt.__init__")
 
-        self._advertisement_thread_Run = False
-        self._advertisement_thread = None
-        self._advertisement_thread_Lock = threading.Lock()
+        self._advertisement_task_Run = False
+        self._advertisement_task = None
+        self._advertisement_task_Lock = asyncio.Lock()
 
         # Table
         # * key: AdvertisementIdentifier
         # * value: advertisement-command for the call of btmgmt tool
-        self._advertisementTable_thread_Lock = threading.Lock()
+        self._advertisementTable_Lock = asyncio.Lock()
         self._advertisementTable = dict()
         
         self._lastSetAdvertisementCommand = None
@@ -48,13 +48,13 @@ class AdvertiserBTMgmt(Advertiser) :
         return
 
 
-    def TryRegisterAdvertisingDevice(self, advertisingDevice: IAdvertisingDevice) -> bool:
+    async def TryRegisterAdvertisingDevice(self, advertisingDevice: IAdvertisingDevice) -> bool:
         """
         try to register the given AdvertisingDevice
         * returns True if the AdvertisingDevice was registered successfully
         * returns False if the AdvertisingDevice wasn't registered successfully (because it still was registered)
         """
-        result = super().TryRegisterAdvertisingDevice(advertisingDevice)
+        result = await super().TryRegisterAdvertisingDevice(advertisingDevice)
 
         logger.debug("AdvertiserBTMgmt.TryRegisterAdvertisingDevice")
 
@@ -62,18 +62,18 @@ class AdvertiserBTMgmt(Advertiser) :
         if(result):
             # register AdvertisingIdentifier -> only registered AdvertisingIdentifier will be sent
             advertisementIdentifier = advertisingDevice.GetAdvertisementIdentifier()
-            self._RegisterAdvertisementIdentifier(advertisementIdentifier)
+            await self._RegisterAdvertisementIdentifier(advertisementIdentifier)
 
         return result
 
 
-    def TryUnregisterAdvertisingDevice(self, advertisingDevice: IAdvertisingDevice) -> bool:
+    async def TryUnregisterAdvertisingDevice(self, advertisingDevice: IAdvertisingDevice) -> bool:
         """
         try to unregister the given AdvertisingDevice
         * returns True if the AdvertisingDevice was unregistered successfully
         * returns False if the AdvertisingDevice wasn't unregistered successfully
         """
-        result = super().TryUnregisterAdvertisingDevice(advertisingDevice)
+        result = await super().TryUnregisterAdvertisingDevice(advertisingDevice)
 
         logger.debug("AdvertiserBTMgmt.TryUnregisterAdvertisingDevice")
 
@@ -81,7 +81,7 @@ class AdvertiserBTMgmt(Advertiser) :
         if(result):
             # unregister AdvertisementIdentifier to remove from publishing
             advertisementIdentifier = advertisingDevice.GetAdvertisementIdentifier()
-            self._UnregisterAdvertisementIdentifier(advertisementIdentifier)
+            await self._UnregisterAdvertisementIdentifier(advertisementIdentifier)
 
         return result
 
@@ -93,10 +93,10 @@ class AdvertiserBTMgmt(Advertiser) :
         logger.debug("AdvertiserBTMgmt.AdvertisementStop")
 
         # stop publishing thread
-        self._advertisement_thread_Run = False
-        if(self._advertisement_thread is not None):
-            self._advertisement_thread.join()
-            self._advertisement_thread = None
+        self._advertisement_task_Run = False
+        if(self._advertisement_task is not None):
+            await self._advertisement_task
+            self._advertisement_task = None
 
         #self._advertisementTable.clear()
 
@@ -108,31 +108,27 @@ class AdvertiserBTMgmt(Advertiser) :
         return
 
 
-    def _RegisterAdvertisementIdentifier(self, advertisementIdentifier: str) -> None:
+    async def _RegisterAdvertisementIdentifier(self, advertisementIdentifier: str) -> None:
         """
         Register AdvertisementIdentifier
         """
         logger.debug("AdvertiserBTMgmt._RegisterAdvertisementIdentifier")
 
-        try:
-            self._advertisementTable_thread_Lock.acquire(blocking=True)
+        async with self._advertisementTable_Lock:
 
             if(not advertisementIdentifier in self._advertisementTable):
                 self._advertisementTable[advertisementIdentifier] = None
-        finally:
-            self._advertisementTable_thread_Lock.release()
 
         return
 
 
-    def _UnregisterAdvertisementIdentifier(self, advertisementIdentifier: str) -> None:
+    async def _UnregisterAdvertisementIdentifier(self, advertisementIdentifier: str) -> None:
         """
         Unregister AdvertisementIdentifier
         """
         logger.debug("AdvertiserBTMgmt._UnregisterAdvertisementIdentifier")
 
-        try:
-            self._registeredDeviceTable_Lock.acquire(blocking=True)
+        async with self._registeredDeviceTable_Lock:
 
             foundAdvertisementIdentifier = False
 
@@ -144,40 +140,33 @@ class AdvertiserBTMgmt(Advertiser) :
                     break
                     
             if(not foundAdvertisementIdentifier):
-                self._RemoveAdvertisementIdentifier(advertisementIdentifier)
+                await self._RemoveAdvertisementIdentifier(advertisementIdentifier)
 
-        finally:
-            self._registeredDeviceTable_Lock.release()
         return
 
-    def _RemoveAdvertisementIdentifier(self, advertisementIdentifier: str) -> None:
+    async def _RemoveAdvertisementIdentifier(self, advertisementIdentifier: str) -> None:
         """
         Remove AdvertisementIdentifier
         """
         logger.debug("AdvertiserBTMgmt._RemoveAdvertisementIdentifier")
 
-        try:
-            self._advertisementTable_thread_Lock.acquire(blocking=True)
+        async with self._advertisementTable_Lock:
 
             if(advertisementIdentifier in self._advertisementTable):
                 self._advertisementTable.pop(advertisementIdentifier)
-            
-        finally:
-            self._advertisementTable_thread_Lock.release()
 
         if(len(self._advertisementTable) == 0):
             await self.AdvertisementStop()
 
         return
 
-    def AdvertisementDataSet(self, advertisementIdentifier: str, manufacturerId: bytes, rawdata: bytes) -> None:
+    async def AdvertisementDataSet(self, advertisementIdentifier: str, manufacturerId: bytes, rawdata: bytes) -> None:
         """
         Set Advertisement data
         """
         logger.debug("AdvertiserBTMgmt.AdvertisementDataSet")
 
-        try:
-            self._advertisementTable_thread_Lock.acquire(blocking=True)
+        async with self._advertisementTable_Lock:
             
             # only registered AdvertisementIdentifier are handled
             if(advertisementIdentifier in self._advertisementTable):
@@ -186,51 +175,45 @@ class AdvertiserBTMgmt(Advertiser) :
 
                 # for quick change handle immediately
                 timeSlot = self._CalcTimeSlot()
-                self._Advertise(advertisementCommand, timeSlot)
-        finally:
-            self._advertisementTable_thread_Lock.release()
+                await self._Advertise(advertisementCommand, timeSlot)
 
         # start publish thread if necessary
-        if(not self._advertisement_thread_Run):
-            self._advertisement_thread = threading.Thread(target=self._publish)
-            self._advertisement_thread.daemon = True
-            self._advertisement_thread.start()
-            self._advertisement_thread_Run = True
+        if(not self._advertisement_task_Run):
+            self._advertisement_task = asyncio.create_task(self._publish)
+            self._advertisement_task_Run = True
 
         logger.debug('AdvertiserBTMgmnt.AdvertisementSet')
 
         return
 
 
-    def _publish(self) -> None:
+    async def _publish(self) -> None:
         """
         publishing loop
         """
         logger.debug("AdvertiserBTMgmt._publish")
 
         # loop while field is True
-        while(self._advertisement_thread_Run):
+        while(self._advertisement_task_Run):
             try:
-                try:
-                    self._advertisementTable_thread_Lock.acquire(blocking=True)
+                
+                async with self._advertisementTable_Lock:
 
                     # make a copy of the table to release the lock as quick as possible
                     copy_of_advertisementTable = self._advertisementTable.copy()
 
                     # calc time for one publishing slot
                     timeSlot = self._CalcTimeSlot()
-                finally:
-                    self._advertisementTable_thread_Lock.release()
                 
                 if(len(copy_of_advertisementTable) == 0):
                     pass
                 else:
                     for key, advertisementCommand in copy_of_advertisementTable.items():
                         # stop publishing?
-                        if(not self._advertisement_thread_Run):
+                        if(not self._advertisement_task_Run):
                             return
 
-                        self._Advertise(advertisementCommand, timeSlot)
+                        await self._Advertise(advertisementCommand, timeSlot)
             except:
                 pass
 
@@ -245,14 +228,13 @@ class AdvertiserBTMgmt(Advertiser) :
         return timeSlot
 
 
-    def _Advertise(self, advertisementCommand: str, timeSlot: float) -> None:
+    async def _Advertise(self, advertisementCommand: str, timeSlot: float) -> None:
         """
         calls the btmgmt tool as subprocess
         """
         logger.debug("AdvertiserBTMgmt._Advertise")
 
-        try:
-            self._advertisement_thread_Lock.acquire(blocking=True)
+        async with self._advertisement_task_Lock:
             timeStart = time.time()    
 
             if (self._lastSetAdvertisementCommand != advertisementCommand):
@@ -265,10 +247,8 @@ class AdvertiserBTMgmt(Advertiser) :
             timeSlotRemain = max(0.001, timeSlot - timeDelta)
 
             # stop publishing?
-            if(self._advertisement_thread_Run):
-                time.sleep(timeSlotRemain)
-        finally:
-            self._advertisement_thread_Lock.release()
+            if(self._advertisement_task_Run):
+                await asyncio.sleep(timeSlotRemain)
 
         return
 

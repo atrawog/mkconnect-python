@@ -3,6 +3,7 @@ __version__ = "0.1"
 
 import sys
 import logging
+import asyncio
 
 logger = logging.getLogger(__name__)
 
@@ -10,7 +11,6 @@ sys.path.append("Advertiser")
 from Advertiser.Advertiser import Advertiser
 
 import subprocess
-import threading
 import time
 
 class AdvertiserHCITool(Advertiser) :
@@ -29,9 +29,9 @@ class AdvertiserHCITool(Advertiser) :
         logger.debug("AdvertiserHCITool.__init__")
 
         self._isInitialized = False
-        self._ad_thread_Run = False
-        self._ad_thread = None
-        self._ad_thread_Lock = threading.Lock()
+        self._ad_task_Run = False
+        self._ad_task = None
+        self._ad_task_Lock = asyncio.Lock()
         self._advertisementTable = dict()
 
         return
@@ -42,10 +42,10 @@ class AdvertiserHCITool(Advertiser) :
         """
         logger.debug("AdvertiserHCITool.AdvertisementStop")
 
-        self._ad_thread_Run = False
-        if(self._ad_thread is not None):
-            self._ad_thread.join()
-            self._ad_thread = None
+        self._ad_task_Run = False
+        if(self._ad_task is not None):
+            await self._ad_task
+            self._ad_task = None
             self._isInitialized = False
 
         hcitool_args_0x08_0x000a = self.HCITool_path + ' -i hci0 cmd 0x08 0x000a 00'
@@ -56,35 +56,31 @@ class AdvertiserHCITool(Advertiser) :
 
         return
 
-    def AdvertisementDataSet(self, identifier: str, manufacturerId: bytes, rawdata: bytes) -> None:
+    async def AdvertisementDataSet(self, identifier: str, manufacturerId: bytes, rawdata: bytes) -> None:
         """
         Set Advertisement data
         """
         logger.debug("AdvertiserHCITool.AdvertisementDataSet")
 
         advertisementCommand = self.HCITool_path + ' -i hci0 cmd 0x08 0x0008 ' + self._CreateTelegramForHCITool(manufacturerId, rawdata)
-        self._ad_thread_Lock.acquire(blocking=True)
-        self._advertisementTable[identifier] = advertisementCommand
-        self._ad_thread_Lock.release()
-
-        if(not self._ad_thread_Run):
-            self._ad_thread = threading.Thread(target=self._publish)
-            self._ad_thread.daemon = True
-            self._ad_thread.start()
-            self._ad_thread_Run = True
+        async with self._ad_task_Lock:
+            self._advertisementTable[identifier] = advertisementCommand
+    
+        if(not self._ad_task_Run):
+            self._ad_task = asyncio.create_task(self._publish())
+            self._ad_task_Run = True
 
         logger.debug('AdvertiserHCITool.AdvertisementSet')
 
         return
 
-    def _publish(self) -> None:
+    async def _publish(self) -> None:
         logger.debug('AdvertiserHCITool._publish')
 
-        while(self._ad_thread_Run):
+        while(self._ad_task_Run):
             try:
-                self._ad_thread_Lock.acquire(blocking=True)
-                copy_of_advertisementTable = self._advertisementTable.copy()
-                self._ad_thread_Lock.release()
+                async with self._ad_task_Lock:
+                    copy_of_advertisementTable = self._advertisementTable.copy()
                 
                 # We want to repeat each command 
                 repetitionsPerSecond = 4
@@ -93,7 +89,7 @@ class AdvertiserHCITool(Advertiser) :
 
                 for key, advertisementCommand in copy_of_advertisementTable.items():
                     # stopp publishing?
-                    if(not self._ad_thread_Run):
+                    if(not self._ad_task_Run):
                         return
 
                     timeStart = time.time()    
@@ -118,7 +114,7 @@ class AdvertiserHCITool(Advertiser) :
                     #     logger.debug(str(timeSlotRemain) + " " + str(key) + ": " + str(advertisement))
                     #     logger.debug(str(timeSlotRemain))
 
-                    time.sleep(timeSlotRemain)
+                    await asyncio.sleep(timeSlotRemain)
             except:
                 pass
 

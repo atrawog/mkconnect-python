@@ -3,13 +3,9 @@ __version__ = "0.1"
 
 import sys
 import logging
+import asyncio
 
 logger = logging.getLogger(__name__)
-
-if (sys.platform == 'rp2'):
-    import _thread as thread
-else:
-    import threading as thread
 
 from IAdvertiser import IAdvertiser
 from IAdvertisingDevice import IAdvertisingDevice
@@ -30,12 +26,7 @@ class Advertiser(IAdvertiser) :
         # * key is the instance of the AdvertisingDevice
         # * value is the AdvertisementIdentifier of the AdvertisingDevice
         self._registeredDeviceTable = dict()
-
-        if (sys.platform == 'rp2'):
-            self._registeredDeviceTable_Lock = thread.allocate_lock()
-        else:
-            self._registeredDeviceTable_Lock = thread.Lock()
-        return
+        self._registeredDeviceTable_Lock = asyncio.Lock()
 
 
     async def AdvertisementStop(self) -> None:
@@ -58,19 +49,15 @@ class Advertiser(IAdvertiser) :
         if(advertisingDevice is None):
             return False
 
-        try:
-            # acquire lock for table
-            #self._registeredDeviceTable_Lock.acquire(blocking=True)
-            self._registeredDeviceTable_Lock.acquire()
+        # acquire lock for table
+        #self._registeredDeviceTable_Lock.acquire(blocking=True)
+        async with self._registeredDeviceTable_Lock:
 
             if(advertisingDevice in self._registeredDeviceTable):
                 return False
             else:
                 self._registeredDeviceTable[advertisingDevice] = advertisingDevice.GetAdvertisementIdentifier()
                 return True
-        finally:
-            # release lock for table
-            self._registeredDeviceTable_Lock.release()
 
 
     async def TryUnregisterAdvertisingDevice(self, advertisingDevice: IAdvertisingDevice) -> bool:
@@ -84,19 +71,15 @@ class Advertiser(IAdvertiser) :
         if(advertisingDevice is None):
             return False
 
-        try:
-            # acquire lock for table
-            #self._registeredDeviceTable_Lock.acquire(blocking=True)
-            self._registeredDeviceTable_Lock.acquire()
+        # acquire lock for table
+        #self._registeredDeviceTable_Lock.acquire(blocking=True)
+        async with self._registeredDeviceTable_Lock:
 
             if(advertisingDevice in self._registeredDeviceTable):
                 self._registeredDeviceTable.pop(advertisingDevice)
                 return True
             else:
                 return False
-        finally:
-            # release lock for table
-            self._registeredDeviceTable_Lock.release()
 
 
     async def AdvertisementDataSet(self, advertisementIdentifier: str, manufacturerId: bytes, rawdata: bytes) -> None:
