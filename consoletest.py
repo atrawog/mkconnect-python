@@ -19,7 +19,8 @@ if (sys.platform == 'linux'):
     from Advertiser.AdvertiserBTSocket import AdvertiserBTSocket as Advertiser
     pass
 elif (sys.platform == 'rp2'):
-    from Advertiser.AdvertiserMicroPython import AdvertiserMicroPython as Advertiser
+    #from Advertiser.AdvertiserMicroPythonThread import AdvertiserMicroPythonThreadThread as Advertiser
+    from Advertiser.AdvertiserMicroPythonAio import AdvertiserMicroPythonAio as Advertiser
     pass
 elif (sys.platform == 'win32'):
     from Advertiser.AdvertiserDummy import AdvertiserDummy as Advertiser

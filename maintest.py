@@ -3,9 +3,10 @@
 import sys
 import time
 import logging
+import asyncio
 
 # set logging
-logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s', level=logging.INFO)
+logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s', level=logging.DEBUG)
 
 print('Script: main.py')
 print('Platform: ' + sys.platform)
@@ -18,7 +19,8 @@ if (sys.platform == 'linux'):
     from Advertiser.AdvertiserBTSocket import AdvertiserBTSocket as Advertiser
     pass
 elif (sys.platform == 'rp2'):
-    from Advertiser.AdvertiserMicroPython import AdvertiserMicroPython as Advertiser
+    #from Advertiser.AdvertiserMicroPythonThread import AdvertiserMicroPythonThreadThread as Advertiser
+    from Advertiser.AdvertiserMicroPythonAio import AdvertiserMicroPythonAio as Advertiser
     pass
 elif (sys.platform == 'win32'):
     from Advertiser.AdvertiserDummy import AdvertiserDummy as Advertiser
@@ -43,114 +45,124 @@ hub1 = MouldKing.Module6_0.Device1
 #hub1 = MouldKing.Module4_0.Device1
 hub2 = MouldKing.Module4_0.Device0
 
-############################################################################
-# get uncrypted connect-telegram as bytearray
-title = "connect-telegram"
-print("\n" + title)
+async def main_async():
+    main()
 
-hub0.Connect()
-#hub1.Connect()
-#hub2.Connect()
-time.sleep(5)
 
-#print("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))
+def main():
+    ############################################################################
+    # get uncrypted connect-telegram as bytearray
+    title = "connect-telegram"
+    print("\n" + title)
 
-#crypted = MouldKingCrypt.Crypt(rawdata) # get crypted data from rawdata
-#print("crypted: " + ' '.join(f'{x:02x}' for x in crypted))
+    hub0.Connect()
+    #hub1.Connect()
+    #hub2.Connect()
+    time.sleep(5)
 
-############################################################################
-# get uncrypted stop-telegram as bytearray
-title = "stop-telegram"
-print("\n" + title)
+    #print("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))
 
-rawdata = hub0.Stop()
-#rawdata = hub1.Stop()
-#rawdata = hub2.Stop()
-time.sleep(1)
+    #crypted = MouldKingCrypt.Crypt(rawdata) # get crypted data from rawdata
+    #print("crypted: " + ' '.join(f'{x:02x}' for x in crypted))
 
-#print("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))
+    ############################################################################
+    # get uncrypted stop-telegram as bytearray
+    title = "stop-telegram"
+    print("\n" + title)
 
-#crypted = MouldKingCrypt.Crypt(rawdata) # get crypted data from rawdata
-#print("crypted: " + ' '.join(f'{x:02x}' for x in crypted))
+    rawdata = hub0.Stop()
+    #rawdata = hub1.Stop()
+    #rawdata = hub2.Stop()
+    time.sleep(1)
 
-############################################################################
-# get uncrypted telegram with channel 1 (indexer 0) fullspeed forwards
-title = "C1: fullspeed forwards"
-print("\n" + title)
+    #print("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))
 
-rawdata = hub0.SetChannel(0, 1)
-time.sleep(1)
+    #crypted = MouldKingCrypt.Crypt(rawdata) # get crypted data from rawdata
+    #print("crypted: " + ' '.join(f'{x:02x}' for x in crypted))
 
-#print("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))
+    ############################################################################
+    # get uncrypted telegram with channel 1 (indexer 0) fullspeed forwards
+    title = "C1: fullspeed forwards"
+    print("\n" + title)
 
-#crypted = MouldKingCrypt.Crypt(rawdata) # get crypted data from rawdata
-#print("crypted: " + ' '.join(f'{x:02x}' for x in crypted))
+    rawdata = hub0.SetChannel(0, 1)
+    time.sleep(1)
 
-############################################################################
-# get uncrypted telegram with channel 1 (indexer 0) halfspeed forwards
-title = "C1: halfspeed forwards"
-print("\n" + title)
+    #print("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))
 
-rawdata = hub0.SetChannel(0, 0.5)
-time.sleep(1)
+    #crypted = MouldKingCrypt.Crypt(rawdata) # get crypted data from rawdata
+    #print("crypted: " + ' '.join(f'{x:02x}' for x in crypted))
 
-#print("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))
+    ############################################################################
+    # get uncrypted telegram with channel 1 (indexer 0) halfspeed forwards
+    title = "C1: halfspeed forwards"
+    print("\n" + title)
 
-#crypted = MouldKingCrypt.Crypt(rawdata) # get crypted data from rawdata
-#print("crypted: " + ' '.join(f'{x:02x}' for x in crypted))
+    rawdata = hub0.SetChannel(0, 0.5)
+    time.sleep(1)
 
-############################################################################
-# get uncrypted telegram with channel 1 (indexer 0) fullspeed forwards
-title = "C1: fullspeed forwards"
-print("\n" + title)
+    #print("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))
 
-#rawdata = hub1.SetChannel(0, 1)
-#time.sleep(2)
+    #crypted = MouldKingCrypt.Crypt(rawdata) # get crypted data from rawdata
+    #print("crypted: " + ' '.join(f'{x:02x}' for x in crypted))
 
-#print("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))
+    ############################################################################
+    # get uncrypted telegram with channel 1 (indexer 0) fullspeed forwards
+    title = "C1: fullspeed forwards"
+    print("\n" + title)
 
-#crypted = MouldKingCrypt.Crypt(rawdata) # get crypted data from rawdata
-#print("crypted: " + ' '.join(f'{x:02x}' for x in crypted))
+    #rawdata = hub1.SetChannel(0, 1)
+    #time.sleep(2)
 
-############################################################################
-# get uncrypted telegram with channel 1 (indexer 0) halfspeed backwards
-title = "C1: halfspeed backwards"
-print("\n" + title)
+    #print("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))
 
-rawdata = hub0.SetChannel(0, -0.5)
-time.sleep(1)
+    #crypted = MouldKingCrypt.Crypt(rawdata) # get crypted data from rawdata
+    #print("crypted: " + ' '.join(f'{x:02x}' for x in crypted))
 
-#print("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))
+    ############################################################################
+    # get uncrypted telegram with channel 1 (indexer 0) halfspeed backwards
+    title = "C1: halfspeed backwards"
+    print("\n" + title)
 
-#crypted = MouldKingCrypt.Crypt(rawdata) # get crypted data from rawdata
-#print("crypted: " + ' '.join(f'{x:02x}' for x in crypted))
+    rawdata = hub0.SetChannel(0, -0.5)
+    time.sleep(1)
 
-############################################################################
-# get uncrypted telegram with channel 1 (indexer 0) halfspeed backwards
-title = "C2: halfspeed backwards"
-print("\n" + title)
+    #print("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))
 
-rawdata = hub0.SetChannel(1, -0.5)
-time.sleep(1)
+    #crypted = MouldKingCrypt.Crypt(rawdata) # get crypted data from rawdata
+    #print("crypted: " + ' '.join(f'{x:02x}' for x in crypted))
 
-#print("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))
+    ############################################################################
+    # get uncrypted telegram with channel 1 (indexer 0) halfspeed backwards
+    title = "C2: halfspeed backwards"
+    print("\n" + title)
 
-#crypted = MouldKingCrypt.Crypt(rawdata) # get crypted data from rawdata
-#print("crypted: " + ' '.join(f'{x:02x}' for x in crypted))
+    rawdata = hub0.SetChannel(1, -0.5)
+    time.sleep(1)
 
-############################################################################
-# disconnect from advertiser
-title = "Disconnect from advertiser"
-print("\n" + title)
+    #print("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))
 
-hub0.Disconnect()
-#hub1.Disconnect()
-#hub2.Disconnect()
-time.sleep(1)
+    #crypted = MouldKingCrypt.Crypt(rawdata) # get crypted data from rawdata
+    #print("crypted: " + ' '.join(f'{x:02x}' for x in crypted))
 
-############################################################################
-# stop Advertisement
-title = "Advertisement stop"
-print("\n" + title)
-advertiser.AdvertisementStop()
-time.sleep(1)
+    ############################################################################
+    # disconnect from advertiser
+    title = "Disconnect from advertiser"
+    print("\n" + title)
+
+    hub0.Disconnect()
+    #hub1.Disconnect()
+    #hub2.Disconnect()
+    time.sleep(1)
+
+    ############################################################################
+    # stop Advertisement
+    title = "Advertisement stop"
+    print("\n" + title)
+    advertiser.AdvertisementStop()
+    time.sleep(1)
+
+if __name__ == "__main__":
+    
+    asyncio.run(main_async())
+

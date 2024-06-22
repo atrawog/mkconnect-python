@@ -3,27 +3,34 @@ __version__ = "0.1"
 
 import sys
 import time
+import asyncio
 import logging
 
 logger = logging.getLogger(__name__)
-
-if (sys.platform == 'rp2'):
-    import _thread as thread
-else:
-    import threading as thread
 
 try:
     import bluetooth
 except ImportError as err:
     logger.error("AdvertiserMicroPythonAio: " + str(err))
 
-
 sys.path.append("Advertiser") 
 from IAdvertisingDevice import IAdvertisingDevice
 from Advertiser.Advertiser import Advertiser
 
+# https://stackoverflow.com/questions/70634627/how-to-block-and-wait-the-result-of-an-async-function-in-a-non-async-function
+loop = None
+def coroutine_wrapper(coro):
+    def fun():
+        # Shedule the coroutine in the event loop of the main thread
+        if(loop):
+            future = asyncio.run_coroutine_threadsafe(coro(), loop)
+        # Wait for the result, this is blocking and may not be done in the
+        # thread of the event loop:
+        return future.result()
+    return fun
 
-class AdvertiserMicroPythonThreadThread(Advertiser) :
+
+class AdvertiserMicroPythonAio(Advertiser) :
     """
     Advertiser using bluetooth library from MicroPython
     """
@@ -38,7 +45,10 @@ class AdvertiserMicroPythonThreadThread(Advertiser) :
         """
         super().__init__()
 
-        logger.debug(f"AdvertiserMicroPythonThread.__init__")
+        logger.debug(f"AdvertiserMicroPythonAio.__init__")
+
+        global loop
+        loop = asyncio.get_running_loop()
 
         # Activate bluetooth
         try:
@@ -46,17 +56,17 @@ class AdvertiserMicroPythonThreadThread(Advertiser) :
             self.ble.active(True)
         except Exception as exception:
             self.ble = None
-            logger.error("AdvertiserMicroPythonThread.init: " + str(exception))
+            logger.error("AdvertiserMicroPythonAio.init: " + str(exception))
 
         self._advertisement_thread_Run = False
         self._advertisement_thread_IsRunning = False
         self._advertisement_thread = None
-        self._advertisement_thread_Lock = thread.allocate_lock()
+        self._advertisement_thread_Lock = asyncio.Lock()
 
         # Table
         # * key: AdvertisementIdentifier
         # * value: advertisement-command for the call of btmgmt tool
-        self._advertisementTable_thread_Lock = thread.allocate_lock()
+        self._advertisementTable_thread_Lock = asyncio.Lock()
         self._advertisementTable = dict()
         
         self._lastSetAdvertisementCommand = None
@@ -72,7 +82,7 @@ class AdvertiserMicroPythonThreadThread(Advertiser) :
         """
         result = super().TryRegisterAdvertisingDevice(advertisingDevice)
 
-        logger.debug(f"AdvertiserMicroPythonThread.TryRegisterAdvertisingDevice")
+        logger.debug(f"AdvertiserMicroPythonAio.TryRegisterAdvertisingDevice")
 
         # AdvertisingDevice was registered successfully in baseclass
         if(result):
@@ -91,7 +101,7 @@ class AdvertiserMicroPythonThreadThread(Advertiser) :
         """
         result = super().TryUnregisterAdvertisingDevice(advertisingDevice)
 
-        logger.debug(f"AdvertiserMicroPythonThread.TryUnregisterAdvertisingDevice")
+        logger.debug(f"AdvertiserMicroPythonAio.TryUnregisterAdvertisingDevice")
 
         # AdvertisingDevice was unregistered successfully in baseclass
         if(result):
@@ -105,41 +115,52 @@ class AdvertiserMicroPythonThreadThread(Advertiser) :
     def AdvertisementStop(self) -> None:
         """
         stop bluetooth advertising
+        """
+        coroutine_wrapper(self.AdvertisementStop_async())
+
+    async def AdvertisementStop_async(self) -> None:
+        """
+        stop bluetooth advertising
 
         """
-        logger.debug(f"AdvertiserMicroPythonThread.AdvertisementStop")
+        logger.debug(f"AdvertiserMicroPythonAio.AdvertisementStop")
 
         # stop publishing thread
         self._advertisement_thread_Run = False
         if(self._advertisement_thread is not None):
             while(self._advertisement_thread_IsRunning):
-                time.sleep(0.1)
+                await asyncio.sleep(0.1)
             self._advertisement_thread = None
 
         if(self.ble is not None):
             self.ble.gap_advertise(None)
 
-            logger.info("AdvertiserMicroPythonThread.AdvertisementStop")
+            logger.info("AdvertiserMicroPythonAio.AdvertisementStop")
         else:
-            logger.info("AdvertiserMicroPythonThread.AdvertisementStop: self.ble is None")
-
-        return
+            logger.info("AdvertiserMicroPythonAio.AdvertisementStop: self.ble is None")
 
 
     def _RegisterAdvertisementIdentifier(self, advertisementIdentifier: str) -> None:
         """
         Register AdvertisementIdentifier
         """
+        coroutine_wrapper(self._RegisterAdvertisementIdentifier_async(advertisementIdentifier))
+
+
+    async def _RegisterAdvertisementIdentifier_async(self, advertisementIdentifier: str) -> None:
+        """
+        Register AdvertisementIdentifier
+        """
 
         try:
-            self._advertisementTable_thread_Lock.acquire()
+            await self._advertisementTable_thread_Lock.acquire()
 
             if(not advertisementIdentifier in self._advertisementTable):
                 self._advertisementTable[advertisementIdentifier] = None
 
-                logger.debug(f"AdvertiserMicroPythonThread._RegisterAdvertisementIdentifier: '{advertisementIdentifier}'")
+                logger.debug(f"AdvertiserMicroPythonAio._RegisterAdvertisementIdentifier: '{advertisementIdentifier}'")
             else:
-                logger.debug(f"AdvertiserMicroPythonThread._RegisterAdvertisementIdentifier: '{advertisementIdentifier}' exists")
+                logger.debug(f"AdvertiserMicroPythonAio._RegisterAdvertisementIdentifier: '{advertisementIdentifier}' exists")
 
         finally:
             self._advertisementTable_thread_Lock.release()
@@ -166,30 +187,38 @@ class AdvertiserMicroPythonThreadThread(Advertiser) :
             if(not foundAdvertisementIdentifier):
                 self._RemoveAdvertisementIdentifier(advertisementIdentifier)
 
-                logger.info(f"AdvertiserMicroPythonThread._UnregisterAdvertisementIdentifier: '{advertisementIdentifier}'")
+                logger.info(f"AdvertiserMicroPythonAio._UnregisterAdvertisementIdentifier: '{advertisementIdentifier}'")
 
             else:
-                logger.info(f"AdvertiserMicroPythonThread._UnregisterAdvertisementIdentifier: '{advertisementIdentifier}' not exists")
+                logger.info(f"AdvertiserMicroPythonAio._UnregisterAdvertisementIdentifier: '{advertisementIdentifier}' not exists")
 
         finally:
             self._registeredDeviceTable_Lock.release()
         return
 
+
     def _RemoveAdvertisementIdentifier(self, advertisementIdentifier: str) -> None:
+        """
+        Remove AdvertisementIdentifier
+        """
+        coroutine_wrapper(self._RemoveAdvertisementIdentifier_async(advertisementIdentifier))
+
+
+    async def _RemoveAdvertisementIdentifier_async(self, advertisementIdentifier: str) -> None:
         """
         Remove AdvertisementIdentifier
         """
 
         try:
-            self._advertisementTable_thread_Lock.acquire()
+            await self._advertisementTable_thread_Lock.acquire()
 
             if(advertisementIdentifier in self._advertisementTable):
                 self._advertisementTable.pop(advertisementIdentifier)
             
-                logger.info(f"AdvertiserMicroPythonThread._RemoveAdvertisementIdentifier: '{advertisementIdentifier}'")
+                logger.info(f"AdvertiserMicroPythonAio._RemoveAdvertisementIdentifier: '{advertisementIdentifier}'")
 
             else:
-                logger.info(f"AdvertiserMicroPythonThread._RemoveAdvertisementIdentifier: '{advertisementIdentifier}' not exists")
+                logger.info(f"AdvertiserMicroPythonAio._RemoveAdvertisementIdentifier: '{advertisementIdentifier}' not exists")
 
         finally:
             self._advertisementTable_thread_Lock.release()
@@ -204,64 +233,73 @@ class AdvertiserMicroPythonThreadThread(Advertiser) :
         """
         Set Advertisement data
         """
+        logger.debug(f"AdvertiserMicroPythonAio.AdvertisementDataSet: start")
+
+        coroutine_wrapper(self.AdvertisementDataSet_async(advertisementIdentifier, manufacturerId, rawdata))
+
+        logger.debug(f"AdvertiserMicroPythonAio.AdvertisementDataSet: finished")
+
+
+    async def AdvertisementDataSet_async(self, advertisementIdentifier: str, manufacturerId: bytes, rawdata: bytes) -> None:
+        """
+        Set Advertisement data
+        """
         try:
-            self._advertisementTable_thread_Lock.acquire()
+            lock = self._advertisementTable_thread_Lock.acquire()
             
             # only registered AdvertisementIdentifier are handled
             if(advertisementIdentifier in self._advertisementTable):
                 advertisementCommand = self._CreateTelegramForPicoW(manufacturerId, rawdata)
                 self._advertisementTable[advertisementIdentifier] = advertisementCommand
 
-                logger.info(f"AdvertiserMicroPythonThread.AdvertisementDataSet: '{advertisementIdentifier}' changed")
+                logger.info(f"AdvertiserMicroPythonAio.AdvertisementDataSet_async: '{advertisementIdentifier}' changed")
 
                 # for quick change handle immediately
                 timeSlot = self._CalcTimeSlot()
-                self._Advertise(advertisementCommand, timeSlot)
+                await self._Advertise_async(advertisementCommand, timeSlot)
             else:
-                logger.info(f"AdvertiserMicroPythonThread.AdvertisementDataSet: '{advertisementIdentifier}' not registered")
+                logger.info(f"AdvertiserMicroPythonAio.AdvertisementDataSet_async: '{advertisementIdentifier}' not registered")
         finally:
             self._advertisementTable_thread_Lock.release()
 
         # start publish thread if necessary
         if(not self._advertisement_thread_Run):
             self._advertisement_thread_Run = True
-            self._advertisement_thread = thread.start_new_thread(self._publishloop, ())
-            # self._advertisement_thread.daemon = True
-            # self._advertisement_thread.start()
+            self._advertisement_thread = asyncio.create_task(self._publishloop_async())
 
         return
 
 
-    def _publishloop(self) -> None:
+    async def _publishloop_async(self) -> None:
         """
         publishing loop
         """
 
-        logger.info('AdvertiserMicroPythonThread._publishloop: started')
+        logger.info('AdvertiserMicroPythonAio._publishloop: started')
 
         self._advertisement_thread_IsRunning = True
 
         # loop while field is True
         loopcounter = 0
         while(self._advertisement_thread_Run):
-            logger.debug(f'AdvertiserMicroPythonThread._publishloop: loop[{loopcounter}]')
+            logger.debug(f'AdvertiserMicroPythonAio._publishloop: loop[{loopcounter}]')
             try:
                 try:
-                    logger.debug('AdvertiserMicroPythonThread._publishloop: acquire before')
+                    logger.debug('AdvertiserMicroPythonAio._publishloop: acquire before')
 
-                    self._advertisementTable_thread_Lock.acquire()
+                    await self._advertisementTable_thread_Lock.acquire()
 
-                    logger.debug('AdvertiserMicroPythonThread._publishloop: acquire after')
+                    logger.debug('AdvertiserMicroPythonAio._publishloop: acquire after')
 
                     # make a copy of the table to release the lock as quick as possible
                     copy_of_advertisementTable = self._advertisementTable.copy()
 
-                    logger.debug('AdvertiserMicroPythonThread._publishloop: copy')
+                    logger.debug('AdvertiserMicroPythonAio._publishloop: copy')
                 finally:
                     self._advertisementTable_thread_Lock.release()
                 
                 if(len(copy_of_advertisementTable) == 0):
-                    logger.debug('AdvertiserMicroPythonThread._publishloop: copy_of_advertisementTable is empty')
+                    logger.debug('AdvertiserMicroPythonAio._publishloop: copy_of_advertisementTable is empty')
                     pass
                 else:
                     # calc time for one publishing slot
@@ -270,16 +308,16 @@ class AdvertiserMicroPythonThreadThread(Advertiser) :
                     for key, advertisementCommand in copy_of_advertisementTable.items():
                         # stop publishing?
                         if(not self._advertisement_thread_Run):
-                            logger.debug('AdvertiserMicroPythonThread._publishloop: quit loop')
+                            logger.debug('AdvertiserMicroPythonAio._publishloop: quit loop')
                             return
 
-                        self._Advertise(advertisementCommand, timeSlot)
+                        await self._Advertise_async(advertisementCommand, timeSlot)
             except:
                 pass
 
             loopcounter = loopcounter + 1
 
-        logger.info('AdvertiserMicroPythonThread._publishloop: exit')
+        logger.info('AdvertiserMicroPythonAio._publishloop: exit')
         self._advertisement_thread_IsRunning = False
 
 
@@ -293,32 +331,32 @@ class AdvertiserMicroPythonThreadThread(Advertiser) :
         return timeSlot
 
 
-    def _Advertise(self, advertisementCommand: bytes, timeSlot: float) -> None:
+    async def _Advertise_async(self, advertisementCommand: bytes, timeSlot: float) -> None:
         """
         calls the btmgmt tool as subprocess
         """
 
         try:
-            self._advertisement_thread_Lock.acquire()
+            lock = self._advertisement_thread_Lock.acquire()
             timeStart = time.time()    
 
-            logger.debug('AdvertiserMicroPythonThread._Advertise: try')
+            logger.debug('AdvertiserMicroPythonAio._Advertise: try')
 
             if (self._lastSetAdvertisementCommand != advertisementCommand):
                 self._lastSetAdvertisementCommand = advertisementCommand
     
-                logger.info('AdvertiserMicroPythonThread._Advertise: new command')
+                logger.info('AdvertiserMicroPythonAio._Advertise: new command')
 
                 if(self.ble is not None):
-                    logger.debug('AdvertiserMicroPythonThread._Advertise: before')
+                    logger.debug('AdvertiserMicroPythonAio._Advertise: before')
 
                     self.ble.gap_advertise(100, advertisementCommand)
 
-                    logger.debug('AdvertiserMicroPythonThread._Advertise: after')
+                    logger.debug('AdvertiserMicroPythonAio._Advertise: after')
                 else:
-                    logger.debug('AdvertiserMicroPythonThread._Advertise: else')
+                    logger.debug('AdvertiserMicroPythonAio._Advertise: else')
             else:
-                logger.debug('AdvertiserMicroPythonThread._Advertise: no new command')
+                logger.debug('AdvertiserMicroPythonAio._Advertise: no new command')
 
             timeEnd = time.time()    
             timeDelta = timeEnd - timeStart
@@ -326,13 +364,13 @@ class AdvertiserMicroPythonThreadThread(Advertiser) :
 
             # stop publishing?
             if(self._advertisement_thread_Run):
-                logger.debug(f'AdvertiserMicroPythonThread._Advertise: sleep: {str(timeSlotRemain)} s')
-                time.sleep(timeSlotRemain)
+                logger.debug(f'AdvertiserMicroPythonAio._Advertise: sleep: {str(timeSlotRemain)} s')
+                await asyncio.sleep(timeSlotRemain)
 
         except Exception as err:
-            logger.warning(f"AdvertiserMicroPythonThread._Advertise: except '{str(err)}'")
+            logger.warning(f"AdvertiserMicroPythonAio._Advertise: except '{str(err)}'")
         finally:
-            logger.debug('AdvertiserMicroPythonThread._Advertise: finally')
+            logger.debug('AdvertiserMicroPythonAio._Advertise: finally')
 
             self._advertisement_thread_Lock.release()
         return

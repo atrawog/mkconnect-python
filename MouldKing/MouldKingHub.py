@@ -116,11 +116,13 @@ class MouldKingHub(AdvertisingDevice) :
         """
         sends the data to the advertiser
         """
-        logger.debug("MouldKingHub._Advertise")
+        logger.debug("MouldKingHub._Advertise: start")
 
         if(self._advertiser is not None):
             cryptedData = MouldKingCrypt.Crypt(rawdata)
             self._advertiser.AdvertisementDataSet(self._identifier, self.ManufacturerID, cryptedData)
+
+        logger.debug("MouldKingHub._Advertise: finished")
 
         return self._Telegram_connect
 
