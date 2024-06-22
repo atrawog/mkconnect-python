@@ -2,9 +2,9 @@ __author__ = "J0EK3R"
 __version__ = "0.1"
 
 import sys
+import logging
 
-sys.path.append("Tracer") 
-from Tracer.Tracer import Tracer
+logger = logging.getLogger(__name__)
 
 sys.path.append("Advertiser") 
 from IAdvertisingDevice import IAdvertisingDevice
@@ -29,9 +29,10 @@ class AdvertiserBTMgmt(Advertiser) :
         """
         initializes the object and defines the member fields
         """
-
         super().__init__() # call baseclass
-        
+
+        logger.debug("AdvertiserBTMgmt.__init__")
+
         self._advertisement_thread_Run = False
         self._advertisement_thread = None
         self._advertisement_thread_Lock = threading.Lock()
@@ -55,6 +56,8 @@ class AdvertiserBTMgmt(Advertiser) :
         """
         result = super().TryRegisterAdvertisingDevice(advertisingDevice)
 
+        logger.debug("AdvertiserBTMgmt.TryRegisterAdvertisingDevice")
+
         # AdvertisingDevice was registered successfully in baseclass
         if(result):
             # register AdvertisingIdentifier -> only registered AdvertisingIdentifier will be sent
@@ -72,6 +75,8 @@ class AdvertiserBTMgmt(Advertiser) :
         """
         result = super().TryUnregisterAdvertisingDevice(advertisingDevice)
 
+        logger.debug("AdvertiserBTMgmt.TryUnregisterAdvertisingDevice")
+
         # AdvertisingDevice was unregistered successfully in baseclass
         if(result):
             # unregister AdvertisementIdentifier to remove from publishing
@@ -85,6 +90,7 @@ class AdvertiserBTMgmt(Advertiser) :
         """
         stop bluetooth advertising
         """
+        logger.debug("AdvertiserBTMgmt.AdvertisementStop")
 
         # stop publishing thread
         self._advertisement_thread_Run = False
@@ -97,9 +103,7 @@ class AdvertiserBTMgmt(Advertiser) :
         advertisementCommand = self._BTMgmt_path + ' rm-adv 1' + ' &> /dev/null'
         subprocess.run(advertisementCommand, shell=True, executable="/bin/bash")
 
-        if (self._tracer is not None):
-            self._tracer.TraceInfo('AdvertiserBTMgmnt.AdvertisementStop')
-            self._tracer.TraceInfo(advertisementCommand)
+        logger.debug(f"AdvertiserBTMgmnt.AdvertisementStop: command='{advertisementCommand}'")
 
         return
 
@@ -108,6 +112,7 @@ class AdvertiserBTMgmt(Advertiser) :
         """
         Register AdvertisementIdentifier
         """
+        logger.debug("AdvertiserBTMgmt._RegisterAdvertisementIdentifier")
 
         try:
             self._advertisementTable_thread_Lock.acquire(blocking=True)
@@ -124,6 +129,8 @@ class AdvertiserBTMgmt(Advertiser) :
         """
         Unregister AdvertisementIdentifier
         """
+        logger.debug("AdvertiserBTMgmt._UnregisterAdvertisementIdentifier")
+
         try:
             self._registeredDeviceTable_Lock.acquire(blocking=True)
 
@@ -147,6 +154,7 @@ class AdvertiserBTMgmt(Advertiser) :
         """
         Remove AdvertisementIdentifier
         """
+        logger.debug("AdvertiserBTMgmt._RemoveAdvertisementIdentifier")
 
         try:
             self._advertisementTable_thread_Lock.acquire(blocking=True)
@@ -166,6 +174,7 @@ class AdvertiserBTMgmt(Advertiser) :
         """
         Set Advertisement data
         """
+        logger.debug("AdvertiserBTMgmt.AdvertisementDataSet")
 
         try:
             self._advertisementTable_thread_Lock.acquire(blocking=True)
@@ -188,8 +197,7 @@ class AdvertiserBTMgmt(Advertiser) :
             self._advertisement_thread.start()
             self._advertisement_thread_Run = True
 
-        if (self._tracer is not None):
-            self._tracer.TraceInfo('AdvertiserBTMgmnt.AdvertisementSet')
+        logger.debug('AdvertiserBTMgmnt.AdvertisementSet')
 
         return
 
@@ -198,9 +206,7 @@ class AdvertiserBTMgmt(Advertiser) :
         """
         publishing loop
         """
-
-        if (self._tracer is not None):
-            self._tracer.TraceInfo('AdvertiserBTMgmnt._publish')
+        logger.debug("AdvertiserBTMgmt._publish")
 
         # loop while field is True
         while(self._advertisement_thread_Run):
@@ -243,6 +249,7 @@ class AdvertiserBTMgmt(Advertiser) :
         """
         calls the btmgmt tool as subprocess
         """
+        logger.debug("AdvertiserBTMgmt._Advertise")
 
         try:
             self._advertisement_thread_Lock.acquire(blocking=True)

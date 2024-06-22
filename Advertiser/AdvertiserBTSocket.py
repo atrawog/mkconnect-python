@@ -5,12 +5,12 @@ import sys
 import enum
 import threading
 import time
+import logging
+
+logger = logging.getLogger(__name__)
 
 from btsocket import btmgmt_socket
 from btsocket import btmgmt_protocol
-
-sys.path.append("Tracer") 
-from Tracer.Tracer import Tracer
 
 sys.path.append("Advertiser") 
 from IAdvertisingDevice import IAdvertisingDevice
@@ -42,7 +42,9 @@ class AdvertiserBTSocket(Advertiser) :
         initializes the object and defines the member fields
         """
         super().__init__() # call baseclass
-        
+
+        logger.debug("AdvertiserBTSocket.__init__")
+
         self._advertisement_thread_Run = False
         self._advertisement_thread = None
         self._advertisement_thread_Lock = threading.Lock()
@@ -68,6 +70,8 @@ class AdvertiserBTSocket(Advertiser) :
         """
         result = super().TryRegisterAdvertisingDevice(advertisingDevice)
 
+        logger.debug("AdvertiserBTSocket.TryRegisterAdvertisingDevice")
+
         # AdvertisingDevice was registered successfully in baseclass
         if(result):
             # register AdvertisingIdentifier -> only registered AdvertisingIdentifier will be sent
@@ -85,6 +89,8 @@ class AdvertiserBTSocket(Advertiser) :
         """
         result = super().TryUnregisterAdvertisingDevice(advertisingDevice)
 
+        logger.debug("AdvertiserBTSocket.TryUnregisterAdvertisingDevice")
+
         # AdvertisingDevice was unregistered successfully in baseclass
         if(result):
             # unregister AdvertisementIdentifier to remove from publishing
@@ -99,6 +105,8 @@ class AdvertiserBTSocket(Advertiser) :
         stop bluetooth advertising
         """
 
+        logger.debug("AdvertiserBTSocket.AdvertisementStop")
+
         # stop publishing thread
         self._advertisement_thread_Run = False
         if(self._advertisement_thread is not None):
@@ -108,9 +116,7 @@ class AdvertiserBTSocket(Advertiser) :
         advertisementCommand = AdvertiserBTSocket._create_rm_advert_command(1)
         self.sock.send(advertisementCommand)
 
-        # if (self._tracer is not None):
-        #     self._tracer.TraceInfo('AdvertiserBTMgmnt.AdvertisementStop')
-        #     self._tracer.TraceInfo(advertisementCommand)
+        #     logger.debug(f"AdvertiserBTMgmnt.AdvertisementStop")
 
         return
 
@@ -119,6 +125,8 @@ class AdvertiserBTSocket(Advertiser) :
         """
         Register AdvertisementIdentifier
         """
+
+        logger.debug("AdvertiserBTSocket._RegisterAdvertisementIdentifier")
 
         try:
             self._advertisementTable_thread_Lock.acquire(blocking=True)
@@ -135,6 +143,8 @@ class AdvertiserBTSocket(Advertiser) :
         """
         Unregister AdvertisementIdentifier
         """
+        logger.debug("AdvertiserBTSocket._UnregisterAdvertisementIdentifier")
+
         try:
             self._registeredDeviceTable_Lock.acquire(blocking=True)
 
@@ -158,6 +168,7 @@ class AdvertiserBTSocket(Advertiser) :
         """
         Remove AdvertisementIdentifier
         """
+        logger.debug("AdvertiserBTSocket._RemoveAdvertisementIdentifier")
 
         try:
             self._advertisementTable_thread_Lock.acquire(blocking=True)
@@ -177,6 +188,7 @@ class AdvertiserBTSocket(Advertiser) :
         """
         Set Advertisement data
         """
+        logger.debug("AdvertiserBTSocket.AdvertisementDataSet")
 
         try:
             self._advertisementTable_thread_Lock.acquire(blocking=True)
@@ -210,8 +222,7 @@ class AdvertiserBTSocket(Advertiser) :
             self._advertisement_thread.start()
             self._advertisement_thread_Run = True
 
-        if (self._tracer is not None):
-            self._tracer.TraceInfo('AdvertiserBTMgmnt.AdvertisementSet')
+        logger.debug('AdvertiserBTMgmnt.AdvertisementSet')
 
         return
 
@@ -220,9 +231,7 @@ class AdvertiserBTSocket(Advertiser) :
         """
         publishing loop
         """
-
-        if (self._tracer is not None):
-            self._tracer.TraceInfo('AdvertiserBTMgmnt._publish')
+        logger.debug("AdvertiserBTSocket._publish")
 
         # loop while field is True
         while(self._advertisement_thread_Run):
@@ -265,6 +274,7 @@ class AdvertiserBTSocket(Advertiser) :
         """
         calls the btmgmt tool as subprocess
         """
+        logger.debug("AdvertiserBTSocket._publish")
 
         try:
             self._advertisement_thread_Lock.acquire(blocking=True)

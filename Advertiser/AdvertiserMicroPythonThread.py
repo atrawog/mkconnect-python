@@ -3,14 +3,14 @@ __version__ = "0.1"
 
 import sys
 import time
+import logging
+
+logger = logging.getLogger(__name__)
 
 if (sys.platform == 'rp2'):
     import _thread as thread
 else:
     import threading as thread
-
-sys.path.append("Tracer") 
-from Tracer.Tracer import Tracer
 
 sys.path.append("Advertiser") 
 from IAdvertisingDevice import IAdvertisingDevice
@@ -21,7 +21,8 @@ try:
 except ImportError as err:
     print("AdvertiserMicroPython: " + str(err))
 
-class AdvertiserMicroPython(Advertiser) :
+
+class AdvertiserMicroPythonThread(Advertiser) :
     """
     Advertiser using bluetooth library from MicroPython
     """
@@ -29,12 +30,14 @@ class AdvertiserMicroPython(Advertiser) :
     # Number of repetitions per second
     _RepetitionsPerSecond = 4
 
+
     def __init__(self):
         """
         initializes the object and defines the fields
         """
-
         super().__init__()
+
+        logger.debug(f"AdvertiserMicroPython.__init__")
 
         # Activate bluetooth
         try:
@@ -42,9 +45,10 @@ class AdvertiserMicroPython(Advertiser) :
             self.ble.active(True)
         except Exception as exception:
             self.ble = None
-            print("AdvertiserMicroPython.init: " + str(exception))
+            logger.error("AdvertiserMicroPython.init: " + str(exception))
 
         self._advertisement_thread_Run = False
+        self._advertisement_thread_IsRunning = False
         self._advertisement_thread = None
         self._advertisement_thread_Lock = thread.allocate_lock()
 
@@ -67,6 +71,8 @@ class AdvertiserMicroPython(Advertiser) :
         """
         result = super().TryRegisterAdvertisingDevice(advertisingDevice)
 
+        logger.debug(f"AdvertiserMicroPython.TryRegisterAdvertisingDevice")
+
         # AdvertisingDevice was registered successfully in baseclass
         if(result):
             # register AdvertisingIdentifier -> only registered AdvertisingIdentifier will be sent
@@ -84,6 +90,8 @@ class AdvertiserMicroPython(Advertiser) :
         """
         result = super().TryUnregisterAdvertisingDevice(advertisingDevice)
 
+        logger.debug(f"AdvertiserMicroPython.TryUnregisterAdvertisingDevice")
+
         # AdvertisingDevice was unregistered successfully in baseclass
         if(result):
             # unregister AdvertisementIdentifier to remove from publishing
@@ -98,24 +106,21 @@ class AdvertiserMicroPython(Advertiser) :
         stop bluetooth advertising
 
         """
+        logger.debug(f"AdvertiserMicroPython.AdvertisementStop")
 
         # stop publishing thread
         self._advertisement_thread_Run = False
         if(self._advertisement_thread is not None):
-            self._advertisement_thread.join()
+            while(self._advertisement_thread_IsRunning):
+                time.sleep(0.1)
             self._advertisement_thread = None
 
         if(self.ble is not None):
             self.ble.gap_advertise(None)
 
-            if (self._tracer is not None):
-                self._tracer.TraceInfo("AdvertiserMicroPython.AdvertisementStop")
+            logger.info("AdvertiserMicroPython.AdvertisementStop")
         else:
-            if (self._tracer is not None):
-                self._tracer.TraceInfo("AdvertiserMicroPython.AdvertisementStop: self.ble is None")
-
-        if (self._tracer is not None):
-            pass
+            logger.info("AdvertiserMicroPython.AdvertisementStop: self.ble is None")
 
         return
 
@@ -131,11 +136,9 @@ class AdvertiserMicroPython(Advertiser) :
             if(not advertisementIdentifier in self._advertisementTable):
                 self._advertisementTable[advertisementIdentifier] = None
 
-                if (self._tracer is not None):
-                    self._tracer.TraceInfo("AdvertiserMicroPython._RegisterAdvertisementIdentifier: " + advertisementIdentifier)
+                logger.debug(f"AdvertiserMicroPython._RegisterAdvertisementIdentifier: '{advertisementIdentifier}'")
             else:
-                if (self._tracer is not None):
-                    self._tracer.TraceInfo("AdvertiserMicroPython._RegisterAdvertisementIdentifier: " + advertisementIdentifier + " exists")
+                logger.debug(f"AdvertiserMicroPython._RegisterAdvertisementIdentifier: '{advertisementIdentifier}' exists")
 
         finally:
             self._advertisementTable_thread_Lock.release()
@@ -162,12 +165,10 @@ class AdvertiserMicroPython(Advertiser) :
             if(not foundAdvertisementIdentifier):
                 self._RemoveAdvertisementIdentifier(advertisementIdentifier)
 
-                if (self._tracer is not None):
-                    self._tracer.TraceInfo("AdvertiserMicroPython._UnregisterAdvertisementIdentifier: " + advertisementIdentifier)
+                logger.info(f"AdvertiserMicroPython._UnregisterAdvertisementIdentifier: '{advertisementIdentifier}'")
 
             else:
-                if (self._tracer is not None):
-                    self._tracer.TraceInfo("AdvertiserMicroPython._UnregisterAdvertisementIdentifier: " + advertisementIdentifier + " not exists")
+                logger.info(f"AdvertiserMicroPython._UnregisterAdvertisementIdentifier: '{advertisementIdentifier}' not exists")
 
         finally:
             self._registeredDeviceTable_Lock.release()
@@ -184,12 +185,10 @@ class AdvertiserMicroPython(Advertiser) :
             if(advertisementIdentifier in self._advertisementTable):
                 self._advertisementTable.pop(advertisementIdentifier)
             
-                if (self._tracer is not None):
-                    self._tracer.TraceInfo("AdvertiserMicroPython._RemoveAdvertisementIdentifier: " + advertisementIdentifier)
+                logger.info(f"AdvertiserMicroPython._RemoveAdvertisementIdentifier: '{advertisementIdentifier}'")
 
             else:
-                if (self._tracer is not None):
-                    self._tracer.TraceInfo("AdvertiserMicroPython._RemoveAdvertisementIdentifier: " + advertisementIdentifier + " not exists")
+                logger.info(f"AdvertiserMicroPython._RemoveAdvertisementIdentifier: '{advertisementIdentifier}' not exists")
 
         finally:
             self._advertisementTable_thread_Lock.release()
@@ -204,17 +203,6 @@ class AdvertiserMicroPython(Advertiser) :
         """
         Set Advertisement data
         """
-        # data = self._CreateTelegramForPicoW(manufacturerId, rawdata)
-
-        # if(self.ble is not None):
-        #     self.ble.gap_advertise(100, data)
-
-        #     if (self._tracer is not None):
-        #         self._tracer.TraceInfo("AdvertisementSet")
-        # else:
-        #     if (self._tracer is not None):
-        #         self._tracer.TraceInfo("self.ble is None")
-
         try:
             self._advertisementTable_thread_Lock.acquire()
             
@@ -223,79 +211,75 @@ class AdvertiserMicroPython(Advertiser) :
                 advertisementCommand = self._CreateTelegramForPicoW(manufacturerId, rawdata)
                 self._advertisementTable[advertisementIdentifier] = advertisementCommand
 
-                if (self._tracer is not None):
-                    self._tracer.TraceInfo("AdvertiserMicroPython.AdvertisementDataSet: " + advertisementIdentifier + " changed")
+                logger.info(f"AdvertiserMicroPython.AdvertisementDataSet: '{advertisementIdentifier}' changed")
 
                 # for quick change handle immediately
                 timeSlot = self._CalcTimeSlot()
                 self._Advertise(advertisementCommand, timeSlot)
             else:
-                if (self._tracer is not None):
-                    self._tracer.TraceInfo("AdvertiserMicroPython.AdvertisementDataSet: " + advertisementIdentifier + " not registered")
+                logger.info(f"AdvertiserMicroPython.AdvertisementDataSet: '{advertisementIdentifier}' not registered")
         finally:
             self._advertisementTable_thread_Lock.release()
 
         # start publish thread if necessary
         if(not self._advertisement_thread_Run):
             self._advertisement_thread_Run = True
-            self._advertisement_thread = thread.start_new_thread(self._publish, ())
+            self._advertisement_thread = thread.start_new_thread(self._publishloop, ())
             # self._advertisement_thread.daemon = True
             # self._advertisement_thread.start()
 
         return
 
 
-    def _publish(self) -> None:
+    def _publishloop(self) -> None:
         """
         publishing loop
         """
 
-        if (self._tracer is not None):
-            self._tracer.TraceInfo('AdvertiserMicroPython._publish: started a')
-            self._tracer.TraceInfo('AdvertiserMicroPython._publish: started ' + str(self._advertisement_thread_Run))
+        logger.info('AdvertiserMicroPython._publishloop: started')
+
+        self._advertisement_thread_IsRunning = True
 
         # loop while field is True
+        loopcounter = 0
         while(self._advertisement_thread_Run):
-            if (self._tracer is not None):
-                self._tracer.TraceInfo('AdvertiserMicroPython._publish: started')
+            logger.debug(f'AdvertiserMicroPython._publishloop: loop[{loopcounter}]')
             try:
                 try:
-                    if (self._tracer is not None):
-                        self._tracer.TraceInfo('AdvertiserMicroPython._publish: acquire before')
+                    logger.debug('AdvertiserMicroPython._publishloop: acquire before')
 
                     self._advertisementTable_thread_Lock.acquire()
 
-                    if (self._tracer is not None):
-                        self._tracer.TraceInfo('AdvertiserMicroPython._publish: acquire after')
+                    logger.debug('AdvertiserMicroPython._publishloop: acquire after')
 
                     # make a copy of the table to release the lock as quick as possible
                     copy_of_advertisementTable = self._advertisementTable.copy()
 
-                    if (self._tracer is not None):
-                        self._tracer.TraceInfo('AdvertiserMicroPython._publish: copy')
-
-                    # calc time for one publishing slot
-                    timeSlot = self._CalcTimeSlot()
+                    logger.debug('AdvertiserMicroPython._publishloop: copy')
                 finally:
                     self._advertisementTable_thread_Lock.release()
                 
                 if(len(copy_of_advertisementTable) == 0):
+                    logger.debug('AdvertiserMicroPython._publishloop: copy_of_advertisementTable is empty')
                     pass
                 else:
+                    # calc time for one publishing slot
+                    timeSlot = self._CalcTimeSlot()
+
                     for key, advertisementCommand in copy_of_advertisementTable.items():
                         # stop publishing?
                         if(not self._advertisement_thread_Run):
+                            logger.debug('AdvertiserMicroPython._publishloop: quit loop')
                             return
 
                         self._Advertise(advertisementCommand, timeSlot)
             except:
                 pass
 
-            if (self._tracer is not None):
-                self._tracer.TraceInfo('AdvertiserMicroPython._publishLoop')
+            loopcounter = loopcounter + 1
 
-        if (self._tracer is not None):
-            self._tracer.TraceInfo('AdvertiserMicroPython._publish: exit')
+        logger.info('AdvertiserMicroPython._publishloop: exit')
+        self._advertisement_thread_IsRunning = False
 
 
     def _CalcTimeSlot(self) -> float:
@@ -317,23 +301,23 @@ class AdvertiserMicroPython(Advertiser) :
             self._advertisement_thread_Lock.acquire()
             timeStart = time.time()    
 
-            if (self._tracer is not None):
-                self._tracer.TraceInfo('AdvertiserMicroPython._Advertise: try')
+            logger.debug('AdvertiserMicroPython._Advertise: try')
 
             if (self._lastSetAdvertisementCommand != advertisementCommand):
                 self._lastSetAdvertisementCommand = advertisementCommand
+    
+                logger.info('AdvertiserMicroPython._Advertise: new command')
 
                 if(self.ble is not None):
-                    if (self._tracer is not None):
-                        self._tracer.TraceInfo('AdvertiserMicroPython._Advertise: before')
+                    logger.debug('AdvertiserMicroPython._Advertise: before')
 
                     self.ble.gap_advertise(100, advertisementCommand)
 
-                    if (self._tracer is not None):
-                        self._tracer.TraceInfo('AdvertiserMicroPython._Advertise: after')
+                    logger.debug('AdvertiserMicroPython._Advertise: after')
                 else:
-                    if (self._tracer is not None):
-                        self._tracer.TraceInfo('AdvertiserMicroPython._Advertise: else')
+                    logger.debug('AdvertiserMicroPython._Advertise: else')
+            else:
+                logger.debug('AdvertiserMicroPython._Advertise: no new command')
 
             timeEnd = time.time()    
             timeDelta = timeEnd - timeStart
@@ -341,14 +325,15 @@ class AdvertiserMicroPython(Advertiser) :
 
             # stop publishing?
             if(self._advertisement_thread_Run):
-                if (self._tracer is not None):
-                    self._tracer.TraceInfo('AdvertiserMicroPython._Advertise: sleep: ' + str(timeSlotRemain))
+                logger.debug(f'AdvertiserMicroPython._Advertise: sleep: {str(timeSlotRemain)} s')
                 time.sleep(timeSlotRemain)
-        finally:
-            self._advertisement_thread_Lock.release()
 
-            if (self._tracer is not None):
-                self._tracer.TraceInfo('AdvertiserMicroPython._Advertise: finally')
+        except Exception as err:
+            logger.warning(f"AdvertiserMicroPython._Advertise: except '{str(err)}'")
+        finally:
+            logger.debug('AdvertiserMicroPython._Advertise: finally')
+
+            self._advertisement_thread_Lock.release()
         return
     
 
@@ -359,8 +344,8 @@ class AdvertiserMicroPython(Advertiser) :
         rawDataArrayLen = len(rawDataArray)
 
         btdata = bytearray(2 + rawDataArrayLen)
-        btdata[0] = manufacturerId[0]
-        btdata[1] = manufacturerId[1]
+        btdata[0] = manufacturerId[1]
+        btdata[1] = manufacturerId[0]
         for index in range(rawDataArrayLen):
             btdata[index + 2] = rawDataArray[index]
 

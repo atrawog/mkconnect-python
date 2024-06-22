@@ -2,9 +2,9 @@ __author__ = "J0EK3R"
 __version__ = "0.1"
 
 import sys
+import logging
 
-sys.path.append("Tracer") 
-from Tracer.Tracer import Tracer
+logger = logging.getLogger(__name__)
 
 sys.path.append("Advertiser") 
 from Advertiser.AdvertisingDevice import AdvertisingDevice
@@ -24,17 +24,18 @@ class MouldKingHub(AdvertisingDevice) :
         """
         initializes the object and defines the fields
         """
-
         super().__init__(identifier)
+
+        logger.debug("MouldKingHub.__init__")
 
         if telegram_connect is not None:
             maxArrayOffset = len(telegram_connect) - 1
 
             if channelStartOffset > maxArrayOffset:
-                raise Exception("max channelStartOffset:" + maxArrayOffset)
+                raise Exception("max channelStartOffset:" + str(maxArrayOffset))
 
             if channelEndOffset > (maxArrayOffset - 1):
-                raise Exception("max channelEndOffset:" + maxArrayOffset)
+                raise Exception("max channelEndOffset:" + str(maxArrayOffset))
 
         self._NumberOfChannels = numberOfChannels
         self._ChannelStartOffset = channelStartOffset
@@ -53,9 +54,10 @@ class MouldKingHub(AdvertisingDevice) :
         """
         returns the telegram to switch the MouldKing Hubs in bluetooth mode
         """
-
         # call baseClass to register at Advertiser
         super().Connect()
+
+        logger.debug("MouldKingHub.Connect")
 
         self._Advertise(self._Telegram_connect)
 
@@ -66,10 +68,11 @@ class MouldKingHub(AdvertisingDevice) :
         """
         disconnects the device from the advertiser
         """
-
         self.Stop()
         
         super().Disconnect()
+
+        logger.debug("MouldKingHub.Disconnect")
 
         return
     
@@ -78,6 +81,7 @@ class MouldKingHub(AdvertisingDevice) :
         """
         set internal stored value of all channels to zero and return the telegram
         """
+        logger.debug("MouldKingHub.Stop")
 
         # init channels        
         for channelId in range(0, self._NumberOfChannels):
@@ -90,9 +94,10 @@ class MouldKingHub(AdvertisingDevice) :
         """
         set internal stored value of channel with channelId to value and return the telegram
         """
+        logger.debug("MouldKingHub.SetChannel")
 
         if channelId > self._NumberOfChannels - 1:
-            raise Exception("only channelId 0.." + int(self._NumberOfChannels - 1) + "are allowed")
+            raise Exception("only channelId 0.." + str(self._NumberOfChannels - 1) + "are allowed")
 
         self._ChannelValueList[channelId] = value
         
@@ -111,9 +116,7 @@ class MouldKingHub(AdvertisingDevice) :
         """
         sends the data to the advertiser
         """
-
-        if(self._tracer is not None):
-            self._tracer.TraceInfo("Advertise")
+        logger.debug("MouldKingHub._Advertise")
 
         if(self._advertiser is not None):
             cryptedData = MouldKingCrypt.Crypt(rawdata)

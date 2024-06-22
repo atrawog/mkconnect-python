@@ -2,6 +2,9 @@ __author__ = "J0EK3R"
 __version__ = "0.1"
 
 import sys
+import logging
+
+logger = logging.getLogger(__name__)
 
 sys.path.append("MouldKing") 
 from MouldKing.MouldKingHub_Byte import MouldKingHub_Byte
@@ -24,7 +27,6 @@ class MouldKing_Hub_6(MouldKingHub_Byte) :
         """
         initializes the object and defines the fields
         """
-
         if deviceId == 0:
             basetelegram = MouldKing_Hub_6.__telegram_base_device_a
         elif deviceId == 1:
@@ -36,6 +38,8 @@ class MouldKing_Hub_6(MouldKingHub_Byte) :
 
         # call baseclass init and set number of channels
         super().__init__("MK6_" + str(deviceId), 6, 3, 1, MouldKing_Hub_6.__telegram_connect, basetelegram)
+
+        logger.debug("MouldKing_Hub_6.__init__")
 
 
 

@@ -2,9 +2,9 @@ __author__ = "J0EK3R"
 __version__ = "0.1"
 
 import sys
+import logging
 
-sys.path.append("Tracer") 
-from Tracer.Tracer import Tracer
+logger = logging.getLogger(__name__)
 
 sys.path.append("Advertiser") 
 from Advertiser.Advertiser import IAdvertisingDevice
@@ -19,11 +19,11 @@ class AdvertisingDevice(IAdvertisingDevice) :
         """
         initializes the object and defines the fields
         """
+        logger.debug("AdvertisingDevice.__init__")
 
         self._connected = False
         self._advertiser = None
         self._advertiser_registered = False
-        self._tracer = None
         self._identifier = identifier
 
 
@@ -31,6 +31,8 @@ class AdvertisingDevice(IAdvertisingDevice) :
         """
         set advertiser object
         """
+        logger.debug("AdvertisingDevice.SetAdvertiser")
+
         if(self._advertiser == advertiser):
             return advertiser
 
@@ -50,19 +52,11 @@ class AdvertisingDevice(IAdvertisingDevice) :
         return advertiser
 
 
-    def SetTracer(self, tracer: Tracer) -> Tracer:
-        """
-        set tracer object
-        """
-        self._tracer = tracer
-
-        return tracer
-
-
     def Connect(self):
         """
         connects the device to the advertiser
         """
+        logger.debug("AdvertisingDevice.Connect")
 
         if(self._advertiser is not None and not self._advertiser_registered):
             self._advertiser_registered = self._advertiser.TryRegisterAdvertisingDevice(self)
@@ -76,6 +70,7 @@ class AdvertisingDevice(IAdvertisingDevice) :
         """
         disconnects the device from the advertiser
         """
+        logger.debug("AdvertisingDevice.Disconnect")
 
         if(self._advertiser is not None and self._advertiser_registered):
             self._advertiser_registered = not self._advertiser.TryUnregisterAdvertisingDevice(self)
@@ -89,6 +84,7 @@ class AdvertisingDevice(IAdvertisingDevice) :
         """
         stops the device
         """
+        logger.debug("AdvertisingDevice.Stop")
 
         raise NotImplementedError # override this methode
 
@@ -101,4 +97,6 @@ class AdvertisingDevice(IAdvertisingDevice) :
 
 
     def GetAdvertisementIdentifier(self) -> str:
+        logger.debug("AdvertisingDevice.GetAdvertisementIdentifier")
+
         return self._identifier

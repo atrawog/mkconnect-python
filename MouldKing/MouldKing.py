@@ -2,9 +2,9 @@ __author__ = "J0EK3R"
 __version__ = "0.1"
 
 import sys
+import logging
 
-sys.path.append("Tracer") 
-from Tracer.Tracer import Tracer
+logger = logging.getLogger(__name__)
 
 sys.path.append("Advertiser") 
 from Advertiser.Advertiser import Advertiser
@@ -50,16 +50,6 @@ class MouldKing :
             # MouldKing.Module4_0.Device2.MouldKing_4_Hubs.SetAdvertiser(advertiser)
             return advertiser
 
-        @staticmethod
-        def SetTracer(tracer: Tracer) -> Tracer:
-            """
-            Set Tracer for all MouldKing 4.0 Hubs
-            """
-
-            MouldKing.Module4_0.Device0.SetTracer(tracer)
-            MouldKing.Module4_0.Device1.SetTracer(tracer)
-            MouldKing.Module4_0.Device2.SetTracer(tracer)
-            return tracer
 
     class Module6_0 :
         """
@@ -92,17 +82,7 @@ class MouldKing :
             MouldKing.Module6_0.Device2.SetAdvertiser(advertiser)
             return advertiser
 
-        @staticmethod
-        def SetTracer(tracer: Tracer) -> Tracer:
-            """
-            Set Tracer for all MouldKing 6.0 Hubs
-            """
 
-            MouldKing.Module6_0.Device0.SetTracer(tracer)
-            MouldKing.Module6_0.Device1.SetTracer(tracer)
-            MouldKing.Module6_0.Device2.SetTracer(tracer)
-            return tracer
-    
     @staticmethod
     def SetAdvertiser(advertiser: Advertiser) -> Advertiser:
         """
@@ -113,13 +93,3 @@ class MouldKing :
         MouldKing.Module4_0.SetAdvertiser(advertiser)
         MouldKing.Module6_0.SetAdvertiser(advertiser)
         return advertiser
-
-    @staticmethod
-    def SetTracer(tracer: Tracer) -> Tracer:
-        """
-        Set Tracer for all MouldKing 4.0 Hubs
-        """
-
-        MouldKing.Module4_0.SetTracer(tracer)
-        MouldKing.Module6_0.SetTracer(tracer)
-        return tracer

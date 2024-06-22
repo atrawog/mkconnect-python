@@ -1,5 +1,8 @@
 import sys
 import time
+import logging
+
+logger = logging.getLogger(__name__)
 
 if (sys.platform == 'rp2'):
     import _thread as thread
@@ -37,3 +40,10 @@ class Test:
         # loop while field is True
         while(self._advertisement_thread_Run):
             print('AdvertiserMicroPython._publish: started')
+
+def blink( threadName, delay):
+    while True:
+        print('blink')
+        time.sleep(1)
+
+Tblink=thread.start_new_thread( blink, ("Thread-1", 0.5, ) )            

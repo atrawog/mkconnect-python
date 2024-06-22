@@ -2,9 +2,9 @@ __author__ = "J0EK3R"
 __version__ = "0.1"
 
 import sys
+import logging
 
-sys.path.append("Tracer") 
-from Tracer.Tracer import Tracer
+logger = logging.getLogger(__name__)
 
 sys.path.append("Advertiser") 
 from Advertiser.IAdvertisingDevice import IAdvertisingDevice
@@ -26,22 +26,13 @@ class MouldKing_Hub_4(IAdvertisingDevice) :
         """
         initializes the object and defines the fields
         """
+        logger.debug("MouldKing_Hub_4.__init__")
 
         if deviceId > 2:
             raise Exception('only deviceId 0..2 are allowed')
         
         self._deviceId = deviceId
         self._NumberOfChannels = 4
-        self._tracer = None
-
-
-    def SetTracer(self, tracer: Tracer) -> Tracer:
-        """
-        set tracer object
-        """
-        self._tracer = tracer
-
-        return tracer
 
 
     def Connect(self) -> None:
@@ -76,7 +67,7 @@ class MouldKing_Hub_4(IAdvertisingDevice) :
         """
 
         if channelId > self._NumberOfChannels - 1:
-            raise Exception("only channelId 0.." + int(self._NumberOfChannels - 1) + "are allowed")
+            raise Exception("only channelId 0.." + str(self._NumberOfChannels - 1) + "are allowed")
 
         return MouldKing_Hub_4._MouldKing_4_Hubs.SubDevice_SetChannel(self._deviceId, self._NumberOfChannels, channelId, value)
 

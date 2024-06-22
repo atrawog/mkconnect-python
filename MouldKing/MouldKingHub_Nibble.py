@@ -2,6 +2,9 @@ __author__ = "J0EK3R"
 __version__ = "0.1"
 
 import sys
+import logging
+
+logger = logging.getLogger(__name__)
 
 sys.path.append("MouldKing") 
 from MouldKing.MouldKingHub import MouldKingHub
@@ -16,9 +19,10 @@ class MouldKingHub_Nibble(MouldKingHub) :
         """
         initializes the object and defines the fields
         """
-
         # call baseclass init and set number of channels
         super().__init__(identifier, numberOfChannels, channelStartOffset, channelEndOffset, telegram_connect, basetelegram)
+
+        logger.debug("MouldKingHub_Nibble.__init__")
 
 
     def CreateTelegram(self) -> bytes:

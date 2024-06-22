@@ -2,6 +2,9 @@ __author__ = "J0EK3R"
 __version__ = "0.1"
 
 import sys
+import logging
+
+logger = logging.getLogger(__name__)
 
 sys.path.append("Advertiser") 
 from Advertiser.IAdvertisingDevice import IAdvertisingDevice
@@ -27,6 +30,8 @@ class MouldKing_Hubs_4_12Ch(MouldKingHub_Nibble) :
         """
         # call baseclass init and set number of channels
         super().__init__("MK4", 12, 3, 1, MouldKing_Hubs_4_12Ch.__telegram_connect, MouldKing_Hubs_4_12Ch.__telegram_base)
+
+        logger.debug("MouldKing_Hubs_4_12Ch.__init__")
 
         self._connectedSubDevices = list()
 
@@ -95,7 +100,7 @@ class MouldKing_Hubs_4_12Ch(MouldKingHub_Nibble) :
         channelIdHubs = hubDeviceId * hubNumberOfChannels + hubChannelId
 
         if channelIdHubs > self._NumberOfChannels - 1:
-            raise Exception("only channelId 0.." + int(self._NumberOfChannels - 1) + "are allowed")
+            raise Exception("only channelId 0.." + str(self._NumberOfChannels - 1) + "are allowed")
 
         self._ChannelValueList[channelIdHubs] = value
         

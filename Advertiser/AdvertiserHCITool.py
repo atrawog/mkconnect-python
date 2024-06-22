@@ -2,9 +2,9 @@ __author__ = "J0EK3R"
 __version__ = "0.1"
 
 import sys
+import logging
 
-sys.path.append("Tracer") 
-from Tracer.Tracer import Tracer
+logger = logging.getLogger(__name__)
 
 sys.path.append("Advertiser") 
 from Advertiser.Advertiser import Advertiser
@@ -24,9 +24,10 @@ class AdvertiserHCITool(Advertiser) :
         """
         initializes the object and defines the fields
         """
-
         super().__init__()
-        
+
+        logger.debug("AdvertiserHCITool.__init__")
+
         self._isInitialized = False
         self._ad_thread_Run = False
         self._ad_thread = None
@@ -39,6 +40,7 @@ class AdvertiserHCITool(Advertiser) :
         """
         stop bluetooth advertising
         """
+        logger.debug("AdvertiserHCITool.AdvertisementStop")
 
         self._ad_thread_Run = False
         if(self._ad_thread is not None):
@@ -50,9 +52,7 @@ class AdvertiserHCITool(Advertiser) :
 
         subprocess.run(hcitool_args_0x08_0x000a + ' &> /dev/null', shell=True, executable="/bin/bash")
 
-        if (self._tracer is not None):
-            self._tracer.TraceInfo('AdvertiserHCITool.AdvertisementStop')
-            self._tracer.TraceInfo(hcitool_args_0x08_0x000a)
+        logger.debug(f"AdvertiserHCITool.AdvertisementStop: '{hcitool_args_0x08_0x000a}'")
 
         return
 
@@ -60,6 +60,7 @@ class AdvertiserHCITool(Advertiser) :
         """
         Set Advertisement data
         """
+        logger.debug("AdvertiserHCITool.AdvertisementDataSet")
 
         advertisementCommand = self.HCITool_path + ' -i hci0 cmd 0x08 0x0008 ' + self._CreateTelegramForHCITool(manufacturerId, rawdata)
         self._ad_thread_Lock.acquire(blocking=True)
@@ -72,14 +73,12 @@ class AdvertiserHCITool(Advertiser) :
             self._ad_thread.start()
             self._ad_thread_Run = True
 
-        if (self._tracer is not None):
-            self._tracer.TraceInfo('AdvertiserHCITool.AdvertisementSet')
+        logger.debug('AdvertiserHCITool.AdvertisementSet')
 
         return
 
     def _publish(self) -> None:
-        if (self._tracer is not None):
-            self._tracer.TraceInfo('AdvertiserHCITool._publish')
+        logger.debug('AdvertiserHCITool._publish')
 
         while(self._ad_thread_Run):
             try:
@@ -107,10 +106,8 @@ class AdvertiserHCITool(Advertiser) :
                         subprocess.run(hcitool_args_0x08_0x0006 + ' &> /dev/null', shell=True, executable="/bin/bash")
                         subprocess.run(hcitool_args_0x08_0x000a + ' &> /dev/null', shell=True, executable="/bin/bash")
 
-                        if (self._tracer is not None):
-                            self._tracer.TraceInfo(str(hcitool_args_0x08_0x0006))
-                            self._tracer.TraceInfo(str(hcitool_args_0x08_0x000a))
-                            self._tracer.TraceInfo()
+                        logger.debug(str(hcitool_args_0x08_0x0006))
+                        logger.debug(str(hcitool_args_0x08_0x000a))
                         
                         self._isInitialized = True
 
@@ -118,11 +115,8 @@ class AdvertiserHCITool(Advertiser) :
                     timeDelta = timeEnd - timeStart
                     timeSlotRemain = max(0.001, timeSlot - timeDelta)
 
-                    # if (self._tracer is not None):
-                    #     self._tracer.TraceInfo(str(timeSlotRemain) + " " + str(key) + ": " + str(advertisement))
-                        
-                    # if (self._tracer is not None):
-                    #     self._tracer.TraceInfo(str(timeSlotRemain))
+                    #     logger.debug(str(timeSlotRemain) + " " + str(key) + ": " + str(advertisement))
+                    #     logger.debug(str(timeSlotRemain))
 
                     time.sleep(timeSlotRemain)
             except:

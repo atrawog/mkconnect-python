@@ -4,13 +4,12 @@
 
 import sys
 import time
+import logging
+
+logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s', level=logging.INFO)
 
 print('Script: consoletest.py')
 print('Platform: ' + sys.platform)
-
-sys.path.append("Tracer") 
-from Tracer.Tracer import Tracer
-from Tracer.TracerConsole import TracerConsole
 
 sys.path.append("Advertiser") 
 # uncomment to choose advertiser
@@ -30,15 +29,10 @@ else:
 sys.path.append("MouldKing") 
 from MouldKing.MouldKing import MouldKing
 
-# instantiate Tracer
-tracer = TracerConsole()
-
 # instantiate Advertiser
 advertiser = Advertiser()
-advertiser.SetTracer(tracer)
 
-# Set Tracer for all MouldKing Hubs
-MouldKing.SetTracer(tracer)
+# Set Advertiser for all MouldKing Hubs
 MouldKing.SetAdvertiser(advertiser)
 
 # save pre-instantiated objects in local variables
@@ -80,22 +74,22 @@ def _getHubId(deviceId):
         raise Exception("deviceId 0..5")
 
 def _automate(deviceId: int, channel: int):
-    userinput = input("\nDo you want to test channel "+ str(channel) +" ? enter y/n\n")
+    #userinput = input("\nDo you want to test channel "+ str(channel) +" ? enter y/n\n")
 
-    if (userinput != str("y")):
-        return
+    #if (userinput != str("y")):
+    #   return
 
-    tracer.TraceInfo("HUB: "+  str(deviceId) +", FORWARD : Power ramp up from 0 to 100% on channel :" + str(channel))
+    print("HUB: "+  str(deviceId) +", FORWARD : Power ramp up from 0 to 100% on channel :" + str(channel))
     for percent in range(0, 110, 10):
-        tracer.TraceInfo("Power : " + str(percent) + "%")
+        print("Power : " + str(percent) + "%")
         mkcontrol(deviceId,channel, percent/100)
         time.sleep(1)
 
     mkstop(deviceId)
 
-    tracer.TraceInfo("HUB: "+  str(deviceId) +", REVERSE: Power ramp up from 0 to 100% on channel :" + str(channel))
+    print("HUB: "+  str(deviceId) +", REVERSE: Power ramp up from 0 to 100% on channel :" + str(channel))
     for percent in range(-0, -110, -10):
-        tracer.TraceInfo("Power : " + str(percent) + "%")
+        print("Power : " + str(percent) + "%")
         mkcontrol(deviceId,channel,percent/100)
         time.sleep(1)
 
@@ -138,45 +132,45 @@ def mkcontrol(deviceId: int=0, channel: int=0, powerAndDirection: float=0):
     return
 
 def test_hub(hubId: int=0):
-    tracer.TraceInfo("HUB "+ str(hubId) +" connecting")
+    print("HUB "+ str(hubId) +" connecting")
     mkconnect()
     time.sleep(1)
 
     for index in range(6):
         _automate(hubId, index) # start channel 0 = A
-        tracer.TraceInfo("Channel change requested")
+        print("Channel change requested")
         time.sleep(1)
 
 def help():
-    tracer.TraceInfo("Available commands:")
-    tracer.TraceInfo(" help()                                                    : print available commands")
-    tracer.TraceInfo(" hints()                                                   : print hints and examples")
-    tracer.TraceInfo(" mkconnect()                                               : Initiate hub control by sending bluetooth connect telegram")
-    tracer.TraceInfo(" mkstop(hubId)                                             : Stop ALL motors")
-    tracer.TraceInfo(" mkcontrol(hubId, channel, powerAndDirection)              : Control a specific hub, channel, power and motor direction")
-    tracer.TraceInfo(" test_hub(hubId)                                           : run automated tests on each channels")
-    tracer.TraceInfo(" mkbtstop()                                                : stop bluetooth advertising")
+    print("Available commands:")
+    print(" help()                                                    : print available commands")
+    print(" hints()                                                   : print hints and examples")
+    print(" mkconnect()                                               : Initiate hub control by sending bluetooth connect telegram")
+    print(" mkstop(hubId)                                             : Stop ALL motors")
+    print(" mkcontrol(hubId, channel, powerAndDirection)              : Control a specific hub, channel, power and motor direction")
+    print(" test_hub(hubId)                                           : run automated tests on each channels")
+    print(" mkbtstop()                                                : stop bluetooth advertising")
 
 def hints():
-    tracer.TraceInfo("HINTS:")
-    tracer.TraceInfo("If run on windows, commands are shown but not executed (hcitool dependency)")
-    tracer.TraceInfo()
-    tracer.TraceInfo("For connecting:")
-    tracer.TraceInfo(" Switch MK6.0 Hubs on - led is flashing green/blue")
-    tracer.TraceInfo(" mkconnect() to send the bluetooth connect telegram. All hubs switch to bluetooth mode")
-    tracer.TraceInfo(" by short-pressing the button on MK6.0 Hubs you can choose the hubId")
-    tracer.TraceInfo("  hubId=0 - one Led flash")
-    tracer.TraceInfo("  hubId=1 - two Led flashs")
-    tracer.TraceInfo("  hubId=2 - three Led flashs")
-    tracer.TraceInfo()
-    tracer.TraceInfo("ex: test_hub(0), mkcontrol(0, 0, 0.5); mkcontrol(0, 1, -1, True)")
-    tracer.TraceInfo(" the minus sign - indicate reverse motor direction")
+    print("HINTS:")
+    print("If run on windows, commands are shown but not executed (hcitool dependency)")
+    print()
+    print("For connecting:")
+    print(" Switch MK6.0 Hubs on - led is flashing green/blue")
+    print(" mkconnect() to send the bluetooth connect telegram. All hubs switch to bluetooth mode")
+    print(" by short-pressing the button on MK6.0 Hubs you can choose the hubId")
+    print("  hubId=0 - one Led flash")
+    print("  hubId=1 - two Led flashs")
+    print("  hubId=2 - three Led flashs")
+    print()
+    print("ex: test_hub(0), mkcontrol(0, 0, 0.5); mkcontrol(0, 1, -1, True)")
+    print(" the minus sign - indicate reverse motor direction")
 
 ##################################################################
 # Entry point when script is started by python -i consoletest.py
 help()
-tracer.TraceInfo()
+print()
 hints()
 
-tracer.TraceInfo()
-tracer.TraceInfo("Ready to execute commands\n")
+print()
+print("Ready to execute commands\n")

@@ -2,6 +2,9 @@ __author__ = "J0EK3R"
 __version__ = "0.1"
 
 import sys
+import logging
+
+logger = logging.getLogger(__name__)
 
 if (sys.platform == 'rp2'):
     import _thread as thread
@@ -10,9 +13,6 @@ else:
 
 from IAdvertiser import IAdvertiser
 from IAdvertisingDevice import IAdvertisingDevice
-
-sys.path.append("Tracer") 
-from Tracer.Tracer import Tracer
 
 class Advertiser(IAdvertiser) :
     """
@@ -24,7 +24,7 @@ class Advertiser(IAdvertiser) :
         """
         initializes the object and defines the member fields
         """
-        self._tracer = None
+        logger.debug(f"Advertiser.__init__")
 
         # dictionary to administer the registered AdvertisingDevices.
         # * key is the instance of the AdvertisingDevice
@@ -38,18 +38,12 @@ class Advertiser(IAdvertiser) :
         return
 
 
-    def SetTracer(self, tracer: Tracer) -> Tracer:
-        """
-        set tracer object
-        """
-        self._tracer = tracer
-        return tracer
-
-
     def AdvertisementStop(self) -> None:
         """
         stop bluetooth advertising for the Advertiser
         """
+        logger.debug(f"Advertiser.AdvertisementStop")
+
         return
 
 
@@ -59,6 +53,8 @@ class Advertiser(IAdvertiser) :
         * returns True if the AdvertisingDevice was registered successfully
         * returns False if the AdvertisingDevice wasn't registered successfully (because it still was registered)
         """
+        logger.debug(f"Advertiser.TryRegisterAdvertisingDevice")
+
         if(advertisingDevice is None):
             return False
 
@@ -83,6 +79,8 @@ class Advertiser(IAdvertiser) :
         * returns True if the AdvertisingDevice was unregistered successfully
         * returns False if the AdvertisingDevice wasn't unregistered successfully
         """
+        logger.debug(f"Advertiser.TryUnregisterAdvertisingDevice")
+
         if(advertisingDevice is None):
             return False
 
@@ -106,4 +104,6 @@ class Advertiser(IAdvertiser) :
         Sets Advertisement-Data for a specific AdvertisementIdentifier
         This Methode has to be overridden by the implementation of the AdvertisingDevice!
         """
+        logger.debug(f"Advertiser.AdvertisementDataSet")
+
         return
