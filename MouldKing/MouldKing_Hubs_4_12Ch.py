@@ -83,7 +83,7 @@ class MouldKing_Hubs_4_12Ch(MouldKingHub_Nibble) :
             if channelId < self._NumberOfChannels:
                 self._ChannelValueList[channelId] = float(0)
         
-        return self.CreateTelegram()
+        return await self.CreateTelegram()
     
 
     async def SubDevice_SetChannel(self, hubDeviceId: int, hubNumberOfChannels: int, hubChannelId: int, value: float) -> bytes:
@@ -104,4 +104,4 @@ class MouldKing_Hubs_4_12Ch(MouldKingHub_Nibble) :
 
         self._ChannelValueList[channelIdHubs] = value
         
-        return self.CreateTelegram()
+        return await self.CreateTelegram()

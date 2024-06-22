@@ -6,7 +6,7 @@ import logging
 import asyncio
 
 # set logging
-logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s', level=logging.DEBUG)
+logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s', level=logging.INFO)
 
 print('Script: main.py')
 print('Platform: ' + sys.platform)
@@ -52,24 +52,9 @@ async def main():
     print("\n" + title)
 
     await hub0.Connect()
-    #hub1.Connect()
-    #hub2.Connect()
+    await hub1.Connect()
+    await hub2.Connect()
     time.sleep(5)
-
-    #print("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))
-
-    #crypted = MouldKingCrypt.Crypt(rawdata) # get crypted data from rawdata
-    #print("crypted: " + ' '.join(f'{x:02x}' for x in crypted))
-
-    ############################################################################
-    # get uncrypted stop-telegram as bytearray
-    title = "stop-telegram"
-    print("\n" + title)
-
-    rawdata = await hub0.Stop()
-    #rawdata = hub1.Stop()
-    #rawdata = hub2.Stop()
-    await asyncio.sleep(1)
 
     #print("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))
 
@@ -82,6 +67,9 @@ async def main():
     print("\n" + title)
 
     rawdata = await hub0.SetChannel(0, 1)
+    rawdata = await hub1.SetChannel(0, 1)
+    rawdata = await hub2.SetChannel(0, 1)
+    rawdata = await hub2.SetChannel(1, 1)
     await asyncio.sleep(1)
 
     #print("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))
@@ -94,7 +82,7 @@ async def main():
     title = "C1: halfspeed forwards"
     print("\n" + title)
 
-    rawdata = await hub0.SetChannel(0, 0.5)
+    rawdata = await hub1.SetChannel(1, 1)
     await asyncio.sleep(1)
 
     #print("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))
@@ -107,8 +95,8 @@ async def main():
     title = "C1: fullspeed forwards"
     print("\n" + title)
 
-    #rawdata = hub1.SetChannel(0, 1)
-    #time.sleep(2)
+    rawdata = await hub2.SetChannel(0, 1)
+    await asyncio.sleep(1)
 
     #print("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))
 
@@ -120,7 +108,7 @@ async def main():
     title = "C1: halfspeed backwards"
     print("\n" + title)
 
-    rawdata = await hub0.SetChannel(0, -0.5)
+    rawdata = await hub1.SetChannel(1, -0.5)
     await asyncio.sleep(1)
 
     #print("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))
@@ -133,7 +121,7 @@ async def main():
     title = "C2: halfspeed backwards"
     print("\n" + title)
 
-    rawdata = await hub0.SetChannel(1, -0.5)
+    rawdata = await hub1.SetChannel(1, -0.5)
     await asyncio.sleep(1)
 
     #print("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))
@@ -147,8 +135,8 @@ async def main():
     print("\n" + title)
 
     await hub0.Disconnect()
-    #hub1.Disconnect()
-    #hub2.Disconnect()
+    await hub1.Disconnect()
+    await hub2.Disconnect()
     await asyncio.sleep(1)
 
     ############################################################################

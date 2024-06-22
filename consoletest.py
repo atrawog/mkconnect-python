@@ -5,6 +5,7 @@
 import sys
 import time
 import logging
+import asyncio
 
 logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s', level=logging.INFO)
 
@@ -31,9 +32,6 @@ from MouldKing.MouldKing import MouldKing
 
 # instantiate Advertiser
 advertiser = Advertiser()
-
-# Set Advertiser for all MouldKing Hubs
-MouldKing.SetAdvertiser(advertiser)
 
 # save pre-instantiated objects in local variables
 hub0 = MouldKing.Module6_0.Device0
@@ -166,11 +164,20 @@ def hints():
     print("ex: test_hub(0), mkcontrol(0, 0, 0.5); mkcontrol(0, 1, -1, True)")
     print(" the minus sign - indicate reverse motor direction")
 
+async def main():
+    # Set Advertiser for all MouldKing Hubs
+    await MouldKing.SetAdvertiser(advertiser)
+
+    help()
+    print()
+    hints()
+
+    print()
+    print("Ready to execute commands\n")
+
 ##################################################################
 # Entry point when script is started by python -i consoletest.py
-help()
-print()
-hints()
+if __name__ == "__main__":
+   
+    asyncio.run(main())
 
-print()
-print("Ready to execute commands\n")

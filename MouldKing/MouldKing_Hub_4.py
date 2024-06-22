@@ -58,7 +58,7 @@ class MouldKing_Hub_4(IAdvertisingDevice) :
         set internal stored value of all channels to zero and return the telegram
         """
 
-        return MouldKing_Hub_4._MouldKing_4_Hubs.SubDevice_Stop(self._deviceId, self._NumberOfChannels)
+        return await MouldKing_Hub_4._MouldKing_4_Hubs.SubDevice_Stop(self._deviceId, self._NumberOfChannels)
 
 
     async def SetChannel(self, channelId: int, value: float) -> bytes:
@@ -69,5 +69,5 @@ class MouldKing_Hub_4(IAdvertisingDevice) :
         if channelId > self._NumberOfChannels - 1:
             raise Exception("only channelId 0.." + str(self._NumberOfChannels - 1) + "are allowed")
 
-        return MouldKing_Hub_4._MouldKing_4_Hubs.SubDevice_SetChannel(self._deviceId, self._NumberOfChannels, channelId, value)
+        return await MouldKing_Hub_4._MouldKing_4_Hubs.SubDevice_SetChannel(self._deviceId, self._NumberOfChannels, channelId, value)
 
