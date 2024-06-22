@@ -38,7 +38,7 @@ class Advertiser(IAdvertiser) :
         return
 
 
-    def AdvertisementStop(self) -> None:
+    async def AdvertisementStop(self) -> None:
         """
         stop bluetooth advertising for the Advertiser
         """
@@ -47,7 +47,7 @@ class Advertiser(IAdvertiser) :
         return
 
 
-    def TryRegisterAdvertisingDevice(self, advertisingDevice: IAdvertisingDevice) -> bool:
+    async def TryRegisterAdvertisingDevice(self, advertisingDevice: IAdvertisingDevice) -> bool:
         """
         try to register the given AdvertisingDevice
         * returns True if the AdvertisingDevice was registered successfully
@@ -73,7 +73,7 @@ class Advertiser(IAdvertiser) :
             self._registeredDeviceTable_Lock.release()
 
 
-    def TryUnregisterAdvertisingDevice(self, advertisingDevice: IAdvertisingDevice) -> bool:
+    async def TryUnregisterAdvertisingDevice(self, advertisingDevice: IAdvertisingDevice) -> bool:
         """
         try to unregister the given AdvertisingDevice
         * returns True if the AdvertisingDevice was unregistered successfully
@@ -99,7 +99,7 @@ class Advertiser(IAdvertiser) :
             self._registeredDeviceTable_Lock.release()
 
 
-    def AdvertisementDataSet(self, advertisementIdentifier: str, manufacturerId: bytes, rawdata: bytes) -> None:
+    async def AdvertisementDataSet(self, advertisementIdentifier: str, manufacturerId: bytes, rawdata: bytes) -> None:
         """
         Sets Advertisement-Data for a specific AdvertisementIdentifier
         This Methode has to be overridden by the implementation of the AdvertisingDevice!

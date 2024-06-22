@@ -12,6 +12,7 @@ from Advertiser.AdvertisingDevice import AdvertisingDevice
 sys.path.append("MouldKing") 
 from MouldKing.MouldKingCrypt import MouldKingCrypt
 
+
 class MouldKingHub(AdvertisingDevice) :
     """
     baseclass
@@ -50,34 +51,34 @@ class MouldKingHub(AdvertisingDevice) :
         return
 
 
-    def Connect(self) -> None:
+    async def Connect(self) -> None:
         """
         returns the telegram to switch the MouldKing Hubs in bluetooth mode
         """
         # call baseClass to register at Advertiser
-        super().Connect()
+        await super().Connect()
 
         logger.debug("MouldKingHub.Connect")
 
-        self._Advertise(self._Telegram_connect)
+        await self._Advertise(self._Telegram_connect)
 
         return
 
 
-    def Disconnect(self) -> None:
+    async def Disconnect(self) -> None:
         """
         disconnects the device from the advertiser
         """
-        self.Stop()
+        await self.Stop()
         
-        super().Disconnect()
+        await super().Disconnect()
 
         logger.debug("MouldKingHub.Disconnect")
 
         return
     
 
-    def Stop(self) -> bytes:
+    async def Stop(self) -> bytes:
         """
         set internal stored value of all channels to zero and return the telegram
         """
@@ -87,10 +88,10 @@ class MouldKingHub(AdvertisingDevice) :
         for channelId in range(0, self._NumberOfChannels):
             self._ChannelValueList[channelId] = float(0)
         
-        return self.CreateTelegram()
+        return await self.CreateTelegram()
 
 
-    def SetChannel(self, channelId: int, value: float) -> bytes:
+    async def SetChannel(self, channelId: int, value: float) -> bytes:
         """
         set internal stored value of channel with channelId to value and return the telegram
         """
@@ -101,10 +102,10 @@ class MouldKingHub(AdvertisingDevice) :
 
         self._ChannelValueList[channelId] = value
         
-        return self.CreateTelegram()
+        return await self.CreateTelegram()
 
 
-    def CreateTelegram(self) -> bytes:
+    async def CreateTelegram(self) -> bytes:
         """
         returns a telegram including the internal stored value from all channels
         """
@@ -112,7 +113,7 @@ class MouldKingHub(AdvertisingDevice) :
         raise NotImplementedError # override this methode
     
 
-    def _Advertise(self, rawdata: bytes) -> bytes:
+    async def _Advertise(self, rawdata: bytes) -> bytes:
         """
         sends the data to the advertiser
         """
@@ -120,7 +121,7 @@ class MouldKingHub(AdvertisingDevice) :
 
         if(self._advertiser is not None):
             cryptedData = MouldKingCrypt.Crypt(rawdata)
-            self._advertiser.AdvertisementDataSet(self._identifier, self.ManufacturerID, cryptedData)
+            await self._advertiser.AdvertisementDataSet(self._identifier, self.ManufacturerID, cryptedData)
 
         logger.debug("MouldKingHub._Advertise: finished")
 

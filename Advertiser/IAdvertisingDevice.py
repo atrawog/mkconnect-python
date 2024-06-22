@@ -20,28 +20,28 @@ class IAdvertisingDevice :
         raise NotImplementedError # override this methode
 
 
-    def Connect(self) -> None:
+    async def Connect(self) -> None:
         """
         connects the device to the advertiser
         """
         raise NotImplementedError # override this methode
 
 
-    def Disconnect(self) -> None:
+    async def Disconnect(self) -> None:
         """
         disconnects the device from the advertiser
         """
         raise NotImplementedError # override this methode
 
 
-    def Stop(self) -> bytes:
+    async def Stop(self) -> bytes:
         """
         stops the device
         """
         raise NotImplementedError # override this methode
     
 
-    def SetChannel(self, channelId: int, value: float) -> bytes:
+    async def SetChannel(self, channelId: int, value: float) -> bytes:
         """
         set internal stored value of channel with channelId to value and return the telegram
         """

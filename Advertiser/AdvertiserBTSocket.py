@@ -100,7 +100,7 @@ class AdvertiserBTSocket(Advertiser) :
         return result
 
 
-    def AdvertisementStop(self) -> None:
+    async def AdvertisementStop(self) -> None:
         """
         stop bluetooth advertising
         """
@@ -180,7 +180,7 @@ class AdvertiserBTSocket(Advertiser) :
             self._advertisementTable_thread_Lock.release()
 
         if(len(self._advertisementTable) == 0):
-            self.AdvertisementStop()
+            await self.AdvertisementStop()
 
         return
 

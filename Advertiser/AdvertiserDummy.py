@@ -26,7 +26,7 @@ class AdvertiserDummy(Advertiser) :
         return
 
 
-    def AdvertisementStop(self) -> None:
+    async def AdvertisementStop(self) -> None:
         """
         stop bluetooth advertising
 

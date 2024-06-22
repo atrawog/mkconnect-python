@@ -27,7 +27,7 @@ class AdvertisingDevice(IAdvertisingDevice) :
         self._identifier = identifier
 
 
-    def SetAdvertiser(self, advertiser: Advertiser) -> Advertiser:
+    async def SetAdvertiser(self, advertiser: Advertiser) -> Advertiser:
         """
         set advertiser object
         """
@@ -52,35 +52,35 @@ class AdvertisingDevice(IAdvertisingDevice) :
         return advertiser
 
 
-    def Connect(self):
+    async def Connect(self):
         """
         connects the device to the advertiser
         """
         logger.debug("AdvertisingDevice.Connect")
 
         if(self._advertiser is not None and not self._advertiser_registered):
-            self._advertiser_registered = self._advertiser.TryRegisterAdvertisingDevice(self)
+            self._advertiser_registered = await self._advertiser.TryRegisterAdvertisingDevice(self)
 
         self._connected = True
 
         return
 
 
-    def Disconnect(self) -> None:
+    async def Disconnect(self) -> None:
         """
         disconnects the device from the advertiser
         """
         logger.debug("AdvertisingDevice.Disconnect")
 
         if(self._advertiser is not None and self._advertiser_registered):
-            self._advertiser_registered = not self._advertiser.TryUnregisterAdvertisingDevice(self)
+            self._advertiser_registered = not await self._advertiser.TryUnregisterAdvertisingDevice(self)
 
         self._connected = False
 
         return
 
 
-    def Stop(self) -> bytes:
+    async def Stop(self) -> bytes:
         """
         stops the device
         """
@@ -89,7 +89,7 @@ class AdvertisingDevice(IAdvertisingDevice) :
         raise NotImplementedError # override this methode
 
 
-    def AdvertisementSet(self, manufacturerId: bytes, rawdata: bytes) -> None:
+    async def AdvertisementSet(self, manufacturerId: bytes, rawdata: bytes) -> None:
         """
         Set Advertisement data
         """

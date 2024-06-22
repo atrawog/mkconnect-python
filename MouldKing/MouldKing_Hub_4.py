@@ -35,25 +35,25 @@ class MouldKing_Hub_4(IAdvertisingDevice) :
         self._NumberOfChannels = 4
 
 
-    def Connect(self) -> None:
+    async def Connect(self) -> None:
         """
         returns the telegram to switch the MouldKing Hubs in bluetooth mode
         """
-        MouldKing_Hub_4._MouldKing_4_Hubs.SubDevice_Register(self)   
+        await MouldKing_Hub_4._MouldKing_4_Hubs.SubDevice_Register(self)   
 
         return 
 
 
-    def Disconnect(self) -> None:
+    async def Disconnect(self) -> None:
         """
         disconnects the device from the advertiser
         """
-        MouldKing_Hub_4._MouldKing_4_Hubs.SubDevice_Unregister(self)
+        await MouldKing_Hub_4._MouldKing_4_Hubs.SubDevice_Unregister(self)
 
         return 
 
 
-    def Stop(self) -> bytes:
+    async def Stop(self) -> bytes:
         """
         set internal stored value of all channels to zero and return the telegram
         """
@@ -61,7 +61,7 @@ class MouldKing_Hub_4(IAdvertisingDevice) :
         return MouldKing_Hub_4._MouldKing_4_Hubs.SubDevice_Stop(self._deviceId, self._NumberOfChannels)
 
 
-    def SetChannel(self, channelId: int, value: float) -> bytes:
+    async def SetChannel(self, channelId: int, value: float) -> bytes:
         """
         set internal stored value of channel with channelId to value and return the telegram
         """

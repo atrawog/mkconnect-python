@@ -36,7 +36,7 @@ class MouldKing_Hubs_4_12Ch(MouldKingHub_Nibble) :
         self._connectedSubDevices = list()
 
 
-    def SubDevice_Register(self, subDevice: IAdvertisingDevice) -> None:
+    async def SubDevice_Register(self, subDevice: IAdvertisingDevice) -> None:
         """
         returns the telegram to switch the MouldKing Hubs in bluetooth mode
         """
@@ -47,12 +47,12 @@ class MouldKing_Hubs_4_12Ch(MouldKingHub_Nibble) :
 
             # first subDevice was added
             if(connectedSubDevicesLen == 0):
-               self.Connect() 
+               await self.Connect() 
 
         return
 
 
-    def SubDevice_Unregister(self, subDevice: IAdvertisingDevice) -> None:
+    async def SubDevice_Unregister(self, subDevice: IAdvertisingDevice) -> None:
         """
         disconnects the device from the advertiser
         """
@@ -61,12 +61,12 @@ class MouldKing_Hubs_4_12Ch(MouldKingHub_Nibble) :
 
             # last subDevice was removed
             if(len(self._connectedSubDevices) == 0):
-                self.Disconnect()
+                await self.Disconnect()
 
         return
 
 
-    def SubDevice_Stop(self, hubDeviceId: int, hubNumberOfChannels: int) -> bytes:
+    async def SubDevice_Stop(self, hubDeviceId: int, hubNumberOfChannels: int) -> bytes:
         """
         set internal stored value of all channels to zero and return the telegram
         """
@@ -86,7 +86,7 @@ class MouldKing_Hubs_4_12Ch(MouldKingHub_Nibble) :
         return self.CreateTelegram()
     
 
-    def SubDevice_SetChannel(self, hubDeviceId: int, hubNumberOfChannels: int, hubChannelId: int, value: float) -> bytes:
+    async def SubDevice_SetChannel(self, hubDeviceId: int, hubNumberOfChannels: int, hubChannelId: int, value: float) -> bytes:
         """
         set internal stored value of channel with channelId to value and return the telegram
         """
