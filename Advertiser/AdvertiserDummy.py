@@ -1,23 +1,25 @@
-__author__ = "J0EK3R"
-__version__ = "0.1"
+""" Dummy Advertiser
+"""
 
 import sys
 import logging
-
-logger = logging.getLogger(__name__)
-
 sys.path.append("Advertiser") 
 from Advertiser.Advertiser import Advertiser
 
 
+__author__ = "J0EK3R"
+__version__ = "0.1"
+
+
+logger = logging.getLogger(__name__)
+
+
 class AdvertiserDummy(Advertiser) :
-    """
-    Dummy Advertiser
+    """ Dummy Advertiser
     """
 
     def __init__(self):
-        """
-        initializes the object and defines the fields
+        """ initializes the object and defines the fields
         """
         super().__init__()
 
@@ -26,19 +28,23 @@ class AdvertiserDummy(Advertiser) :
         return
 
 
-    async def AdvertisementStop(self) -> None:
-        """
-        stop bluetooth advertising
+    async def advertisement_stop(self) -> None:
+        """ stop bluetooth advertising
 
+        :return: returns nothing
         """
-        logger.debug("AdvertiserDummy.AdvertisementStop")
+        logger.debug("AdvertiserDummy.advertisement_stop")
 
         return
 
 
-    def AdvertisementDataSet(self, identifier: str, manufacturerId: bytes, rawdata: bytes) -> None:
-        """
-        Set Advertisement data
+    def set_advertisement_data(self, advertisementIdentifier: str, manufacturerId: bytes, rawdata: bytes) -> None:
+        """ Set Advertisement data
+
+        :param advertisementIdentifier:  advertisementIdentifier
+        :param manufacturerId: manufacturerId
+        :param rawdata: rawdata
+        :return: returns nothing
         """
         logger.debug("AdvertiserDummy.AdvertisementDataSet")
 

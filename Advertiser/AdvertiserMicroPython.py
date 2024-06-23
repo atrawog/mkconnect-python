@@ -1,35 +1,38 @@
-__author__ = "J0EK3R"
-__version__ = "0.1"
+"""
+Advertiser using bluetooth library from MicroPython
+"""
 
 import sys
 import time
 import asyncio
 import logging
-
-logger = logging.getLogger(__name__)
-
 try:
     import bluetooth
 except ImportError as err:
-    logger.error("AdvertiserMicroPython: " + str(err))
+    print("AdvertiserMicroPython: " + str(err))
 
 sys.path.append("Advertiser") 
 from IAdvertisingDevice import IAdvertisingDevice
 from Advertiser.Advertiser import Advertiser
 
 
+__author__ = "J0EK3R"
+__version__ = "0.1"
+
+
+logger = logging.getLogger(__name__)
+
+
 class AdvertiserMicroPython(Advertiser) :
-    """
-    Advertiser using bluetooth library from MicroPython
+    """ Advertiser using bluetooth library from MicroPython
     """
 
     # Number of repetitions per second
-    _RepetitionsPerSecond = 4
+    _repetitions_per_second = 4     
 
 
     def __init__(self):
-        """
-        initializes the object and defines the fields
+        """ initializes the object and defines the fields
         """
         super().__init__()
 
@@ -49,82 +52,88 @@ class AdvertiserMicroPython(Advertiser) :
         self._advertisement_task_Run: bool = False
         self._advertisement_task_IsRunning: bool = False
         self._advertisement_task = None
-        self._advertisement_task_Lock = asyncio.Lock()
+        self._advertisement_task_Lock: asyncio.Lock = asyncio.Lock()
 
         # Table
         # * key: AdvertisementIdentifier
         # * value: advertisement-command for the call of btmgmt tool
-        self._advertisementTable_Lock = asyncio.Lock()
-        self._advertisementTable = dict()
+        self._advertisementTable_Lock: asyncio.Lock = asyncio.Lock()
+        self._advertisementTable: dict = dict()
         
-        self._lastSetAdvertisementCommand = None
+        self._last_set_advertisementData = None
 
         return
 
 
-    async def TryRegisterAdvertisingDevice(self, advertisingDevice: IAdvertisingDevice) -> bool:
-        """
-        try to register the given AdvertisingDevice
-        * returns True if the AdvertisingDevice was registered successfully
-        * returns False if the AdvertisingDevice wasn't registered successfully (because it still was registered)
-        """
-        result = await super().TryRegisterAdvertisingDevice(advertisingDevice)
+    async def try_register_advertising_device(self, advertisingDevice: IAdvertisingDevice) -> bool:
+        """ try to register the given AdvertisingDevice
+        * returns true if the AdvertisingDevice was registered successfully
+        * returns false if the AdvertisingDevice wasn't registered successfully (because it still was registered)
 
-        logger.debug(f"AdvertiserMicroPython.TryRegisterAdvertisingDevice")
+        :param advertisingDevice: the advertising device to register
+        :return: returns true if success
+        """
+        result = await super().try_register_advertising_device(advertisingDevice)
+
+        logger.debug(f"AdvertiserMicroPython.try_register_advertising_device")
 
         # AdvertisingDevice was registered successfully in baseclass
         if(result):
             # register AdvertisingIdentifier -> only registered AdvertisingIdentifier will be sent
-            advertisementIdentifier = advertisingDevice.GetAdvertisementIdentifier()
-            await self._RegisterAdvertisementIdentifier(advertisementIdentifier)
+            advertisementIdentifier = advertisingDevice.get_advertisement_identifier()
+            await self._register_advertisementIdentifier(advertisementIdentifier)
 
         return result
 
 
-    async def TryUnregisterAdvertisingDevice(self, advertisingDevice: IAdvertisingDevice) -> bool:
-        """
-        try to unregister the given AdvertisingDevice
+    async def try_unregister_advertising_device(self, advertisingDevice: IAdvertisingDevice) -> bool:
+        """ try to unregister the given AdvertisingDevice
         * returns True if the AdvertisingDevice was unregistered successfully
         * returns False if the AdvertisingDevice wasn't unregistered successfully
-        """
-        result = await super().TryUnregisterAdvertisingDevice(advertisingDevice)
 
-        logger.debug(f"AdvertiserMicroPython.TryUnregisterAdvertisingDevice")
+        :param advertisingDevice: the advertising device to unregister
+        :return: returns true if success
+        """
+        result = await super().try_unregister_advertising_device(advertisingDevice)
+
+        logger.debug(f"AdvertiserMicroPython.try_unregister_advertising_device")
 
         # AdvertisingDevice was unregistered successfully in baseclass
         if(result):
             # unregister AdvertisementIdentifier to remove from publishing
-            advertisementIdentifier = advertisingDevice.GetAdvertisementIdentifier()
-            await self._UnregisterAdvertisementIdentifier(advertisementIdentifier)
+            advertisementIdentifier = advertisingDevice.get_advertisement_identifier()
+            await self._unregister_advertisementIdentifier(advertisementIdentifier)
 
         return result
 
 
-    async def AdvertisementStop(self) -> None:
-        """
-        stop bluetooth advertising
+    async def advertisement_stop(self) -> None:
+        """ stop bluetooth advertising
 
+        :return: returns nothing
         """
-        logger.debug(f"AdvertiserMicroPython.AdvertisementStop")
+        logger.debug(f"AdvertiserMicroPython.advertisement_stop")
 
         # stop publishing thread
         self._advertisement_task_Run = False
+
         if(self._advertisement_task is not None):
-            while(self._advertisement_task_IsRunning):
-                await asyncio.sleep(0.1)
+            await self._advertisement_task
             self._advertisement_task = None
 
         if(self.ble is not None):
             self.ble.gap_advertise(None)
 
-            logger.info("AdvertiserMicroPython.AdvertisementStop")
+            logger.info("AdvertiserMicroPython.advertisement_stop")
         else:
-            logger.info("AdvertiserMicroPython.AdvertisementStop: self.ble is None")
+            logger.info("AdvertiserMicroPython.advertisement_stop: self.ble is None")
 
 
-    async def _RegisterAdvertisementIdentifier(self, advertisementIdentifier: str) -> None:
-        """
-        Register AdvertisementIdentifier
+    async def _register_advertisementIdentifier(self, advertisementIdentifier: str) -> None:
+        """ Register AdvertisementIdentifier
+
+        :param advertisementIdentifier: the advertisementIdentifier to register
+        :return: returns nothing
         """
 
         async with self._advertisementTable_Lock:
@@ -132,20 +141,20 @@ class AdvertiserMicroPython(Advertiser) :
             if(not advertisementIdentifier in self._advertisementTable):
                 self._advertisementTable[advertisementIdentifier] = None
 
-                logger.debug(f"AdvertiserMicroPython._RegisterAdvertisementIdentifier: '{advertisementIdentifier}'")
+                logger.debug(f"AdvertiserMicroPython._register_advertisementIdentifier: '{advertisementIdentifier}'")
             else:
-                logger.debug(f"AdvertiserMicroPython._RegisterAdvertisementIdentifier: '{advertisementIdentifier}' exists")
+                logger.debug(f"AdvertiserMicroPython._register_advertisementIdentifier: '{advertisementIdentifier}' exists")
 
         return
 
 
-    async def _UnregisterAdvertisementIdentifier(self, advertisementIdentifier: str) -> None:
-        """
-        Unregister AdvertisementIdentifier
-        """
-        try:
-            self._registeredDeviceTable_Lock.acquire()
+    async def _unregister_advertisementIdentifier(self, advertisementIdentifier: str) -> None:
+        """ Unregister AdvertisementIdentifier
 
+        :param advertisementIdentifier: the advertisementIdentifier to unregister
+        :return: returns nothing
+        """
+        async with self._registeredDeviceTable_Lock:
             foundAdvertisementIdentifier = False
 
             # there are devices wich share the same AdvertisementIdentifier
@@ -156,56 +165,60 @@ class AdvertiserMicroPython(Advertiser) :
                     break
                     
             if(not foundAdvertisementIdentifier):
-                await self._RemoveAdvertisementIdentifier(advertisementIdentifier)
+                await self._remove_advertisementIdentifier(advertisementIdentifier)
 
-                logger.info(f"AdvertiserMicroPython._UnregisterAdvertisementIdentifier: '{advertisementIdentifier}'")
+                logger.info(f"AdvertiserMicroPython._unregister_advertisementIdentifier: '{advertisementIdentifier}'")
 
             else:
-                logger.info(f"AdvertiserMicroPython._UnregisterAdvertisementIdentifier: '{advertisementIdentifier}' not exists")
+                logger.info(f"AdvertiserMicroPython._unregister_advertisementIdentifier: '{advertisementIdentifier}' not exists")
 
-        finally:
-            self._registeredDeviceTable_Lock.release()
         return
 
 
-    async def _RemoveAdvertisementIdentifier(self, advertisementIdentifier: str) -> None:
-        """
-        Remove AdvertisementIdentifier
+    async def _remove_advertisementIdentifier(self, advertisementIdentifier: str) -> None:
+        """ Remove AdvertisementIdentifier
+
+        :param advertisementIdentifier: the advertisementIdentifier to remove
+        :return: returns nothing
         """
 
         async with self._advertisementTable_Lock:
             if(advertisementIdentifier in self._advertisementTable):
                 self._advertisementTable.pop(advertisementIdentifier)
             
-                logger.info(f"AdvertiserMicroPython._RemoveAdvertisementIdentifier: '{advertisementIdentifier}'")
+                logger.info(f"AdvertiserMicroPython._remove_advertisementIdentifier: '{advertisementIdentifier}'")
 
             else:
-                logger.info(f"AdvertiserMicroPython._RemoveAdvertisementIdentifier: '{advertisementIdentifier}' not exists")
+                logger.info(f"AdvertiserMicroPython._remove_advertisementIdentifier: '{advertisementIdentifier}' not exists")
 
         if(len(self._advertisementTable) == 0):
-            await self.AdvertisementStop()
+            await self.advertisement_stop()
 
         return
     
 
-    async def AdvertisementDataSet(self, advertisementIdentifier: str, manufacturerId: bytes, rawdata: bytes) -> None:
-        """
-        Set Advertisement data
+    async def set_advertisement_data(self, advertisementIdentifier: str, manufacturerId: bytes, rawdata: bytes) -> None:
+        """  Set AdvertisementData
+
+        :param advertisementIdentifier: the advertisementIdentifier
+        :param manufacturerId: manufacturerId
+        :param rawdata: rawdata
+        :return: returns nothing
         """
         async with self._advertisementTable_Lock:
             
             # only registered AdvertisementIdentifier are handled
             if(advertisementIdentifier in self._advertisementTable):
-                advertisementCommand = self._CreateTelegramForPicoW(manufacturerId, rawdata)
+                advertisementCommand = self._create_telegram_for_picoW(manufacturerId, rawdata)
                 self._advertisementTable[advertisementIdentifier] = advertisementCommand
 
-                logger.info(f"AdvertiserMicroPython.AdvertisementDataSet: '{advertisementIdentifier}' changed")
+                logger.info(f"AdvertiserMicroPython.set_advertisement_data: '{advertisementIdentifier}' changed")
 
                 # for quick change handle immediately
-                timeSlot = self._CalcTimeSlot()
-                await self._Advertise(advertisementCommand, timeSlot)
+                timeSlot = self._calc_timeSlot_s()
+                await self._advertise(advertisementCommand, timeSlot)
             else:
-                logger.info(f"AdvertiserMicroPython.AdvertisementDataSet: '{advertisementIdentifier}' not registered")
+                logger.info(f"AdvertiserMicroPython.set_advertisement_data: '{advertisementIdentifier}' not registered")
 
         # start publish thread if necessary
         if(not self._advertisement_task_Run):
@@ -216,8 +229,9 @@ class AdvertiserMicroPython(Advertiser) :
 
 
     async def _publishloop(self) -> None:
-        """
-        publishing loop
+        """ publishing loop
+
+        :return: returns nothing
         """
 
         logger.info('AdvertiserMicroPython._publishloop: started')
@@ -227,25 +241,16 @@ class AdvertiserMicroPython(Advertiser) :
         # loop while field is True
         loopcounter = 0
         while(self._advertisement_task_Run):
-            #logger.debug(f'AdvertiserMicroPython._publishloop: loop[{loopcounter}]')
             try:
-                #logger.debug('AdvertiserMicroPython._publishloop: acquire before')
-
                 async with self._advertisementTable_Lock:
-
-                    #logger.debug('AdvertiserMicroPython._publishloop: acquire after')
-
                     # make a copy of the table to release the lock as quick as possible
                     copy_of_advertisementTable = self._advertisementTable.copy()
-
-                    #logger.debug('AdvertiserMicroPython._publishloop: copy')
                 
                 if(len(copy_of_advertisementTable) == 0):
-                    #logger.debug('AdvertiserMicroPython._publishloop: copy_of_advertisementTable is empty')
                     pass
                 else:
                     # calc time for one publishing slot
-                    timeSlot = self._CalcTimeSlot()
+                    timeSlot = self._calc_timeSlot_s()
 
                     for key, advertisementCommand in copy_of_advertisementTable.items():
                         # stop publishing?
@@ -253,7 +258,7 @@ class AdvertiserMicroPython(Advertiser) :
                             logger.debug('AdvertiserMicroPython._publishloop: quit loop')
                             return
 
-                        await self._Advertise(advertisementCommand, timeSlot)
+                        await self._advertise(advertisementCommand, timeSlot)
             except:
                 pass
 
@@ -263,57 +268,58 @@ class AdvertiserMicroPython(Advertiser) :
         self._advertisement_task_IsRunning = False
 
 
-    def _CalcTimeSlot(self) -> float:
-        """
-        Calculates the timespan in seconds for each timeslot
-        """
+    async def _advertise(self, advertisementData: bytes, timeSlot_s: float) -> None:
+        """ set advertisement data to to ble
 
-        # timeSlot = 1 second / repetitionsPerSecond / len(self._advertisementTable)
-        timeSlot = 1 / self._RepetitionsPerSecond / max(1, len(self._advertisementTable))
-        return timeSlot
-
-
-    async def _Advertise(self, advertisementCommand: bytes, timeSlot: float) -> None:
-        """
-        calls the btmgmt tool as subprocess
+        :param advertisementData: advertisementData
+        :param timeSlot_s: timespab for the timeslot
+        :return: returns nothing
         """
 
         async with self._advertisement_task_Lock:
             timeStart = time.time()    
 
-            logger.debug('AdvertiserMicroPython._Advertise: try')
-
-            if (self._lastSetAdvertisementCommand != advertisementCommand):
-                self._lastSetAdvertisementCommand = advertisementCommand
+            if (self._last_set_advertisementData != advertisementData):
+                self._last_set_advertisementData = advertisementData
     
-                logger.debug('AdvertiserMicroPython._Advertise: new command')
+                logger.debug('AdvertiserMicroPython._advertise: new command')
 
                 if(self.ble is not None):
-                    logger.debug('AdvertiserMicroPython._Advertise: before')
-
-                    self.ble.gap_advertise(100, advertisementCommand)
-
-                    logger.debug('AdvertiserMicroPython._Advertise: after')
+                    self.ble.gap_advertise(100, advertisementData)
                 else:
-                    logger.debug('AdvertiserMicroPython._Advertise: else')
+                    pass
             else:
-                logger.debug('AdvertiserMicroPython._Advertise: no new command')
+                logger.debug('AdvertiserMicroPython._advertise: no new command')
 
             timeEnd = time.time()    
             timeDelta = timeEnd - timeStart
-            timeSlotRemain = max(0.001, timeSlot - timeDelta)
+            timeSlotRemain = max(0.001, timeSlot_s - timeDelta)
 
             # stop publishing?
             if(self._advertisement_task_Run):
-                logger.debug(f'AdvertiserMicroPython._Advertise: sleep: {str(timeSlotRemain)} s')
+                logger.debug(f'AdvertiserMicroPython._advertise: sleep: {str(timeSlotRemain)} s')
                 await asyncio.sleep(timeSlotRemain)
 
         return
     
 
-    def _CreateTelegramForPicoW(self, manufacturerId: bytes, rawDataArray: bytes) -> bytes:
+    def _calc_timeSlot_s(self) -> float:
+        """ Calculates the timespan in seconds for each timeslot
+
+        :return: returns the timespan for the slot in seconds
         """
-        Create input data for bluetooth lib for Pico W 
+
+        # timeSlot = 1 second / repetitionsPerSecond / len(self._advertisementTable)
+        timeSlot = 1 / self._repetitions_per_second / max(1, len(self._advertisementTable))
+        return timeSlot
+
+
+    def _create_telegram_for_picoW(self, manufacturerId: bytes, rawDataArray: bytes) -> bytes:
+        """ Create input data for bluetooth lib for Pico W 
+
+        :param manufacturerId: manufacturerId
+        :param rawDataArray: rawDataArray
+        :return: returns the rawdata array
         """
         rawDataArrayLen = len(rawDataArray)
 

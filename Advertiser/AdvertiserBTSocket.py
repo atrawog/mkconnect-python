@@ -1,28 +1,32 @@
-__author__ = "J0EK3R"
-__version__ = "0.1"
+""" This class is a Bluetooth Advertiser using a btmgmtsocket on linux to set the advertisement data
+"""
 
 import sys
 import enum
 import time
 import logging
 import asyncio
-
-logger = logging.getLogger(__name__)
-
 from btsocket import btmgmt_socket
-from btsocket import btmgmt_protocol
 
 sys.path.append("Advertiser") 
 from IAdvertisingDevice import IAdvertisingDevice
 from Advertiser.Advertiser import Advertiser
 
 
+__author__ = "J0EK3R"
+__version__ = "0.1"
+
+
+logger = logging.getLogger(__name__)
+
+
 class AdvertiserBTSocket(Advertiser) :
-    """
-    baseclass
+    """ This class is a Bluetooth Advertiser using a btmgmtsocket on linux to set the advertisement data
     """
 
-    class Flags(enum.IntEnum):
+    class _Flags(enum.IntEnum):
+        """ internal class Flags
+        """
         CONNECTABLE = enum.auto()
         GENERAL_DISCOVERABLE = enum.auto()
         LIMITED_DISCOVERABLE = enum.auto()
@@ -34,26 +38,27 @@ class AdvertiserBTSocket(Advertiser) :
         PHY_LE_2M = enum.auto()
         PHY_LE_CODED = enum.auto()
 
+
     # Number of repetitions per second
     _RepetitionsPerSecond = 4
 
+
     def __init__(self):
-        """
-        initializes the object and defines the member fields
+        """ initializes the object and defines the member fields
         """
         super().__init__() # call baseclass
 
         logger.debug("AdvertiserBTSocket.__init__")
 
-        self._advertisement_task_Run = False
+        self._advertisement_task_Run: bool = False
         self._advertisement_task = None
-        self._advertisement_task_Lock = asyncio.Lock()
+        self._advertisement_task_Lock: asyncio.Lock = asyncio.Lock()
 
         # Table
         # * key: AdvertisementIdentifier
         # * value: advertisement-command for the call of btmgmt tool
-        self._advertisementTable_Lock = asyncio.Lock()
-        self._advertisementTable = dict()
+        self._advertisementTable_Lock: asyncio.Lock = asyncio.Lock()
+        self._advertisementTable: dict = dict()
         
         self._lastSetAdvertisementCommand = None
 
@@ -62,50 +67,55 @@ class AdvertiserBTSocket(Advertiser) :
         return
 
 
-    async def TryRegisterAdvertisingDevice(self, advertisingDevice: IAdvertisingDevice) -> bool:
-        """
-        try to register the given AdvertisingDevice
-        * returns True if the AdvertisingDevice was registered successfully
-        * returns False if the AdvertisingDevice wasn't registered successfully (because it still was registered)
-        """
-        result = await super().TryRegisterAdvertisingDevice(advertisingDevice)
+    async def try_register_advertising_device(self, advertisingDevice: IAdvertisingDevice) -> bool:
+        """ try to register the given AdvertisingDevice
+        * returns true if the AdvertisingDevice was registered successfully
+        * returns false if the AdvertisingDevice wasn't registered successfully (because it still was registered)
 
-        logger.debug("AdvertiserBTSocket.TryRegisterAdvertisingDevice")
+        :param advertisingDevice: the advertising device to register
+        :return: returns true if success
+        """
+        result: bool = await super().try_register_advertising_device(advertisingDevice)
+
+        logger.debug("AdvertiserBTSocket.try_register_advertising_device")
 
         # AdvertisingDevice was registered successfully in baseclass
         if(result):
             # register AdvertisingIdentifier -> only registered AdvertisingIdentifier will be sent
-            advertisementIdentifier = advertisingDevice.GetAdvertisementIdentifier()
-            await self._RegisterAdvertisementIdentifier(advertisementIdentifier)
+            advertisementIdentifier = advertisingDevice.get_advertisement_identifier()
+            await self._register_advertisementIdentifier(advertisementIdentifier)
 
         return result
 
 
-    async def TryUnregisterAdvertisingDevice(self, advertisingDevice: IAdvertisingDevice) -> bool:
-        """
-        try to unregister the given AdvertisingDevice
+    async def try_unregister_advertising_device(self, advertisingDevice: IAdvertisingDevice) -> bool:
+        """ try to unregister the given AdvertisingDevice
         * returns True if the AdvertisingDevice was unregistered successfully
         * returns False if the AdvertisingDevice wasn't unregistered successfully
-        """
-        result = await super().TryUnregisterAdvertisingDevice(advertisingDevice)
 
-        logger.debug("AdvertiserBTSocket.TryUnregisterAdvertisingDevice")
+        :param advertisingDevice: the advertising device to unregister
+        :return: returns true if success
+        """
+        result: bool = await super().try_unregister_advertising_device(advertisingDevice)
+
+        logger.debug("AdvertiserBTSocket.try_unregister_advertising_device")
 
         # AdvertisingDevice was unregistered successfully in baseclass
         if(result):
             # unregister AdvertisementIdentifier to remove from publishing
-            advertisementIdentifier = advertisingDevice.GetAdvertisementIdentifier()
-            await self._UnregisterAdvertisementIdentifier(advertisementIdentifier)
+            advertisementIdentifier = advertisingDevice.get_advertisement_identifier()
+            await self._unregister_advertisementIdentifier(advertisementIdentifier)
 
         return result
 
 
-    async def AdvertisementStop(self) -> None:
-        """
-        stop bluetooth advertising
+    async def advertisement_stop(self) -> None:
+        """ stop bluetooth advertising
+
+        :return: returns nothing
         """
 
-        logger.debug("AdvertiserBTSocket.AdvertisementStop")
+        logger.debug("AdvertiserBTSocket.advertisement_stop")
 
         # stop publishing thread
         self._advertisement_task_Run = False
@@ -113,37 +123,37 @@ class AdvertiserBTSocket(Advertiser) :
             await self._advertisement_task
             self._advertisement_task = None
 
-        advertisementCommand = AdvertiserBTSocket._create_rm_advert_command(1)
+        advertisementCommand: bytes = AdvertiserBTSocket._create_rm_advert_command(1)
         self.sock.send(advertisementCommand)
-
-        #     logger.debug(f"AdvertiserBTMgmnt.AdvertisementStop")
 
         return
 
 
-    async def _RegisterAdvertisementIdentifier(self, advertisementIdentifier: str) -> None:
-        """
-        Register AdvertisementIdentifier
+    async def _register_advertisementIdentifier(self, advertisementIdentifier: str) -> None:
+        """ Register AdvertisementIdentifier
+
+        :param advertisementIdentifier: the advertisementIdentifier to register
+        :return: returns nothing
         """
 
-        logger.debug("AdvertiserBTSocket._RegisterAdvertisementIdentifier")
+        logger.debug("AdvertiserBTSocket._register_advertisementIdentifier")
 
         async with self._advertisementTable_Lock:
-
             if(not advertisementIdentifier in self._advertisementTable):
                 self._advertisementTable[advertisementIdentifier] = None
 
         return
 
 
-    async def _UnregisterAdvertisementIdentifier(self, advertisementIdentifier: str) -> None:
+    async def _unregister_advertisementIdentifier(self, advertisementIdentifier: str) -> None:
+        """ Unregister AdvertisementIdentifier
+
+        :param advertisementIdentifier: the advertisementIdentifier to unregister
+        :return: returns nothing
         """
-        Unregister AdvertisementIdentifier
-        """
-        logger.debug("AdvertiserBTSocket._UnregisterAdvertisementIdentifier")
+        logger.debug("AdvertiserBTSocket._unregister_advertisementIdentifier")
 
         async with self._registeredDeviceTable_Lock:
-
             foundAdvertisementIdentifier = False
 
             # there are devices wich share the same AdvertisementIdentifier
@@ -154,42 +164,47 @@ class AdvertiserBTSocket(Advertiser) :
                     break
                     
             if(not foundAdvertisementIdentifier):
-                await self._RemoveAdvertisementIdentifier(advertisementIdentifier)
+                await self._remove_advertisementIdentifier(advertisementIdentifier)
 
         return
 
-    async def _RemoveAdvertisementIdentifier(self, advertisementIdentifier: str) -> None:
+
+    async def _remove_advertisementIdentifier(self, advertisementIdentifier: str) -> None:
+        """ Remove AdvertisementIdentifier
+
+        :param advertisementIdentifier: the advertisementIdentifier to remove
+        :return: returns nothing
         """
-        Remove AdvertisementIdentifier
-        """
-        logger.debug("AdvertiserBTSocket._RemoveAdvertisementIdentifier")
+        logger.debug("AdvertiserBTSocket._remove_advertisementIdentifier")
 
         async with self._advertisementTable_Lock:
-
             if(advertisementIdentifier in self._advertisementTable):
                 self._advertisementTable.pop(advertisementIdentifier)
 
         if(len(self._advertisementTable) == 0):
-            await self.AdvertisementStop()
+            await self.advertisement_stop()
 
         return
 
-    async def AdvertisementDataSet(self, advertisementIdentifier: str, manufacturerId: bytes, rawdata: bytes) -> None:
+    async def set_advertisement_data(self, advertisementIdentifier: str, manufacturerId: bytes, rawdata: bytes) -> None:
+        """ Set Advertisement data
+
+        :param advertisementIdentifier:  advertisementIdentifier
+        :param manufacturerId: manufacturerId
+        :param rawdata: rawdata
+        :return: returns nothing
         """
-        Set Advertisement data
-        """
-        logger.debug("AdvertiserBTSocket.AdvertisementDataSet")
+        logger.debug("AdvertiserBTSocket.set_advertisement_data")
 
         async with self._advertisementTable_Lock:
-            
             # only registered AdvertisementIdentifier are handled
             if(advertisementIdentifier in self._advertisementTable):
                 # advertisementCommand = self._BTMgmt_path + ' add-adv -d ' + self._CreateTelegramForBTMgmmt(manufacturerId, rawdata) + ' --general-discov 1' + ' &> /dev/null'
-                advertisingData = self._CreateAdvertisingDataString(manufacturerId, rawdata)
+                advertisingData = self._create_advertisingData(manufacturerId, rawdata)
 
-                advertisementCommand = AdvertiserBTSocket._create_add_advert_command(
+                advertisementCommand: bytes = AdvertiserBTSocket._create_add_advert_command(
                     instance_id=1,
-                    flags=AdvertiserBTSocket.Flags.GENERAL_DISCOVERABLE,
+                    flags=AdvertiserBTSocket._Flags.GENERAL_DISCOVERABLE,
                     duration=0x00,  # zero means use default
                     timeout=0x00,  # zero means use default
                     #adv_data='1bfff0ff6DB643CF7E8F471188665938D17AAA26495E131415161718',
@@ -199,22 +214,23 @@ class AdvertiserBTSocket(Advertiser) :
                 self._advertisementTable[advertisementIdentifier] = advertisementCommand
 
                 # for quick change handle immediately
-                timeSlot = self._CalcTimeSlot()
-                await self._Advertise(advertisementCommand, timeSlot)
+                timeSlot = self._calc_timeSlot_s()
+                await self._advertise(advertisementCommand, timeSlot)
 
         # start publish thread if necessary
         if(not self._advertisement_task_Run):
-            self._advertisement_task = asyncio.create_task(self._publish())
             self._advertisement_task_Run = True
+            self._advertisement_task = asyncio.create_task(self._publish())
 
-        logger.debug('AdvertiserBTMgmnt.AdvertisementSet')
+        logger.debug('AdvertiserBTSocket.set_advertisement_data')
 
         return
 
 
     async def _publish(self) -> None:
-        """
-        publishing loop
+        """ publishing loop
+
+        :return: returns nothing
         """
         logger.debug("AdvertiserBTSocket._publish")
 
@@ -227,7 +243,7 @@ class AdvertiserBTSocket(Advertiser) :
                     copy_of_advertisementTable = self._advertisementTable.copy()
 
                     # calc time for one publishing slot
-                    timeSlot = self._CalcTimeSlot()
+                    timeSlot = self._calc_timeSlot_s()
                 
                 if(len(copy_of_advertisementTable) == 0):
                     pass
@@ -237,14 +253,15 @@ class AdvertiserBTSocket(Advertiser) :
                         if(not self._advertisement_task_Run):
                             return
 
-                        await self._Advertise(advertisementCommand, timeSlot)
+                        await self._advertise(advertisementCommand, timeSlot)
             except:
                 pass
 
 
-    def _CalcTimeSlot(self) -> float:
-        """
-        Calculates the timespan in seconds for each timeslot
+    def _calc_timeSlot_s(self) -> float:
+        """ Calculates the timespan in seconds for each timeslot
+
+        :return: returns the timespan for the slot in seconds
         """
 
         # timeSlot = 1 second / repetitionsPerSecond / len(self._advertisementTable)
@@ -252,20 +269,21 @@ class AdvertiserBTSocket(Advertiser) :
         return timeSlot
 
 
-    async def _Advertise(self, advertisementCommand: str, timeSlot: float) -> None:
+    async def _advertise(self, advertisementData: bytes, timeSlot: float) -> None:
+        """ calls the btmgmt tool as subprocess
+
+        :return: returns nothing
         """
-        calls the btmgmt tool as subprocess
-        """
-        logger.debug("AdvertiserBTSocket._publish")
+        logger.debug("AdvertiserBTSocket._advertise")
 
         async with self._advertisement_task_Lock:
             timeStart = time.time()    
 
-            if (self._lastSetAdvertisementCommand != advertisementCommand):
-                self._lastSetAdvertisementCommand = advertisementCommand
+            if (self._lastSetAdvertisementCommand != advertisementData):
+                self._lastSetAdvertisementCommand = advertisementData
 
                 # self.loop.call_soon(self.sock.send, advertisementCommand)
-                self.sock.send(advertisementCommand)
+                self.sock.send(advertisementData)
 
             timeEnd = time.time()    
             timeDelta = timeEnd - timeStart
@@ -277,9 +295,11 @@ class AdvertiserBTSocket(Advertiser) :
 
         return
 
-    def _CreateAdvertisingDataString(self, manufacturerId: bytes, rawDataArray: bytes) -> str:
-        """
-        Create input data for btmgmt 
+
+    def _create_advertisingData(self, manufacturerId: bytes, rawDataArray: bytes) -> str:
+        """ Create data to advertise
+
+        :return: returns data to advertise
         """
         rawDataArrayLen = len(rawDataArray)
         
@@ -293,9 +313,11 @@ class AdvertiserBTSocket(Advertiser) :
 
         return ''.join(f'{x:02x}' for x in resultArray)
 
+
     @staticmethod
     def _little_bytes(value, size_of):
         return int(value).to_bytes(size_of, byteorder='little')
+
 
     @staticmethod
     def _create_add_advert_command(instance_id, flags, duration, timeout, adv_data, scan_rsp):
@@ -446,6 +468,7 @@ class AdvertiserBTSocket(Advertiser) :
         param_len = AdvertiserBTSocket._little_bytes(len(params), 2)
 
         return cmd + ctrl_idx + param_len + params
+
 
     @staticmethod
     def _create_rm_advert_command(instance_id):

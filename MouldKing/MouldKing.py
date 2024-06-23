@@ -45,7 +45,7 @@ class MouldKing :
             """
 
             # MouldKing_4_Hubs is the same instance for all MouldKing_4_Hub-Instances
-            await MouldKing.Module4_0.Device0._MouldKing_4_Hubs.SetAdvertiser(advertiser)
+            await MouldKing.Module4_0.Device0._MouldKing_4_Hubs.set_advertiser(advertiser)
             # MouldKing.Module4_0.Device1.MouldKing_4_Hubs.SetAdvertiser(advertiser)
             # MouldKing.Module4_0.Device2.MouldKing_4_Hubs.SetAdvertiser(advertiser)
             return advertiser
@@ -77,9 +77,9 @@ class MouldKing :
             Set Advertiser for all MouldKing 6.0 Hubs
             """
 
-            await MouldKing.Module6_0.Device0.SetAdvertiser(advertiser)
-            await MouldKing.Module6_0.Device1.SetAdvertiser(advertiser)
-            await MouldKing.Module6_0.Device2.SetAdvertiser(advertiser)
+            await MouldKing.Module6_0.Device0.set_advertiser(advertiser)
+            await MouldKing.Module6_0.Device1.set_advertiser(advertiser)
+            await MouldKing.Module6_0.Device2.set_advertiser(advertiser)
             return advertiser
 
 

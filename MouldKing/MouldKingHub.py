@@ -1,11 +1,5 @@
-__author__ = "J0EK3R"
-__version__ = "0.1"
-
 import sys
 import logging
-
-logger = logging.getLogger(__name__)
-
 sys.path.append("Advertiser") 
 from Advertiser.AdvertisingDevice import AdvertisingDevice
 
@@ -13,9 +7,15 @@ sys.path.append("MouldKing")
 from MouldKing.MouldKingCrypt import MouldKingCrypt
 
 
+__author__ = "J0EK3R"
+__version__ = "0.1"
+
+
+logger = logging.getLogger(__name__)
+
+
 class MouldKingHub(AdvertisingDevice) :
-    """
-    baseclass
+    """ baseclass
     """
 
     ManufacturerID = bytes([0xFF, 0xF0])
@@ -51,12 +51,12 @@ class MouldKingHub(AdvertisingDevice) :
         return
 
 
-    async def Connect(self) -> None:
+    async def connect(self) -> None:
         """
         returns the telegram to switch the MouldKing Hubs in bluetooth mode
         """
         # call baseClass to register at Advertiser
-        await super().Connect()
+        await super().connect()
 
         logger.debug("MouldKingHub.Connect")
 
@@ -65,22 +65,23 @@ class MouldKingHub(AdvertisingDevice) :
         return
 
 
-    async def Disconnect(self) -> None:
+    async def disconnect(self) -> None:
         """
         disconnects the device from the advertiser
         """
-        await self.Stop()
+        await self.stop()
         
-        await super().Disconnect()
+        await super().disconnect()
 
         logger.debug("MouldKingHub.Disconnect")
 
         return
     
 
-    async def Stop(self) -> bytes:
-        """
-        set internal stored value of all channels to zero and return the telegram
+    async def stop(self) -> bytes:
+        """ stops the device by setting the internal stored values of all channels to zero and return the telegram
+
+        :return: returns the generated rawdata
         """
         logger.debug("MouldKingHub.Stop")
 
@@ -91,11 +92,15 @@ class MouldKingHub(AdvertisingDevice) :
         return await self.CreateTelegram()
 
 
-    async def SetChannel(self, channelId: int, value: float) -> bytes:
+    async def set_channel(self, channelId: int, value: float) -> bytes:
         """
         set internal stored value of channel with channelId to value and return the telegram
+
+        :param channelId: identifier for the channel
+        :param value: value to set for the channel
+        :return: returns the generated rawdata
         """
-        logger.debug("MouldKingHub.SetChannel")
+        logger.debug("MouldKingHub.set_channel")
 
         if channelId > self._NumberOfChannels - 1:
             raise Exception("only channelId 0.." + str(self._NumberOfChannels - 1) + "are allowed")
@@ -121,7 +126,7 @@ class MouldKingHub(AdvertisingDevice) :
 
         if(self._advertiser is not None):
             cryptedData = MouldKingCrypt.Crypt(rawdata)
-            await self._advertiser.AdvertisementDataSet(self._identifier, self.ManufacturerID, cryptedData)
+            await self._advertiser.set_advertisement_data(self._identifier, self.ManufacturerID, cryptedData)
 
         logger.debug("MouldKingHub._Advertise: finished")
 

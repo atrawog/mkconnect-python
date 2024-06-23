@@ -47,7 +47,7 @@ class MouldKing_Hubs_4_12Ch(MouldKingHub_Nibble) :
 
             # first subDevice was added
             if(connectedSubDevicesLen == 0):
-               await self.Connect() 
+               await self.connect() 
 
         return
 
@@ -61,7 +61,7 @@ class MouldKing_Hubs_4_12Ch(MouldKingHub_Nibble) :
 
             # last subDevice was removed
             if(len(self._connectedSubDevices) == 0):
-                await self.Disconnect()
+                await self.disconnect()
 
         return
 

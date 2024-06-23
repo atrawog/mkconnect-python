@@ -100,7 +100,7 @@ async def mkbtstop():
     """
     stop bluetooth advertising
     """
-    await advertiser.AdvertisementStop()
+    await advertiser.advertisement_stop()
     # hcitool_args1 = hcitool_path + ' -i hci0 cmd 0x08 0x000a 00' + ' &> /dev/null'
 
     # if platform.system() == 'Linux':
@@ -119,17 +119,17 @@ async def mkconnect(deviceId: int=0):
     press the button on the hub(s) and the flashing of status led should switch from blue-green to blue
     """
     hub = _getHubId(deviceId)
-    rawdata = await hub.Connect()
+    rawdata = await hub.connect()
     return
 
 async def mkstop(deviceId: int=0):
     hub = _getHubId(deviceId)
-    rawdata = await hub.Stop()
+    rawdata = await hub.stop()
     return        
 
 async def mkcontrol(deviceId: int=0, channel: int=0, powerAndDirection: float=0):
     hub = _getHubId(deviceId)
-    rawdata = await hub.SetChannel(channel, powerAndDirection)
+    rawdata = await hub.set_channel(channel, powerAndDirection)
     return
 
 async def test_hub(hubId: int=0):

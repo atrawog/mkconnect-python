@@ -51,9 +51,9 @@ async def main():
     title = "connect-telegram"
     print("\n" + title)
 
-    await hub0.Connect()
-    await hub1.Connect()
-    await hub2.Connect()
+    await hub0.connect()
+    await hub1.connect()
+    await hub2.connect()
     time.sleep(5)
 
     #print("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))
@@ -66,10 +66,10 @@ async def main():
     title = "C1: fullspeed forwards"
     print("\n" + title)
 
-    rawdata = await hub0.SetChannel(0, 1)
-    rawdata = await hub1.SetChannel(0, 1)
-    rawdata = await hub2.SetChannel(0, 1)
-    rawdata = await hub2.SetChannel(1, 1)
+    rawdata = await hub0.set_channel(0, 1)
+    rawdata = await hub1.set_channel(0, 1)
+    rawdata = await hub2.set_channel(0, 1)
+    rawdata = await hub2.set_channel(1, 1)
     await asyncio.sleep(1)
 
     #print("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))
@@ -82,7 +82,7 @@ async def main():
     title = "C1: halfspeed forwards"
     print("\n" + title)
 
-    rawdata = await hub1.SetChannel(1, 1)
+    rawdata = await hub1.set_channel(1, 1)
     await asyncio.sleep(1)
 
     #print("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))
@@ -95,7 +95,7 @@ async def main():
     title = "C1: fullspeed forwards"
     print("\n" + title)
 
-    rawdata = await hub2.SetChannel(0, 1)
+    rawdata = await hub2.set_channel(0, 1)
     await asyncio.sleep(1)
 
     #print("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))
@@ -108,7 +108,7 @@ async def main():
     title = "C1: halfspeed backwards"
     print("\n" + title)
 
-    rawdata = await hub1.SetChannel(1, -0.5)
+    rawdata = await hub1.set_channel(1, -0.5)
     await asyncio.sleep(1)
 
     #print("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))
@@ -121,7 +121,7 @@ async def main():
     title = "C2: halfspeed backwards"
     print("\n" + title)
 
-    rawdata = await hub1.SetChannel(1, -0.5)
+    rawdata = await hub1.set_channel(1, -0.5)
     await asyncio.sleep(1)
 
     #print("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))
@@ -134,16 +134,16 @@ async def main():
     title = "Disconnect from advertiser"
     print("\n" + title)
 
-    await hub0.Disconnect()
-    await hub1.Disconnect()
-    await hub2.Disconnect()
+    await hub0.disconnect()
+    await hub1.disconnect()
+    await hub2.disconnect()
     await asyncio.sleep(1)
 
     ############################################################################
     # stop Advertisement
     title = "Advertisement stop"
     print("\n" + title)
-    await advertiser.AdvertisementStop()
+    await advertiser.advertisement_stop()
     await asyncio.sleep(1)
 
 if __name__ == "__main__":

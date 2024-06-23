@@ -1,28 +1,35 @@
-__author__ = "J0EK3R"
-__version__ = "0.1"
+""" This class is a Bluetooth Advertiser using the 'hcitool' on linux to set the advertisement data
+"""
 
 import sys
 import logging
 import asyncio
-
-logger = logging.getLogger(__name__)
+import subprocess
+import time
 
 sys.path.append("Advertiser") 
 from Advertiser.Advertiser import Advertiser
 
-import subprocess
-import time
+
+__author__ = "J0EK3R"
+__version__ = "0.1"
+
+
+logger = logging.getLogger(__name__)
+
 
 class AdvertiserHCITool(Advertiser) :
-    """
-    baseclass
+    """ This class is a Bluetooth Advertiser using the 'hcitool' on linux to set the advertisement data
     """
 
     HCITool_path = '/usr/bin/hcitool'
 
+    # We want to repeat each command 
+    _RepetitionsPerSecond = 4
+
+
     def __init__(self):
-        """
-        initializes the object and defines the fields
+        """ initializes the object and defines the fields
         """
         super().__init__()
 
@@ -36,11 +43,13 @@ class AdvertiserHCITool(Advertiser) :
 
         return
 
-    async def AdvertisementStop(self) -> None:
+
+    async def advertisement_stop(self) -> None:
+        """ stop bluetooth advertising
+
+        :return: returns true if success
         """
-        stop bluetooth advertising
-        """
-        logger.debug("AdvertiserHCITool.AdvertisementStop")
+        logger.debug("AdvertiserHCITool.advertisement_stop")
 
         self._ad_task_Run = False
         if(self._ad_task is not None):
@@ -56,36 +65,44 @@ class AdvertiserHCITool(Advertiser) :
 
         return
 
-    async def AdvertisementDataSet(self, identifier: str, manufacturerId: bytes, rawdata: bytes) -> None:
-        """
-        Set Advertisement data
-        """
-        logger.debug("AdvertiserHCITool.AdvertisementDataSet")
 
-        advertisementCommand = self.HCITool_path + ' -i hci0 cmd 0x08 0x0008 ' + self._CreateTelegramForHCITool(manufacturerId, rawdata)
+    async def set_advertisement_data(self, identifier: str, manufacturerId: bytes, rawdata: bytes) -> None:
+        """ Set Advertisement data
+
+        :param advertisementIdentifier:  advertisementIdentifier
+        :param manufacturerId: manufacturerId
+        :param rawdata: rawdata
+        :return: returns nothing
+        """
+        logger.debug("AdvertiserHCITool.set_advertisement_data")
+
+        advertisementCommand = self.HCITool_path + ' -i hci0 cmd 0x08 0x0008 ' + self._create_telegram_for_HCITool(manufacturerId, rawdata)
         async with self._ad_task_Lock:
             self._advertisementTable[identifier] = advertisementCommand
     
         if(not self._ad_task_Run):
-            self._ad_task = asyncio.create_task(self._publish())
+            self._ad_task = asyncio.create_task(self._publish_loop())
             self._ad_task_Run = True
 
         logger.debug('AdvertiserHCITool.AdvertisementSet')
 
         return
 
-    async def _publish(self) -> None:
-        logger.debug('AdvertiserHCITool._publish')
+
+    async def _publish_loop(self) -> None:
+        """ publishing loop
+
+        :return: returns nothing
+        """
+        logger.debug('AdvertiserHCITool._publish_loop')
 
         while(self._ad_task_Run):
             try:
                 async with self._ad_task_Lock:
                     copy_of_advertisementTable = self._advertisementTable.copy()
                 
-                # We want to repeat each command 
-                repetitionsPerSecond = 4
                 # timeSlot = 1 second / repetitionsPerSecond / len(copy_of_advertisementTable)
-                timeSlot = 1 / repetitionsPerSecond / max(1, len(copy_of_advertisementTable))
+                timeSlot = 1 / AdvertiserHCITool._RepetitionsPerSecond / max(1, len(copy_of_advertisementTable))
 
                 for key, advertisementCommand in copy_of_advertisementTable.items():
                     # stopp publishing?
@@ -118,9 +135,11 @@ class AdvertiserHCITool(Advertiser) :
             except:
                 pass
 
-    def _CreateTelegramForHCITool(self, manufacturerId: bytes, rawDataArray: bytes) -> str:
-        """
-        Create input data for hcitool 
+
+    def _create_telegram_for_HCITool(self, manufacturerId: bytes, rawDataArray: bytes) -> str:
+        """ Create input data for hcitool 
+
+        :return: returns data-String
         """
         rawDataArrayLen = len(rawDataArray)
         

@@ -35,7 +35,7 @@ class MouldKing_Hub_4(IAdvertisingDevice) :
         self._NumberOfChannels = 4
 
 
-    async def Connect(self) -> None:
+    async def connect(self) -> None:
         """
         returns the telegram to switch the MouldKing Hubs in bluetooth mode
         """
@@ -44,7 +44,7 @@ class MouldKing_Hub_4(IAdvertisingDevice) :
         return 
 
 
-    async def Disconnect(self) -> None:
+    async def disconnect(self) -> None:
         """
         disconnects the device from the advertiser
         """
@@ -53,18 +53,24 @@ class MouldKing_Hub_4(IAdvertisingDevice) :
         return 
 
 
-    async def Stop(self) -> bytes:
-        """
-        set internal stored value of all channels to zero and return the telegram
+    async def stop(self) -> bytes:
+        """ stops the device by setting the internal stored values of all channels to zero and return the telegram
+
+        :return: returns the generated rawdata
         """
 
         return await MouldKing_Hub_4._MouldKing_4_Hubs.SubDevice_Stop(self._deviceId, self._NumberOfChannels)
 
 
-    async def SetChannel(self, channelId: int, value: float) -> bytes:
+    async def set_channel(self, channelId: int, value: float) -> bytes:
         """
         set internal stored value of channel with channelId to value and return the telegram
+
+        :param channelId: identifier for the channel
+        :param value: value to set for the channel
+        :return: returns the generated rawdata
         """
+        logger.debug("MouldKing_Hub_4.set_channel")
 
         if channelId > self._NumberOfChannels - 1:
             raise Exception("only channelId 0.." + str(self._NumberOfChannels - 1) + "are allowed")

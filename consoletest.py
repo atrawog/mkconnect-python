@@ -97,7 +97,7 @@ def mkbtstop():
     """
     stop bluetooth advertising
     """
-    advertiser.AdvertisementStop()
+    advertiser.advertisement_stop()
     # hcitool_args1 = hcitool_path + ' -i hci0 cmd 0x08 0x000a 00' + ' &> /dev/null'
 
     # if platform.system() == 'Linux':
@@ -116,17 +116,17 @@ def mkconnect(deviceId: int=0):
     press the button on the hub(s) and the flashing of status led should switch from blue-green to blue
     """
     hub = _getHubId(deviceId)
-    rawdata = hub.Connect()
+    rawdata = hub.connect()
     return
 
 def mkstop(deviceId: int=0):
     hub = _getHubId(deviceId)
-    rawdata = hub.Stop()
+    rawdata = hub.stop()
     return        
 
 def mkcontrol(deviceId: int=0, channel: int=0, powerAndDirection: float=0):
     hub = _getHubId(deviceId)
-    rawdata = hub.SetChannel(channel, powerAndDirection)
+    rawdata = hub.set_channel(channel, powerAndDirection)
     return
 
 def test_hub(hubId: int=0):
