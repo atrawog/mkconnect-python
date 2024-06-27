@@ -39,7 +39,7 @@ class MouldKing_Hub_4(IAdvertisingDevice) :
         """
         returns the telegram to switch the MouldKing Hubs in bluetooth mode
         """
-        await MouldKing_Hub_4._MouldKing_4_Hubs.SubDevice_Register(self)   
+        await MouldKing_Hub_4._MouldKing_4_Hubs.subDevice_register(self)   
 
         return 
 
@@ -48,7 +48,7 @@ class MouldKing_Hub_4(IAdvertisingDevice) :
         """
         disconnects the device from the advertiser
         """
-        await MouldKing_Hub_4._MouldKing_4_Hubs.SubDevice_Unregister(self)
+        await MouldKing_Hub_4._MouldKing_4_Hubs.subDevice_unregister(self)
 
         return 
 
@@ -59,7 +59,7 @@ class MouldKing_Hub_4(IAdvertisingDevice) :
         :return: returns the generated rawdata
         """
 
-        return await MouldKing_Hub_4._MouldKing_4_Hubs.SubDevice_Stop(self._deviceId, self._NumberOfChannels)
+        return await MouldKing_Hub_4._MouldKing_4_Hubs.subDevice_stop(self._deviceId, self._NumberOfChannels)
 
 
     async def set_channel(self, channelId: int, value: float) -> bytes:
@@ -75,5 +75,5 @@ class MouldKing_Hub_4(IAdvertisingDevice) :
         if channelId > self._NumberOfChannels - 1:
             raise Exception("only channelId 0.." + str(self._NumberOfChannels - 1) + "are allowed")
 
-        return await MouldKing_Hub_4._MouldKing_4_Hubs.SubDevice_SetChannel(self._deviceId, self._NumberOfChannels, channelId, value)
+        return await MouldKing_Hub_4._MouldKing_4_Hubs.subDevice_setChannel(self._deviceId, self._NumberOfChannels, channelId, value)
 

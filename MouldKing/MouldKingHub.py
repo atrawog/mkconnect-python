@@ -60,7 +60,7 @@ class MouldKingHub(AdvertisingDevice) :
 
         logger.debug("MouldKingHub.Connect")
 
-        await self._Advertise(self._Telegram_connect)
+        await self._advertise(self._Telegram_connect)
 
         return
 
@@ -89,7 +89,7 @@ class MouldKingHub(AdvertisingDevice) :
         for channelId in range(0, self._NumberOfChannels):
             self._ChannelValueList[channelId] = float(0)
         
-        return await self.CreateTelegram()
+        return await self.create_telegram()
 
 
     async def set_channel(self, channelId: int, value: float) -> bytes:
@@ -107,10 +107,10 @@ class MouldKingHub(AdvertisingDevice) :
 
         self._ChannelValueList[channelId] = value
         
-        return await self.CreateTelegram()
+        return await self.create_telegram()
 
 
-    async def CreateTelegram(self) -> bytes:
+    async def create_telegram(self) -> bytes:
         """
         returns a telegram including the internal stored value from all channels
         """
@@ -118,14 +118,14 @@ class MouldKingHub(AdvertisingDevice) :
         raise NotImplementedError # override this methode
     
 
-    async def _Advertise(self, rawdata: bytes) -> bytes:
+    async def _advertise(self, rawdata: bytes) -> bytes:
         """
         sends the data to the advertiser
         """
         logger.debug("MouldKingHub._Advertise: start")
 
         if(self._advertiser is not None):
-            cryptedData = MouldKingCrypt.Crypt(rawdata)
+            cryptedData = MouldKingCrypt.crypt(rawdata)
             await self._advertiser.set_advertisement_data(self._identifier, self.ManufacturerID, cryptedData)
 
         logger.debug("MouldKingHub._Advertise: finished")

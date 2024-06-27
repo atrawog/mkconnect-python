@@ -184,7 +184,7 @@ def exit():
 
 async def task1():
     # Set Advertiser for all MouldKing Hubs
-    await MouldKing.SetAdvertiser(advertiser)
+    await MouldKing.set_advertiser(advertiser)
 
     help()
     print()

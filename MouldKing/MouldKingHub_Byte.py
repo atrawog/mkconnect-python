@@ -25,7 +25,7 @@ class MouldKingHub_Byte(MouldKingHub) :
         logger.debug("MouldKingHub_Byte.__init__")
 
 
-    async def CreateTelegram(self) -> bytes:
+    async def create_telegram(self) -> bytes:
         """
         returns the telegram including the internal stored value from all channels
         """
@@ -52,6 +52,6 @@ class MouldKingHub_Byte(MouldKingHub) :
                 else:
                     currentTelegramData[currentChannelStartOffset] = 0x80
 
-        await self._Advertise(currentTelegramData)
+        await self._advertise(currentTelegramData)
         
         return currentTelegramData

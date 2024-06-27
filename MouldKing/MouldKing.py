@@ -39,15 +39,15 @@ class MouldKing :
         """
 
         @staticmethod
-        async def SetAdvertiser(advertiser: Advertiser) -> Advertiser:
+        async def set_advertiser(advertiser: Advertiser) -> Advertiser:
             """
             Set Advertiser for all MouldKing 4.0 Hubs
             """
 
             # MouldKing_4_Hubs is the same instance for all MouldKing_4_Hub-Instances
             await MouldKing.Module4_0.Device0._MouldKing_4_Hubs.set_advertiser(advertiser)
-            # MouldKing.Module4_0.Device1.MouldKing_4_Hubs.SetAdvertiser(advertiser)
-            # MouldKing.Module4_0.Device2.MouldKing_4_Hubs.SetAdvertiser(advertiser)
+            # MouldKing.Module4_0.Device1.MouldKing_4_Hubs.set_advertiser(advertiser)
+            # MouldKing.Module4_0.Device2.MouldKing_4_Hubs.set_advertiser(advertiser)
             return advertiser
 
 
@@ -72,7 +72,7 @@ class MouldKing :
         """
 
         @staticmethod
-        async def SetAdvertiser(advertiser: Advertiser) -> Advertiser:
+        async def set_advertiser(advertiser: Advertiser) -> Advertiser:
             """
             Set Advertiser for all MouldKing 6.0 Hubs
             """
@@ -84,12 +84,12 @@ class MouldKing :
 
 
     @staticmethod
-    async def SetAdvertiser(advertiser: Advertiser) -> Advertiser:
+    async def set_advertiser(advertiser: Advertiser) -> Advertiser:
         """
         Set Advertiser for all MouldKing 4.0 Hubs
         """
 
         # MouldKing_4_Hubs is the same instance for all MouldKing_4_Hub-Instances
-        await MouldKing.Module4_0.SetAdvertiser(advertiser)
-        await MouldKing.Module6_0.SetAdvertiser(advertiser)
+        await MouldKing.Module4_0.set_advertiser(advertiser)
+        await MouldKing.Module6_0.set_advertiser(advertiser)
         return advertiser

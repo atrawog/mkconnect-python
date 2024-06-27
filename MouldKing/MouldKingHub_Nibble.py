@@ -25,7 +25,7 @@ class MouldKingHub_Nibble(MouldKingHub) :
         logger.debug("MouldKingHub_Nibble.__init__")
 
 
-    async def CreateTelegram(self) -> bytes:
+    async def create_telegram(self) -> bytes:
         """
         returns the telegram including the internal stored value from all channels
         """
@@ -73,6 +73,6 @@ class MouldKingHub_Nibble(MouldKingHub) :
             # next byte
             byteOffset = byteOffset + 1
 
-        await self._Advertise(currentTelegramData)
+        await self._advertise(currentTelegramData)
         
         return currentTelegramData

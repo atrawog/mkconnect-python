@@ -34,7 +34,7 @@ async def main():
     advertiser = Advertiser()
 
     # Set Advertiser for all MouldKing Hubs
-    await MouldKing.SetAdvertiser(advertiser)
+    await MouldKing.set_advertiser(advertiser)
 
     # save pre-instantiated objects in local variables
     hub0 = MouldKing.Module6_0.Device0
