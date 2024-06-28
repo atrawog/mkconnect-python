@@ -13,6 +13,8 @@ print('Script: consoletest.py')
 print('Platform: ' + sys.platform)
 
 sys.path.append("Advertiser") 
+from Advertiser.AdvertiseringDeviceSync import AdvertiseringDeviceSync
+
 # uncomment to choose advertiser
 if (sys.platform == 'linux'):
     #from Advertiser.AdvertiserHCITool import AdvertiserHCITool as Advertiser
@@ -34,13 +36,21 @@ from MouldKing.MouldKing import MouldKing
 advertiser = Advertiser()
 
 # save pre-instantiated objects in local variables
-hub0 = MouldKing.Module6_0.Device0
-hub1 = MouldKing.Module6_0.Device1
-hub2 = MouldKing.Module6_0.Device2
+hub0sync = MouldKing.Module6_0.Device0
+hub1sync = MouldKing.Module6_0.Device1
+hub2sync = MouldKing.Module6_0.Device2
 
-hub3 = MouldKing.Module4_0.Device0
-hub4 = MouldKing.Module4_0.Device1
-hub5 = MouldKing.Module4_0.Device2
+hub3sync = MouldKing.Module4_0.Device0
+hub4sync = MouldKing.Module4_0.Device1
+hub5sync = MouldKing.Module4_0.Device2
+
+hub0 = AdvertiseringDeviceSync(hub0sync)
+hub1 = AdvertiseringDeviceSync(hub1sync)
+hub2 = AdvertiseringDeviceSync(hub2sync)
+
+hub3 = AdvertiseringDeviceSync(hub3sync)
+hub4 = AdvertiseringDeviceSync(hub4sync)
+hub5 = AdvertiseringDeviceSync(hub5sync)
 
 def _getChannelId(channel):
     switch={
