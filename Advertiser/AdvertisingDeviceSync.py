@@ -17,7 +17,7 @@ __version__ = "0.1"
 logger = logging.getLogger(__name__)
 
 
-class AdvertiseringDeviceSync :
+class AdvertisingDeviceSync :
     """ The class AdvertiseringDeviceSync is a wrapper for (async) objects implementing IAdvertisingDevice
     that wraps the async methodes to sync methods
     """

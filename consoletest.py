@@ -7,13 +7,13 @@ import time
 import logging
 import asyncio
 
-logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s', level=logging.INFO)
+logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s', level=logging.DEBUG)
 
 print('Script: consoletest.py')
 print('Platform: ' + sys.platform)
 
 sys.path.append("Advertiser") 
-from Advertiser.AdvertiseringDeviceSync import AdvertiseringDeviceSync
+from Advertiser.AdvertisingDeviceSync import AdvertisingDeviceSync
 
 # uncomment to choose advertiser
 if (sys.platform == 'linux'):
@@ -44,13 +44,13 @@ hub3sync = MouldKing.Module4_0.Device0
 hub4sync = MouldKing.Module4_0.Device1
 hub5sync = MouldKing.Module4_0.Device2
 
-hub0 = AdvertiseringDeviceSync(hub0sync)
-hub1 = AdvertiseringDeviceSync(hub1sync)
-hub2 = AdvertiseringDeviceSync(hub2sync)
+hub0 = AdvertisingDeviceSync(hub0sync)
+hub1 = AdvertisingDeviceSync(hub1sync)
+hub2 = AdvertisingDeviceSync(hub2sync)
 
-hub3 = AdvertiseringDeviceSync(hub3sync)
-hub4 = AdvertiseringDeviceSync(hub4sync)
-hub5 = AdvertiseringDeviceSync(hub5sync)
+hub3 = AdvertisingDeviceSync(hub3sync)
+hub4 = AdvertisingDeviceSync(hub4sync)
+hub5 = AdvertisingDeviceSync(hub5sync)
 
 def _getChannelId(channel):
     switch={
