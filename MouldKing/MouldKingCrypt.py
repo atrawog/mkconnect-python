@@ -65,17 +65,15 @@ class MouldKingCrypt :
 
         return telegramArray
 
-
     @staticmethod
-    def __create_magic_array(magic_number: int, size: int) -> bytes:
+    def __create_magic_array(magic_number: int, size: int) -> bytearray:
         magic_array = [0] * size
         magic_array[0] = 1
 
         for index in range(1, 7):
             magic_array[index] = (magic_number >> (6 - index)) & 1
 
-        return bytes(magic_array)
-
+        return bytearray(magic_array)
 
     @staticmethod
     def __revert_bits_byte(value: int) -> int:
@@ -85,7 +83,6 @@ class MouldKingCrypt :
                 result = result | (1 << (7 - index_bit))
         return result
 
-
     @staticmethod
     def __revert_bits_int(value: int) -> int:
         result = 0
@@ -94,9 +91,8 @@ class MouldKingCrypt :
                 result |= 1 << (15 - index_bit)
         return 65535 & result
 
-
     @staticmethod
-    def __crypt_array(byte_array: bytes, magic_number_array: bytes) -> bytes:
+    def __crypt_array(byte_array: bytearray, magic_number_array: bytearray) -> bytes:
         # foreach byte of array
         for index_byte in range(len(byte_array)):
             current_byte = byte_array[index_byte]
@@ -106,7 +102,6 @@ class MouldKingCrypt :
                 current_result += (((current_byte >> index_bit) & 1) ^ MouldKingCrypt.__shift_magic_array(magic_number_array)) << index_bit
             byte_array[index_byte] = current_result & 255
         return byte_array
-
 
     @staticmethod
     def __calc_checksum_from_arrays(first_array: bytes, second_array: bytes) -> int:
@@ -129,9 +124,8 @@ class MouldKingCrypt :
 
         return MouldKingCrypt.__revert_bits_int(result) ^ 65535
 
-
     @staticmethod
-    def __shift_magic_array(i_arr: bytes) -> bytes:
+    def __shift_magic_array(i_arr: bytearray) -> int:
         r1 = i_arr[3] ^ i_arr[6]
         i_arr[3] = i_arr[2]
         i_arr[2] = i_arr[1]
