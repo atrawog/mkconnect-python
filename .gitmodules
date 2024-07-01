@@ -1,0 +1,3 @@
+[submodule "lib/aiomqtt"]
+	path = lib/aiomqtt
+	url = https://github.com/sbtinstruments/aiomqtt/tree/main/aiomqtt
