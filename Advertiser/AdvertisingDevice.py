@@ -117,3 +117,14 @@ class AdvertisingDevice(IAdvertisingDevice) :
         logger.debug("AdvertisingDevice.get_advertisement_identifier")
 
         return self._identifier
+
+
+    def get_is_connected(self) -> bool:
+        """ Returns true if device is connected.
+        This Methode has to be overridden by the implementation of the AdvertisingDevice!
+
+        :return: returns true if device is connected
+        """
+        logger.debug("AdvertisingDevice.get_is_connected")
+
+        return self._connected

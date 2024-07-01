@@ -26,6 +26,24 @@ class IAdvertisingDevice :
         raise NotImplementedError # override this methode
 
 
+    def get_number_of_channels(self) -> int:
+        """ Returns the number of channels.
+        This Methode has to be overridden by the implementation of the AdvertisingDevice!
+
+        :return: returns the number of channels
+        """
+        raise NotImplementedError # override this methode
+
+
+    def get_is_connected(self) -> bool:
+        """ Returns true if device is connected.
+        This Methode has to be overridden by the implementation of the AdvertisingDevice!
+
+        :return: returns true if device is connected
+        """
+        raise NotImplementedError # override this methode
+
+
     async def connect(self) -> None:
         """ connects the device to the advertiser
 
@@ -56,5 +74,15 @@ class IAdvertisingDevice :
         :param channelId: identifier for the channel
         :param value: value to set for the channel
         :return: returns the generated rawdata
+        """
+        raise NotImplementedError # override this methode
+
+
+    def get_channel(self, channelId: int) -> float:
+        """ get internal stored value of channel with channelId
+
+        :param channelId: identifier for the channel
+        :param value: value to set for the channel
+        :return: returns the internal stored value
         """
         raise NotImplementedError # override this methode

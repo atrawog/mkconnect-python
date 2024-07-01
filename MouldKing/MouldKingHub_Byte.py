@@ -10,14 +10,12 @@ sys.path.append("MouldKing")
 from MouldKing.MouldKingHub import MouldKingHub
 
 class MouldKingHub_Byte(MouldKingHub) :
-    """
-    baseclass handling with byte channels
+    """ baseclass handling with byte channels
     """
 
 
     def __init__(self, identifier: str, numberOfChannels, channelStartOffset, channelEndOffset, telegram_connect, basetelegram):
-        """
-        initializes the object and defines the fields
+        """ initializes the object and defines the fields
         """
         # call baseclass init and set number of channels
         super().__init__(identifier, numberOfChannels, channelStartOffset, channelEndOffset, telegram_connect, basetelegram)
@@ -26,8 +24,7 @@ class MouldKingHub_Byte(MouldKingHub) :
 
 
     async def create_telegram(self) -> bytes:
-        """
-        returns the telegram including the internal stored value from all channels
+        """ returns the telegram including the internal stored value from all channels
         """
         
         # make a copy of the basetelegram

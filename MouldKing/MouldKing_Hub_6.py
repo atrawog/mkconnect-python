@@ -11,8 +11,7 @@ from MouldKing.MouldKingHub_Byte import MouldKingHub_Byte
 
 
 class MouldKing_Hub_6(MouldKingHub_Byte) :
-    """
-    class handling the MouldKing 6.0 Hub
+    """ class handling the MouldKing 6.0 Hub
     """
 
     # static fields/constants
@@ -24,8 +23,7 @@ class MouldKing_Hub_6(MouldKingHub_Byte) :
 
 
     def __init__(self, deviceId: int):
-        """
-        initializes the object and defines the fields
+        """ initializes the object and defines the fields
         """
         if deviceId == 0:
             basetelegram = MouldKing_Hub_6.__telegram_base_device_a

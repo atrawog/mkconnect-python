@@ -22,8 +22,7 @@ class MouldKingHub(AdvertisingDevice) :
 
 
     def __init__(self, identifier: str, numberOfChannels: int, channelStartOffset: int, channelEndOffset: int, telegram_connect: bytes, basetelegram: bytes):
-        """
-        initializes the object and defines the fields
+        """ initializes the object and defines the fields
         """
         super().__init__(identifier)
 
@@ -49,6 +48,17 @@ class MouldKingHub(AdvertisingDevice) :
         self._ChannelValueList = [float(0)] * self._NumberOfChannels
 
         return
+
+
+    def get_number_of_channels(self) -> int:
+        """ Returns the number of channels.
+        This Methode has to be overridden by the implementation of the AdvertisingDevice!
+
+        :return: returns the number of channels
+        """
+        logger.debug("MouldKingHub.get_number_of_channels")
+
+        return self._NumberOfChannels
 
 
     async def connect(self) -> None:
@@ -108,6 +118,18 @@ class MouldKingHub(AdvertisingDevice) :
         self._ChannelValueList[channelId] = value
         
         return await self.create_telegram()
+
+
+    def get_channel(self, channelId: int) -> float:
+        """ get internal stored value of channel with channelId
+
+        :param channelId: identifier for the channel
+        :param value: value to set for the channel
+        :return: returns the internal stored value
+        """
+        logger.debug("MouldKingHub.get_channel")
+
+        return self._ChannelValueList[channelId]
 
 
     async def create_telegram(self) -> bytes:
