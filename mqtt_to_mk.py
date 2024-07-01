@@ -9,8 +9,7 @@ logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s', level=loggi
 print('Script: mqtt_to_mk.py')
 print('Platform: ' + sys.platform)
 
-sys.path.append("lib") 
-from lib.mqtt_as import MQTTClient, config
+client = None
 
 sys.path.append("Advertiser") 
 # uncomment to choose advertiser
@@ -21,6 +20,18 @@ if (sys.platform == 'linux'):
     pass
 elif (sys.platform == 'rp2'):
     from Advertiser.AdvertiserMicroPython import AdvertiserMicroPython as Advertiser
+
+    from lib.mqtt_as import MQTTClient, config
+
+    # Local configuration
+    config['ssid'] = enter ssid
+    config['wifi_pw'] = enter password
+    config['server'] = '192.168.0.131'
+    config["queue_len"] = 1  # Use event interface with default queue size
+
+    #MQTTClient.DEBUG = True  # Optional: print diagnostic messages
+    client = MQTTClient(config)
+
     pass
 elif (sys.platform == 'win32'):
     from Advertiser.AdvertiserDummy import AdvertiserDummy as Advertiser
@@ -43,11 +54,6 @@ hub4 = MouldKing.Module4_0.Device1
 hub5 = MouldKing.Module4_0.Device2
 
 hubs = [hub0, hub1, hub2, hub3, hub4, hub5]
-
-# Local configuration
-config['ssid'] = enter ssid
-config['wifi_pw'] = enter password
-config['server'] = '192.168.0.131'
 
 async def messages(client):  # Respond to incoming messages
     async for topic, msg, retained in client.queue:
@@ -123,9 +129,6 @@ async def main(client):
 
         #     hubId += 1
 
-config["queue_len"] = 1  # Use event interface with default queue size
-#MQTTClient.DEBUG = True  # Optional: print diagnostic messages
-client = MQTTClient(config)
 try:
     asyncio.run(main(client))
 finally:
