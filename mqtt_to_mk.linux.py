@@ -5,10 +5,10 @@
 mqtt_brocker_ip = '192.168.0.131' # set ip-adress of mqtt broker
 mqtt_reconnect_interval = 3  # [seconds]
 
-mqtt_topic_base = 'mk'
+mqtt_topic_base = 'mouldking'
 mqtt_topic_hub = mqtt_topic_base + '/hub{hubId:}'
-mqtt_topic_advertisementIdentifier = mqtt_topic_hub + '/advertisementIdentifier'
-mqtt_topic_type = mqtt_topic_hub + '/type'
+mqtt_topic_advertisementIdentifier = mqtt_topic_hub + '/info/advertisementIdentifier'
+mqtt_topic_type = mqtt_topic_hub + '/info/typename'
 mqtt_topic_connect = mqtt_topic_hub + '/connect'
 mqtt_topic_channel = mqtt_topic_hub + '/channel{channelId:}'
 
@@ -86,12 +86,15 @@ async def publish_hub_state(mqtt_Client, hub: IAdvertisingDevice, hubId: int) ->
     :param hubId: id of the hub
     :return: returns nothing
     """
-    await mqtt_Client.publish(mqtt_topic_advertisementIdentifier.format(hubId = hubId), hub.get_advertisement_identifier(), qos = 1)
-    await mqtt_Client.publish(mqtt_topic_type.format(hubId = hubId), hub.get_typename(), qos = 1)
-    await mqtt_Client.publish(mqtt_topic_connect.format(hubId = hubId), str((int(hub.get_is_connected()))), qos = 1)
+    # info:
+    await mqtt_Client.publish(mqtt_topic_type.format(hubId = hubId), hub.get_typename())
+    await mqtt_Client.publish(mqtt_topic_advertisementIdentifier.format(hubId = hubId), hub.get_advertisement_identifier())
+
+    # command
+    await mqtt_Client.publish(mqtt_topic_connect.format(hubId = hubId), str((int(hub.get_is_connected()))))
 
     for channelId in range(hub.get_number_of_channels()):
-        await mqtt_Client.publish(mqtt_topic_channel.format(hubId = hubId, channelId = channelId), str(hub.get_channel(channelId)), qos = 1)
+        await mqtt_Client.publish(mqtt_topic_channel.format(hubId = hubId, channelId = channelId), str(hub.get_channel(channelId)))
 
 
 async def process_mqtt_message(mqtt_client, topic_str: str, msg_str: str) -> None:
