@@ -1,5 +1,11 @@
-# This is an example 
+# This example connects to a mqtt-broker and publishes the states of all hubs.
+# Each hub creates an own topic containing sub-topics for 'connect' and each 'channel'.
+# By modifying the topics 'connect' and 'channel' i.e. with a mqtt-client you can control
+# the hubs and set the values of the hub's channels.
 #
+# This example uses asyncio-mqtt (https://pypi.org/project/asyncio-mqtt/) wich has to be
+# installed first.
+
 
 # settings
 mqtt_brocker_ip = '192.168.0.131' # set ip-adress of mqtt broker
@@ -7,8 +13,9 @@ mqtt_reconnect_interval = 3  # [seconds]
 
 mqtt_topic_base = 'mouldking'
 mqtt_topic_hub = mqtt_topic_base + '/hub{hubId:}'
-mqtt_topic_advertisementIdentifier = mqtt_topic_hub + '/info/advertisementIdentifier'
-mqtt_topic_type = mqtt_topic_hub + '/info/typename'
+mqtt_topic_info = mqtt_topic_hub + '/info'
+mqtt_topic_advertisementIdentifier = mqtt_topic_info + '/advertisementIdentifier'
+mqtt_topic_type = mqtt_topic_info + '/typename'
 mqtt_topic_connect = mqtt_topic_hub + '/connect'
 mqtt_topic_channel = mqtt_topic_hub + '/channel{channelId:}'
 
