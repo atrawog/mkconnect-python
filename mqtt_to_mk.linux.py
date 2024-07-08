@@ -2,18 +2,19 @@ import asyncio
 import logging
 import sys
 
+# create and setup logger
 logger = logging.getLogger(__name__)
-
 logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s', level=logging.INFO)
 
-print('Script: mqtt_to_mk.py')
+print('Script: mqtt_to_mk.linux.py')
 print('Platform: ' + sys.platform)
 
-client = None
+# set ip-adress of mqtt broker
+mqttbrockerip = '192.168.0.131'
 
 sys.path.append("Advertiser") 
-# uncomment to choose advertiser
 if (sys.platform == 'linux'):
+    # uncomment to choose advertiser
     #from Advertiser.AdvertiserHCITool import AdvertiserHCITool as Advertiser
     #from Advertiser.AdvertiserBTMgmt import AdvertiserBTMgmt as Advertiser
     from Advertiser.AdvertiserBTSocket import AdvertiserBTSocket as Advertiser
@@ -21,24 +22,12 @@ if (sys.platform == 'linux'):
     from contextlib import AsyncExitStack, asynccontextmanager
     from random import randrange
     from asyncio_mqtt import Client, MqttError    
+
+    # Connect to the MQTT broker
+    def createClient():
+        return Client(mqttbrockerip)
+   
     pass
-elif (sys.platform == 'rp2'):
-    from Advertiser.AdvertiserMicroPython import AdvertiserMicroPython as Advertiser
-
-    from lib.mqtt_as import MQTTClient, config
-
-    # Local configuration
-    config['ssid'] = ''
-    config['wifi_pw'] = 'enter password'
-    config['server'] = '192.168.0.131'
-    config["queue_len"] = 1  # Use event interface with default queue size
-
-    #MQTTClient.DEBUG = True  # Optional: print diagnostic messages
-    client = MQTTClient(config)
-
-    pass
-elif (sys.platform == 'win32'):
-    from Advertiser.AdvertiserDummy import AdvertiserDummy as Advertiser
 else:
     raise Exception('unsupported platform')
 
@@ -57,56 +46,122 @@ hub3 = MouldKing.Module4_0.Device0
 hub4 = MouldKing.Module4_0.Device1
 hub5 = MouldKing.Module4_0.Device2
 
+# array of all hubs
 hubs = [hub0, hub1, hub2, hub3, hub4, hub5]
 
-async def process(topic_str: str, msg_str: str):
+
+async def publish_hubs(mqtt_Client) -> None:
+    """ for all hubs publish current state and channel values with the given mqtt-client
+
+    :param mqtt_Client: mqtt_Client
+    :return: returns nothing
+    """
+    hubId: int = 0
+    for hub in hubs:
+        await publish_hub_state(mqtt_Client, hub, hubId)
+
+        hubId += 1
+
+
+async def publish_hub_state(mqtt_Client, hub, hubId: int) -> None:
+    """ publish current state and channel values of the given hub with the given mqtt-client
+
+    :param mqtt_Client: mqtt_Client
+    :param hub: hub
+    :param hubId: id of the hub
+    :return: returns nothing
+    """
+    await mqtt_Client.publish(f'mk/hub{hubId}/AdvertisementIdentifier', hub.get_advertisement_identifier(), qos = 1)
+    await mqtt_Client.publish(f'mk/hub{hubId}/connect', str((int(hub.get_is_connected()))), qos = 1)
+
+    for channelId in range(hub.get_number_of_channels()):
+        await mqtt_Client.publish(f'mk/hub{hubId}/channel{channelId}', str(hub.get_channel(channelId)), qos = 1)
+
+
+async def process_mqtt_message(mqtt_client, topic_str: str, msg_str: str) -> None:
+    """ process the incomming mqtt messages
+
+    :param mqtt_Client: mqtt_Client
+    :param topic_str: topic string
+    :param msg_str: message string
+    :return: returns nothing
+    """
     try:
         if(topic_str.startswith('mk/hub')):
+            # extract hubId from message
             hubId = int(topic_str[6])
 
             if(hubId < 0 or hubId >= len(hubs)):
                 return
             
+            # take hub from array
             hub = hubs[hubId]
 
+            # command 'connect'
             if('connect' in topic_str):
-                if(msg_str == '1'):
+                mqttValue = bool(msg_str == '1')
+                currentValue: bool = hub.get_is_connected()
+
+                # only set on changed value
+                if(mqttValue == currentValue):
+                    return
+                
+                if(mqttValue):
                     await hub.connect()
                 else:
                     await hub.disconnect()
+                    # update state
+                    # on disconnect all channel values are set to 0
+                    await publish_hub_state(mqtt_client, hub, hubId)
 
+            # command 'channel'
             elif('channel' in topic_str):
                 channelStartIndex = topic_str.index('channel') + len('channel')
                 channelId = int(topic_str[channelStartIndex :])
                 
-                # print(f'channelStartIndex: {channelStartIndex} channelId: {channelId}')
+                if(channelId < 0 or channelId >= hub.get_number_of_channels()):
+                    return
 
-                if(channelId >= 0 and channelId < hub.get_number_of_channels()):
-                    await hub.set_channel(channelId, float(msg_str))
+                mqttValue = float(msg_str)
+                currentValue = hub.get_channel(channelId)
+
+                # only set on changed value
+                if(mqttValue == currentValue):
+                    return
+                
+                await hub.set_channel(channelId, mqttValue)
+                # update state
+                # await publish_hub_state(mqtt_client, hub, hubId)
     except:
         pass
 
-async def messages(client):  # Respond to incoming messages
-    async for topic, msg, retained in client.queue:
+
+async def process_mqtt_messages(mqtt_client, messages) -> None:
+    """ process all incoming messages
+
+    :param mqtt_client: mqtt_client
+    :param messages: list of messages to process
+    :return: returns nothing
+    """
+    async for message in messages:
+        await process_mqtt_message(mqtt_client, message.topic, message.payload.decode())
+
+
+async def cancel_tasks(tasks) -> None:
+    """ cancel each task in given list
+
+    :param tasks: list of tasks to cancel
+    :return: returns nothing
+    """
+    for task in tasks:
+        task.cancel()
         try:
-            topic_str = topic.decode()
-            msg_str = msg.decode()
-
-            await process(topic_str, msg_str)
-
-        except:
+            await task
+        except asyncio.CancelledError:
             pass
 
 
-async def up(client):  # Respond to connectivity being (re)established
-    while True:
-        await client.up.wait()  # Wait on an Event
-        client.up.clear()
-        await client.subscribe('mk/#', 1)  # renew subscriptions
-        print('up')
-
-
-async def advanced_example():
+async def connect_mqtt():
     # We 💛 context managers. Let's create a stack to help
     # us manage them.
     async with AsyncExitStack() as stack:
@@ -116,7 +171,7 @@ async def advanced_example():
         stack.push_async_callback(cancel_tasks, tasks)
 
         # Connect to the MQTT broker
-        client = Client("192.168.0.131")
+        client = createClient()
         await stack.enter_async_context(client)
 
         # You can create any number of topic filters
@@ -125,93 +180,42 @@ async def advanced_example():
             #"floors/rooftop/#"
             # 👉 Try to add more filters!
         )
+
         for topic_filter in topic_filters:
             # Log all messages that matches the filter
             manager = client.filtered_messages(topic_filter)
             messages = await stack.enter_async_context(manager)
-            task = asyncio.create_task(process_messages(messages))
+            task = asyncio.create_task(process_mqtt_messages(client, messages))
             tasks.add(task)
-
-        # Messages that doesn't match a filter will get logged here
-        messages = await stack.enter_async_context(client.unfiltered_messages())
-        task = asyncio.create_task(log_messages(messages, "[unfiltered] {}"))
-        tasks.add(task)
 
         # Subscribe to topic(s)
         # 🤔 Note that we subscribe *after* starting the message
         # loggers. Otherwise, we may miss retained messages.
         await client.subscribe("mk/#")
 
-        # Publish a random value to each of these topics
-        topics = (
-            "floors/basement/humidity",
-            "floors/rooftop/humidity",
-            "floors/rooftop/illuminance",
-            # 👉 Try to add more topics!
-        )
-#        task = asyncio.create_task(post_to_topics(client, topics))
-#        tasks.add(task)
-
-        task = asyncio.create_task(post_init(client))
+        task = asyncio.create_task(publish_hubs(client))
         tasks.add(task)
 
         # Wait for everything to complete (or fail due to, e.g., network
         # errors)
         await asyncio.gather(*tasks)
 
-async def post_init(client):
-    # init topics
-    hubId = 0
-    for hub in hubs:
-        await client.publish(f'mk/hub{hubId}/AdvertisementIdentifier', hub.get_advertisement_identifier(), qos = 1)
-        await client.publish(f'mk/hub{hubId}/connect', '{}'.format(0), qos = 1)
-
-        for channelId in range(hub.get_number_of_channels()):
-            await client.publish(f'mk/hub{hubId}/channel{channelId}', '{}'.format(0), qos = 1)
-
-        hubId += 1
-
-    await MouldKing.set_advertiser(advertiser)
-
-
-async def post_to_topics(client, topics):
-    while True:
-        for topic in topics:
-            message = randrange(100)
-            print(f'[topic="{topic}"] Publishing message={message}')
-            await client.publish(topic, message, qos=1)
-            await asyncio.sleep(2)
-
-async def log_messages(messages, template):
-    async for message in messages:
-        print(template.format(message.payload.decode()))
-#        await process(message.topic, message.payload.decode())
-
-async def process_messages(messages):
-    async for message in messages:
-        await process(message.topic, message.payload.decode())
-
-
-async def cancel_tasks(tasks):
-    for task in tasks:
-        task.cancel()
-        try:
-            await task
-        except asyncio.CancelledError:
-            pass
 
 async def main():
+    # set advertiser to all hubs
+    await MouldKing.set_advertiser(advertiser)
 
-    # Run the advanced_example indefinitely. Reconnect automatically
-    # if the connection is lost.
+    # Run the connect_mqtt indefinitely.
+    # Reconnect automatically if the connection is lost.
     reconnect_interval = 3  # [seconds]
     while True:
         try:
-            await advanced_example()
+            await connect_mqtt()
         except MqttError as error:
             print(f'Error "{error}". Reconnecting in {reconnect_interval} seconds.')
         finally:
             await asyncio.sleep(reconnect_interval)
 
 
-asyncio.run(main())
+if __name__ == "__main__":
+    asyncio.run(main())
