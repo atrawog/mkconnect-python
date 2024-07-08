@@ -12,7 +12,8 @@ mqtt_brocker_ip = '192.168.0.131' # set ip-adress of mqtt broker
 mqtt_reconnect_interval = 3  # [seconds]
 
 mqtt_topic_base = 'mouldking'
-mqtt_topic_hub = mqtt_topic_base + '/hub{hubId:}'
+mqtt_topic_hub_base = mqtt_topic_base + '/hub'
+mqtt_topic_hub = mqtt_topic_hub_base + '{hubId:}'
 mqtt_topic_info = mqtt_topic_hub + '/info'
 mqtt_topic_advertisementIdentifier = mqtt_topic_info + '/advertisementIdentifier'
 mqtt_topic_type = mqtt_topic_info + '/typename'
@@ -113,9 +114,9 @@ async def process_mqtt_message(mqtt_client, topic_str: str, msg_str: str) -> Non
     :return: returns nothing
     """
     try:
-        if(topic_str.startswith('mk/hub')):
+        if(topic_str.startswith(mqtt_topic_hub_base)):
             # extract hubId from message
-            hubId = int(topic_str[6])
+            hubId = int(topic_str[len(mqtt_topic_hub_base)])
 
             if(hubId < 0 or hubId >= len(hubs)):
                 return
