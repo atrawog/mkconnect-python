@@ -1,3 +1,18 @@
+# This is an example 
+#
+
+# settings
+mqtt_brocker_ip = '192.168.0.131' # set ip-adress of mqtt broker
+mqtt_reconnect_interval = 3  # [seconds]
+
+mqtt_topic_base = 'mk'
+mqtt_topic_hub = mqtt_topic_base + '/hub{hubId:}'
+mqtt_topic_advertisementIdentifier = mqtt_topic_hub + '/advertisementIdentifier'
+mqtt_topic_type = mqtt_topic_hub + '/type'
+mqtt_topic_connect = mqtt_topic_hub + '/connect'
+mqtt_topic_channel = mqtt_topic_hub + '/channel{channelId:}'
+
+
 import asyncio
 import logging
 import sys
@@ -9,10 +24,9 @@ logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s', level=loggi
 print('Script: mqtt_to_mk.linux.py')
 print('Platform: ' + sys.platform)
 
-# set ip-adress of mqtt broker
-mqttbrockerip = '192.168.0.131'
+sys.path.append("Advertiser")
+from Advertiser.IAdvertisingDevice import IAdvertisingDevice
 
-sys.path.append("Advertiser") 
 if (sys.platform == 'linux'):
     # uncomment to choose advertiser
     #from Advertiser.AdvertiserHCITool import AdvertiserHCITool as Advertiser
@@ -23,9 +37,9 @@ if (sys.platform == 'linux'):
     from random import randrange
     from asyncio_mqtt import Client, MqttError    
 
-    # Connect to the MQTT broker
+    # funkction to create MQTT-client
     def createClient():
-        return Client(mqttbrockerip)
+        return Client(mqtt_brocker_ip)
    
     pass
 else:
@@ -50,6 +64,7 @@ hub5 = MouldKing.Module4_0.Device2
 hubs = [hub0, hub1, hub2, hub3, hub4, hub5]
 
 
+
 async def publish_hubs(mqtt_Client) -> None:
     """ for all hubs publish current state and channel values with the given mqtt-client
 
@@ -63,7 +78,7 @@ async def publish_hubs(mqtt_Client) -> None:
         hubId += 1
 
 
-async def publish_hub_state(mqtt_Client, hub, hubId: int) -> None:
+async def publish_hub_state(mqtt_Client, hub: IAdvertisingDevice, hubId: int) -> None:
     """ publish current state and channel values of the given hub with the given mqtt-client
 
     :param mqtt_Client: mqtt_Client
@@ -71,11 +86,12 @@ async def publish_hub_state(mqtt_Client, hub, hubId: int) -> None:
     :param hubId: id of the hub
     :return: returns nothing
     """
-    await mqtt_Client.publish(f'mk/hub{hubId}/AdvertisementIdentifier', hub.get_advertisement_identifier(), qos = 1)
-    await mqtt_Client.publish(f'mk/hub{hubId}/connect', str((int(hub.get_is_connected()))), qos = 1)
+    await mqtt_Client.publish(mqtt_topic_advertisementIdentifier.format(hubId = hubId), hub.get_advertisement_identifier(), qos = 1)
+    await mqtt_Client.publish(mqtt_topic_type.format(hubId = hubId), hub.get_typename(), qos = 1)
+    await mqtt_Client.publish(mqtt_topic_connect.format(hubId = hubId), str((int(hub.get_is_connected()))), qos = 1)
 
     for channelId in range(hub.get_number_of_channels()):
-        await mqtt_Client.publish(f'mk/hub{hubId}/channel{channelId}', str(hub.get_channel(channelId)), qos = 1)
+        await mqtt_Client.publish(mqtt_topic_channel.format(hubId = hubId, channelId = channelId), str(hub.get_channel(channelId)), qos = 1)
 
 
 async def process_mqtt_message(mqtt_client, topic_str: str, msg_str: str) -> None:
@@ -130,8 +146,11 @@ async def process_mqtt_message(mqtt_client, topic_str: str, msg_str: str) -> Non
                     return
                 
                 await hub.set_channel(channelId, mqttValue)
-                # update state
-                # await publish_hub_state(mqtt_client, hub, hubId)
+
+            # unhandled command
+            else:
+                pass
+
     except:
         pass
 
@@ -176,7 +195,7 @@ async def connect_mqtt():
 
         # You can create any number of topic filters
         topic_filters = (
-            "mk/#",
+            mqtt_topic_base + "/#",
             #"floors/rooftop/#"
             # 👉 Try to add more filters!
         )
@@ -191,7 +210,7 @@ async def connect_mqtt():
         # Subscribe to topic(s)
         # 🤔 Note that we subscribe *after* starting the message
         # loggers. Otherwise, we may miss retained messages.
-        await client.subscribe("mk/#")
+        await client.subscribe(mqtt_topic_base + "/#")
 
         task = asyncio.create_task(publish_hubs(client))
         tasks.add(task)
@@ -207,14 +226,13 @@ async def main():
 
     # Run the connect_mqtt indefinitely.
     # Reconnect automatically if the connection is lost.
-    reconnect_interval = 3  # [seconds]
     while True:
         try:
             await connect_mqtt()
         except MqttError as error:
-            print(f'Error "{error}". Reconnecting in {reconnect_interval} seconds.')
+            print(f'Error "{error}". Reconnecting in {mqtt_reconnect_interval} seconds.')
         finally:
-            await asyncio.sleep(reconnect_interval)
+            await asyncio.sleep(mqtt_reconnect_interval)
 
 
 if __name__ == "__main__":

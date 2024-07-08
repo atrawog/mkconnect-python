@@ -34,6 +34,15 @@ class MouldKing_Hub_4(IAdvertisingDevice) :
         self._NumberOfChannels = 4
 
 
+    def get_typename(self) -> str:
+        """ Returns the typename of the device.
+        This Methode has to be overridden by the implementation of the AdvertisingDevice!
+
+        :return: returns a string containing the typename
+        """
+        return MouldKing_Hub_4._MouldKing_4_Hubs.get_typename() + f' - device {self._deviceId}'
+
+
     def get_number_of_channels(self) -> int:
         """ Returns the number of channels.
         This Methode has to be overridden by the implementation of the AdvertisingDevice!

@@ -34,6 +34,15 @@ class MouldKing_Hubs_4_12Ch(MouldKingHub_Nibble) :
         self._connectedSubDevices = list()
 
 
+    def get_typename(self) -> str:
+        """ Returns the typename of the device.
+        This Methode has to be overridden by the implementation of the AdvertisingDevice!
+
+        :return: returns a string containing the typename
+        """
+        return 'MouldKing Hub4.0'
+
+
     async def subDevice_register(self, subDevice: IAdvertisingDevice) -> None:
         """ returns the telegram to switch the MouldKing Hubs in bluetooth mode
         """

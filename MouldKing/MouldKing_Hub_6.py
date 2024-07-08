@@ -40,5 +40,15 @@ class MouldKing_Hub_6(MouldKingHub_Byte) :
         logger.debug("MouldKing_Hub_6.__init__")
 
 
+    def get_typename(self) -> str:
+        """ Returns the typename of the device.
+        This Methode has to be overridden by the implementation of the AdvertisingDevice!
+
+        :return: returns a string containing the typename
+        """
+        return 'MouldKing Hub6.0'
+
+
+
 
 

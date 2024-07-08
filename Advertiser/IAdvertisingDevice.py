@@ -13,6 +13,16 @@ class IAdvertisingDevice :
     To prevent cyclic imports caused by imports of Advertiser <--> AdvertisingDevice.
     """
 
+
+    def get_typename(self) -> str:
+        """ Returns the typename of the device.
+        This Methode has to be overridden by the implementation of the AdvertisingDevice!
+
+        :return: returns a string containing the typename
+        """
+        raise NotImplementedError # override this methode
+
+
     def get_advertisement_identifier(self) -> str:
         """ Returns the AdvertisementIdentifier to differentiate the Advertising-Data.
         The AdvertisementIdentifier is used to register the Advertising-Data object.
