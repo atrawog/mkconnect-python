@@ -32,6 +32,9 @@ logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s', level=loggi
 print('Script: mqtt_to_mk.linux.py')
 print('Platform: ' + sys.platform)
 
+sys.path.append("MouldKing") 
+from MouldKing.MouldKing import MouldKing
+
 sys.path.append("Advertiser")
 from Advertiser.IAdvertisingDevice import IAdvertisingDevice
 
@@ -48,20 +51,77 @@ if (sys.platform == 'linux'):
     def mqtt_create_client():
         logger.info('Creating MQTT-Client')
         return Client(mqtt_brocker_ip)
-    
+
+
     def bt_create_advertiser():
         logger.info('Creating Bluetooth-Advertiser')
         return Advertiser()
-   
+
+
+    async def mqtt_connect(mqtt_client):
+        # We 💛 context managers. Let's create a stack to help
+        # us manage them.
+        async with AsyncExitStack() as stack:
+            # Keep track of the asyncio tasks that we create, so that
+            # we can cancel them on exit
+            tasks = set()
+            stack.push_async_callback(cancel_tasks, tasks)
+
+            # Connect to the MQTT broker
+            await stack.enter_async_context(mqtt_client)
+
+            # You can create any number of topic filters
+            topic_filters = (
+                mqtt_topic_base + "/#",
+                #"floors/rooftop/#"
+                # 👉 Try to add more filters!
+            )
+
+            for topic_filter in topic_filters:
+                # Log all messages that matches the filter
+                manager = mqtt_client.filtered_messages(topic_filter)
+                messages = await stack.enter_async_context(manager)
+                task = asyncio.create_task(mqtt_process_messages(mqtt_client, messages))
+                tasks.add(task)
+
+            # Subscribe to topic(s)
+            # 🤔 Note that we subscribe *after* starting the message
+            # loggers. Otherwise, we may miss retained messages.
+            await mqtt_client.subscribe(mqtt_topic_base + "/#")
+
+            task = asyncio.create_task(mqtt_publish_hubs(mqtt_client))
+            tasks.add(task)
+
+            # Wait for everything to complete (or fail due to, e.g., network
+            # errors)
+            await asyncio.gather(*tasks)
+
+
+    async def mqtt_loop(mqtt_client):  # Respond to connectivity being (re)established
+        logger.info('Created task mqtt_loop')
+
+        # Run the connect_mqtt indefinitely.
+        # Reconnect automatically if the connection is lost.
+        while True:
+            try:
+                await mqtt_connect(mqtt_client)
+            except MqttError as error:
+                logger.info(f'Error "{error}". Reconnecting in {mqtt_reconnect_interval} seconds.')
+            finally:
+                await asyncio.sleep(mqtt_reconnect_interval)
+
+    async def mqtt_stop(mqtt_client):
+        pass
+
     pass
 
 else:
     raise Exception('unsupported platform')
 
-sys.path.append("MouldKing") 
-from MouldKing.MouldKing import MouldKing
+######################################################
+# globals
 
-# save pre-instantiated objects in local variables
+# save pre-instantiated objects in global variables
 hub0 = MouldKing.Module6_0.Device0
 hub1 = MouldKing.Module6_0.Device1
 hub2 = MouldKing.Module6_0.Device2
@@ -192,59 +252,6 @@ async def cancel_tasks(tasks) -> None:
             pass
 
 
-async def connect_mqtt(mqtt_client):
-    # We 💛 context managers. Let's create a stack to help
-    # us manage them.
-    async with AsyncExitStack() as stack:
-        # Keep track of the asyncio tasks that we create, so that
-        # we can cancel them on exit
-        tasks = set()
-        stack.push_async_callback(cancel_tasks, tasks)
-
-        # Connect to the MQTT broker
-        await stack.enter_async_context(mqtt_client)
-
-        # You can create any number of topic filters
-        topic_filters = (
-            mqtt_topic_base + "/#",
-            #"floors/rooftop/#"
-            # 👉 Try to add more filters!
-        )
-
-        for topic_filter in topic_filters:
-            # Log all messages that matches the filter
-            manager = mqtt_client.filtered_messages(topic_filter)
-            messages = await stack.enter_async_context(manager)
-            task = asyncio.create_task(mqtt_process_messages(mqtt_client, messages))
-            tasks.add(task)
-
-        # Subscribe to topic(s)
-        # 🤔 Note that we subscribe *after* starting the message
-        # loggers. Otherwise, we may miss retained messages.
-        await mqtt_client.subscribe(mqtt_topic_base + "/#")
-
-        task = asyncio.create_task(mqtt_publish_hubs(mqtt_client))
-        tasks.add(task)
-
-        # Wait for everything to complete (or fail due to, e.g., network
-        # errors)
-        await asyncio.gather(*tasks)
-
-
-async def mqtt_loop(mqtt_client):  # Respond to connectivity being (re)established
-    logger.info('Created task mqtt_loop')
-
-    # Run the connect_mqtt indefinitely.
-    # Reconnect automatically if the connection is lost.
-    while True:
-        try:
-            await connect_mqtt(mqtt_client)
-        except MqttError as error:
-            print(f'Error "{error}". Reconnecting in {mqtt_reconnect_interval} seconds.')
-        finally:
-            await asyncio.sleep(mqtt_reconnect_interval)
-
-
 async def main():
     try:
         # instantiate Advertiser
@@ -262,8 +269,8 @@ async def main():
             await asyncio.sleep(5)
 
     finally:
-        advertiser.advertisement_stop()
-        mqtt_client.close()  # Prevent LmacRxBlk:1 errors
+        await advertiser.advertisement_stop()
+        await mqtt_stop(mqtt_client)
 
 
 if __name__ == "__main__":
