@@ -84,7 +84,7 @@ class MouldKing_Hub_4(IAdvertisingDevice) :
         """
         await MouldKing_Hub_4._MouldKing_4_Hubs.subDevice_unregister(self)
 
-        self._connected = True
+        self._connected = False
 
         return 
 
