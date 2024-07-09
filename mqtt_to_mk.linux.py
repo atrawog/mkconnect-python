@@ -47,15 +47,16 @@ if (sys.platform == 'linux'):
     from contextlib import AsyncExitStack, asynccontextmanager
     from asyncio_mqtt import Client, MqttError    
 
-    # funkction to create MQTT-client
-    def mqtt_create_client():
-        logger.info('Creating MQTT-Client')
-        return Client(mqtt_brocker_ip)
-
-
+    # function to create BT-Advertiser
     def bt_create_advertiser():
         logger.info('Creating Bluetooth-Advertiser')
         return Advertiser()
+
+
+    # function to create MQTT-client
+    def mqtt_create_client():
+        logger.info('Creating MQTT-Client')
+        return Client(mqtt_brocker_ip)
 
 
     async def mqtt_connect(mqtt_client):
@@ -110,8 +111,57 @@ if (sys.platform == 'linux'):
             finally:
                 await asyncio.sleep(mqtt_reconnect_interval)
 
+
     async def mqtt_stop(mqtt_client):
+        logger.info('mqtt_stop')
         pass
+
+    pass
+
+elif (sys.platform == 'rp2'):
+    from Advertiser.AdvertiserMicroPython import AdvertiserMicroPython as Advertiser
+    from lib.mqtt_as import MQTTClient, config
+
+    # function to create BT-Advertiser
+    def bt_create_advertiser():
+        logger.info('Creating Bluetooth-Advertiser')
+        return Advertiser()
+
+
+    # function to create MQTT-client
+    def mqtt_create_Client():
+        logger.info('Creating MQTT-Client')
+        # Local configuration
+        # config['ssid'] = enter ssid
+        # config['wifi_pw'] = enter password
+        config['ssid'] = "Tartaros.Air"
+        config['wifi_pw'] = "airM@us=="
+        config['server'] = mqtt_brocker_ip
+        config["queue_len"] = 1  # Use event interface with default queue size
+
+        #MQTTClient.DEBUG = True  # Optional: print diagnostic messages
+        return MQTTClient(config)
+    
+
+    async def mqtt_loop(mqtt_client):  # Respond to connectivity being (re)established
+        logger.info('Created task mqtt_loop')
+
+        await mqtt_client.connect()
+        logger.info('MQTT-Client connected')
+
+        for coroutine in (mqtt_process_messages, mqtt_publish_hubs):
+            asyncio.create_task(coroutine(mqtt_client))
+
+        while True:
+            await mqtt_client.up.wait()  # Wait on an Event
+            mqtt_client.up.clear()
+            await mqtt_client.subscribe(mqtt_topic_base + '/#', 1)  # renew subscriptions
+
+
+    async def mqtt_stop(mqtt_client):
+        logger.info('mqtt_stop')
+        if(mqtt_client is not None):
+            mqtt_client.close()  # Prevent LmacRxBlk:1 errors
 
     pass
 
@@ -258,17 +308,23 @@ async def main():
         advertiser = bt_create_advertiser()
         await MouldKing.set_advertiser(advertiser)
 
+        print("CC")
         # instantiate MQTT-Client
         mqtt_client = mqtt_create_client()
 
+        print("DD")
         # run mqtt-loop
         asyncio.create_task(mqtt_loop(mqtt_client))
 
         # main-loop
         while True:
+            print("loop")
             await asyncio.sleep(5)
-
+    except Exception as exception:
+        logger.error(str(exception))
+        
     finally:
+        print("finally")
         await advertiser.advertisement_stop()
         await mqtt_stop(mqtt_client)
 
