@@ -112,6 +112,17 @@ if (sys.platform == 'linux'):
                 await asyncio.sleep(mqtt_reconnect_interval)
 
 
+    async def mqtt_process_messages(mqtt_client, messages) -> None:
+        """ process all incoming messages
+
+        :param mqtt_client: mqtt_client
+        :param messages: list of messages to process
+        :return: returns nothing
+        """
+        async for message in messages:
+            await mqtt_process_message(mqtt_client, message.topic, message.payload.decode())
+
+
     async def mqtt_stop(mqtt_client):
         logger.info('mqtt_stop')
         pass
@@ -134,8 +145,8 @@ elif (sys.platform == 'rp2'):
         # Local configuration
         # config['ssid'] = enter ssid
         # config['wifi_pw'] = enter password
-        config['ssid'] = "Tartaros.Air"
-        config['wifi_pw'] = "airM@us=="
+        config['ssid'] = enter ssid
+        config['wifi_pw'] = enter password
         config['server'] = mqtt_brocker_ip
         config["queue_len"] = 1  # Use event interface with default queue size
 
@@ -156,6 +167,21 @@ elif (sys.platform == 'rp2'):
             await mqtt_client.up.wait()  # Wait on an Event
             mqtt_client.up.clear()
             await mqtt_client.subscribe(mqtt_topic_base + '/#', 1)  # renew subscriptions
+
+
+    async def mqtt_process_messages(mqtt_client):  # Respond to incoming messages
+        logger.info('Created task mqtt_process_messages')
+
+        async for topic, msg, retained in mqtt_client.queue:
+            try:
+                topic_str = topic.decode()
+                msg_str = msg.decode()
+
+                logger.info(topic_str)
+
+                await mqtt_process_message(mqtt_client, topic_str, msg_str)
+            except:
+                pass
 
 
     async def mqtt_stop(mqtt_client):
@@ -230,17 +256,6 @@ async def mqtt_publish_hub_state(mqtt_Client, hub: IAdvertisingDevice, hubId: in
 
     for channelId in range(hub.get_number_of_channels()):
         await mqtt_Client.publish(mqtt_topic_channel.format(hubId = hubId, channelId = channelId), str(hub.get_channel(channelId)))
-
-
-async def mqtt_process_messages(mqtt_client, messages) -> None:
-    """ process all incoming messages
-
-    :param mqtt_client: mqtt_client
-    :param messages: list of messages to process
-    :return: returns nothing
-    """
-    async for message in messages:
-        await mqtt_process_message(mqtt_client, message.topic, message.payload.decode())
 
 
 async def mqtt_process_message(mqtt_client, topic_str: str, msg_str: str) -> None:
@@ -324,11 +339,9 @@ async def main():
         advertiser = bt_create_advertiser()
         await MouldKing.set_advertiser(advertiser)
 
-        print("CC")
         # instantiate MQTT-Client
         mqtt_client = mqtt_create_client()
 
-        print("DD")
         # run mqtt-loop
         asyncio.create_task(mqtt_loop(mqtt_client))
 
@@ -336,6 +349,7 @@ async def main():
         while True:
             print("loop")
             await asyncio.sleep(5)
+
     except Exception as exception:
         logger.error(str(exception))
         
