@@ -28,7 +28,7 @@ class AdvertiserMicroPython(Advertiser) :
     """
 
     # Number of repetitions per second
-    _repetitions_per_second = 4     
+    _repetitions_per_second = 50
 
 
     def __init__(self):

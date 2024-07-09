@@ -26,7 +26,7 @@ class AdvertiserBTMgmt(Advertiser) :
     _BTMgmt_path: str = '/usr/bin/btmgmt'
 
     # Number of repetitions per second
-    _RepetitionsPerSecond: int = 4
+    _RepetitionsPerSecond: int = 50
 
 
     def __init__(self):

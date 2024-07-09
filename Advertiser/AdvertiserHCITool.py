@@ -25,7 +25,7 @@ class AdvertiserHCITool(Advertiser) :
     HCITool_path = '/usr/bin/hcitool'
 
     # We want to repeat each command 
-    _RepetitionsPerSecond = 4
+    _RepetitionsPerSecond = 50
 
 
     def __init__(self):
