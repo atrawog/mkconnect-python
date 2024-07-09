@@ -37,9 +37,9 @@ from Advertiser.IAdvertisingDevice import IAdvertisingDevice
 
 if (sys.platform == 'linux'):
     # uncomment to choose advertiser
-    #from Advertiser.AdvertiserHCITool import AdvertiserHCITool as Advertiser
-    #from Advertiser.AdvertiserBTMgmt import AdvertiserBTMgmt as Advertiser
-    from Advertiser.AdvertiserBTSocket import AdvertiserBTSocket as Advertiser
+    # from Advertiser.AdvertiserHCITool import AdvertiserHCITool as Advertiser      # worsest choice
+    # from Advertiser.AdvertiserBTMgmt import AdvertiserBTMgmt as Advertiser        # should work
+    from Advertiser.AdvertiserBTSocket import AdvertiserBTSocket as Advertiser      # best choice
 
     from contextlib import AsyncExitStack, asynccontextmanager
     from random import randrange
