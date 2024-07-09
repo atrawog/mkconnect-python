@@ -20,7 +20,7 @@ mqtt_topic_type = mqtt_topic_info + '/typename'
 mqtt_topic_connect = mqtt_topic_hub + '/connect'
 mqtt_topic_channel = mqtt_topic_hub + '/channel{channelId:}'
 
-
+# imports
 import asyncio
 import logging
 import sys
@@ -48,6 +48,9 @@ if (sys.platform == 'linux'):
     # funkction to create MQTT-client
     def createClient():
         return Client(mqtt_brocker_ip)
+    
+    def createAdvertiser():
+        return Advertiser()
    
     pass
 else:
@@ -55,9 +58,6 @@ else:
 
 sys.path.append("MouldKing") 
 from MouldKing.MouldKing import MouldKing
-
-# instantiate Advertiser
-advertiser = Advertiser()
 
 # save pre-instantiated objects in local variables
 hub0 = MouldKing.Module6_0.Device0
@@ -232,6 +232,8 @@ async def connect_mqtt():
 
 
 async def main():
+    # instantiate Advertiser
+    advertiser = Advertiser()
     # set advertiser to all hubs
     await MouldKing.set_advertiser(advertiser)
 
