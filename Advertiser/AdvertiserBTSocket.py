@@ -40,7 +40,7 @@ class AdvertiserBTSocket(Advertiser) :
 
 
     # Number of repetitions per second
-    _RepetitionsPerSecond = 4
+    _RepetitionsPerSecond = 50
 
 
     def __init__(self):
@@ -214,7 +214,8 @@ class AdvertiserBTSocket(Advertiser) :
                 self._advertisementTable[advertisementIdentifier] = advertisementCommand
 
                 # for quick change handle immediately
-                timeSlot = self._calc_timeSlot_s()
+                arrayLen = len(self._advertisementTable)
+                timeSlot = self._calc_timeSlot_s(arrayLen)
                 await self._advertise(advertisementCommand, timeSlot)
 
         # start publish thread if necessary
@@ -241,13 +242,14 @@ class AdvertiserBTSocket(Advertiser) :
 
                     # make a copy of the table to release the lock as quick as possible
                     copy_of_advertisementTable = self._advertisementTable.copy()
+                    arrayLen = len(copy_of_advertisementTable)
 
-                    # calc time for one publishing slot
-                    timeSlot = self._calc_timeSlot_s()
-                
-                if(len(copy_of_advertisementTable) == 0):
+                if(arrayLen == 0):
                     pass
                 else:
+                    # calc time for one publishing slot
+                    timeSlot = self._calc_timeSlot_s(arrayLen)
+                
                     for key, advertisementCommand in copy_of_advertisementTable.items():
                         # stop publishing?
                         if(not self._advertisement_task_Run):
@@ -258,14 +260,14 @@ class AdvertiserBTSocket(Advertiser) :
                 pass
 
 
-    def _calc_timeSlot_s(self) -> float:
+    def _calc_timeSlot_s(self, arrayLen: int) -> float:
         """ Calculates the timespan in seconds for each timeslot
 
         :return: returns the timespan for the slot in seconds
         """
 
         # timeSlot = 1 second / repetitionsPerSecond / len(self._advertisementTable)
-        timeSlot = 1 / self._RepetitionsPerSecond / max(1, len(self._advertisementTable))
+        timeSlot = 1 / self._RepetitionsPerSecond / max(1, arrayLen)
         return timeSlot
 
 
