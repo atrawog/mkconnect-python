@@ -129,7 +129,7 @@ elif (sys.platform == 'rp2'):
 
 
     # function to create MQTT-client
-    def mqtt_create_Client():
+    def mqtt_create_client():
         logger.info('Creating MQTT-Client')
         # Local configuration
         # config['ssid'] = enter ssid
@@ -160,8 +160,24 @@ elif (sys.platform == 'rp2'):
 
     async def mqtt_stop(mqtt_client):
         logger.info('mqtt_stop')
-        if(mqtt_client is not None):
-            mqtt_client.close()  # Prevent LmacRxBlk:1 errors
+        mqtt_client.close()  # Prevent LmacRxBlk:1 errors
+
+    pass
+
+elif (sys.platform == 'win32'):
+    from Advertiser.AdvertiserDummy import AdvertiserDummy as Advertiser
+
+    def bt_create_advertiser():
+        return Advertiser()
+
+    def mqtt_create_client():
+        return None
+
+    async def mqtt_loop(mqtt_client):       
+        pass
+
+    async def mqtt_stop(mqtt_client):
+        pass
 
     pass
 

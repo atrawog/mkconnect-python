@@ -25,21 +25,17 @@ print('Platform: ' + sys.platform)
 sys.path.append("Advertiser") 
 from Advertiser.IAdvertisingDevice import IAdvertisingDevice
 
-if (sys.platform == 'linux'):
-    # uncomment to choose advertiser
-    #from Advertiser.AdvertiserHCITool import AdvertiserHCITool as Advertiser
-    #from Advertiser.AdvertiserBTMgmt import AdvertiserBTMgmt as Advertiser
-    from Advertiser.AdvertiserBTSocket import AdvertiserBTSocket as Advertiser
-    
-    pass
-
-elif (sys.platform == 'rp2'):
+if (sys.platform == 'rp2'):
     from Advertiser.AdvertiserMicroPython import AdvertiserMicroPython as Advertiser
-
     from lib.mqtt_as import MQTTClient, config
 
+    def bt_create_advertiser():
+        logger.info('Creating Bluetooth-Advertiser')
+        return Advertiser()
+
+
     # function to create MQTT-client
-    def mqtt_create_Client():
+    def mqtt_create_client():
         logger.info('Creating MQTT-Client')
         # Local configuration
         # config['ssid'] = enter ssid
@@ -51,11 +47,6 @@ elif (sys.platform == 'rp2'):
 
         #MQTTClient.DEBUG = True  # Optional: print diagnostic messages
         return MQTTClient(config)
-    
-
-    def bt_create_advertiser():
-        logger.info('Creating Bluetooth-Advertiser')
-        return Advertiser()
 
 
     async def mqtt_loop(mqtt_client):  # Respond to connectivity being (re)established
@@ -72,19 +63,26 @@ elif (sys.platform == 'rp2'):
             mqtt_client.up.clear()
             await mqtt_client.subscribe(mqtt_topic_base + '/#', 1)  # renew subscriptions
 
+
+    async def mqtt_stop(mqtt_client):
+        logger.info('mqtt_stop')
+        mqtt_client.close()  # Prevent LmacRxBlk:1 errors
+
     pass
 
 elif (sys.platform == 'win32'):
     from Advertiser.AdvertiserDummy import AdvertiserDummy as Advertiser
 
-    # function to create MQTT-client
-    def mqtt_create_Client():
-        return None
-
     def bt_create_advertiser():
         return Advertiser()
 
+    def mqtt_create_client():
+        return None
+
     async def mqtt_loop(mqtt_client):       
+        pass
+
+    async def mqtt_stop(mqtt_client):
         pass
 
     pass
@@ -115,7 +113,6 @@ async def mqtt_publish_hubs(mqtt_Client) -> None:
     hubId: int = 0
     for hub in hubs:
         await mqtt_publish_hub_state(mqtt_Client, hub, hubId)
-
         hubId += 1
 
 
@@ -221,7 +218,7 @@ async def main():
         await MouldKing.set_advertiser(advertiser)
 
         # instantiate MQTT-Client
-        mqtt_client = mqtt_create_Client()
+        mqtt_client = mqtt_create_client()
 
         # run mqtt-loop
         asyncio.create_task(mqtt_loop(mqtt_client))
@@ -232,7 +229,7 @@ async def main():
 
     finally:
         await advertiser.advertisement_stop()
-        mqtt_client.close()  # Prevent LmacRxBlk:1 errors
+        await mqtt_stop(mqtt_client)
 
 
 if __name__ == "__main__":
