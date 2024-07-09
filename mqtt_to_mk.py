@@ -149,8 +149,8 @@ elif (sys.platform == 'rp2'):
         # Local configuration
         # config['ssid'] = enter ssid
         # config['wifi_pw'] = enter password
-        config['ssid'] = enter ssid
-        config['wifi_pw'] = enter password
+        config['ssid'] = input("Enter ssid: ")
+        config['wifi_pw'] = input("Enter wifi password: ")
         config['server'] = mqtt_brocker_ip
         config["queue_len"] = 1  # Use event interface with default queue size
 
