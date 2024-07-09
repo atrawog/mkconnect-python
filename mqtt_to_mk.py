@@ -52,9 +52,25 @@ elif (sys.platform == 'rp2'):
         #MQTTClient.DEBUG = True  # Optional: print diagnostic messages
         return MQTTClient(config)
     
-    def createAdvertiser():
+
+    def bt_create_advertiser():
         logger.info('Creating Bluetooth-Advertiser')
         return Advertiser()
+
+
+    async def mqtt_loop(mqtt_client):  # Respond to connectivity being (re)established
+        logger.info('Created task mqtt_loop')
+
+        await mqtt_client.connect()
+        logger.info('MQTT-Client connected')
+
+        for coroutine in (mqtt_process_messages, mqtt_publish_hubs):
+            asyncio.create_task(coroutine(mqtt_client))
+
+        while True:
+            await mqtt_client.up.wait()  # Wait on an Event
+            mqtt_client.up.clear()
+            await mqtt_client.subscribe(mqtt_topic_base + '/#', 1)  # renew subscriptions
 
     pass
 
@@ -65,9 +81,12 @@ elif (sys.platform == 'win32'):
     def mqtt_create_Client():
         return None
 
-    def createAdvertiser():
+    def bt_create_advertiser():
         return Advertiser()
-    
+
+    async def mqtt_loop(mqtt_client):       
+        pass
+
     pass
 else:
     raise Exception('unsupported platform')
@@ -195,27 +214,14 @@ async def mqtt_process_message(mqtt_client, topic_str: str, msg_str: str) -> Non
         pass
 
 
-async def mqtt_loop(mqtt_client):  # Respond to connectivity being (re)established
-    logger.info('Created task mqtt_loop')
-
-    for coroutine in (mqtt_process_messages, mqtt_publish_hubs):
-        asyncio.create_task(coroutine(mqtt_client))
-
-    while True:
-        await mqtt_client.up.wait()  # Wait on an Event
-        mqtt_client.up.clear()
-        await mqtt_client.subscribe(mqtt_topic_base + '/#', 1)  # renew subscriptions
-
-
 async def main():
     try:
         # instantiate Advertiser
-        advertiser = createAdvertiser()
+        advertiser = bt_create_advertiser()
         await MouldKing.set_advertiser(advertiser)
 
+        # instantiate MQTT-Client
         mqtt_client = mqtt_create_Client()
-        await mqtt_client.connect()
-        logger.info('MQTT-Client connected')
 
         # run mqtt-loop
         asyncio.create_task(mqtt_loop(mqtt_client))
@@ -225,7 +231,7 @@ async def main():
             await asyncio.sleep(5)
 
     finally:
-        advertiser.advertisement_stop()
+        await advertiser.advertisement_stop()
         mqtt_client.close()  # Prevent LmacRxBlk:1 errors
 
 

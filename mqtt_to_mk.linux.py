@@ -251,6 +251,7 @@ async def main():
         advertiser = bt_create_advertiser()
         await MouldKing.set_advertiser(advertiser)
 
+        # instantiate MQTT-Client
         mqtt_client = mqtt_create_client()
 
         # run mqtt-loop
@@ -263,7 +264,6 @@ async def main():
     finally:
         advertiser.advertisement_stop()
         mqtt_client.close()  # Prevent LmacRxBlk:1 errors
-
 
 
 if __name__ == "__main__":
