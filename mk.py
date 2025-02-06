@@ -13,8 +13,6 @@ from Tracer.TracerConsole import TracerConsole
 sys.path.append("Advertiser") 
 # uncomment to choose advertiser
 if (sys.platform == 'linux'):
-    #from Advertiser.AdvertiserHCITool import AdvertiserHCITool as Advertiser
-    #from Advertiser.AdvertiserBTMgmt import AdvertiserBTMgmt as Advertiser
     from Advertiser.AdvertiserBTSocket import AdvertiserBTSocket as Advertiser
     pass
 elif (sys.platform == 'rp2'):
@@ -39,23 +37,15 @@ advertiser.SetTracer(tracer)
 MouldKing.SetTracer(tracer)
 MouldKing.SetAdvertiser(advertiser)
 
-# save pre-instantiated objects in local variables
-#hub0 = MouldKing.Module6_0.Device0
-#hub1 = MouldKing.Module6_0.Device1
-#hub2 = MouldKing.Module6_0.Device2
+hub = MouldKing.Module4_0.Device0
 
-hub0 = MouldKing.Module4_0.Device0
-hub1 = MouldKing.Module4_0.Device1
-hub2 = MouldKing.Module4_0.Device2
 
 ############################################################################
 # get uncrypted connect-telegram as bytearray
 title = "connect-telegram"
 tracer.TraceInfo("\n" + title)
 
-hub0.Connect()
-hub1.Connect()
-hub2.Connect()
+hub.Connect()
 time.sleep(5)
 
 #tracer.TraceInfo("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))
@@ -68,11 +58,10 @@ time.sleep(5)
 title = "stop-telegram"
 tracer.TraceInfo("\n" + title)
 
-rawdata = hub0.Stop()
-rawdata = hub1.Stop()
+rawdata = hub.Stop()
 time.sleep(1)
 
-#tracer.TraceInfo("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))
+tracer.TraceInfo("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))
 
 #crypted = MouldKingCrypt.Crypt(rawdata) # get crypted data from rawdata
 #tracer.TraceInfo("crypted: " + ' '.join(f'{x:02x}' for x in crypted))
@@ -82,10 +71,10 @@ time.sleep(1)
 title = "C1: fullspeed forwards"
 tracer.TraceInfo("\n" + title)
 
-rawdata = hub0.SetChannel(0, 1)
+rawdata = hub.SetChannel(0, 1)
 time.sleep(1)
 
-#tracer.TraceInfo("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))
+tracer.TraceInfo("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))
 
 #crypted = MouldKingCrypt.Crypt(rawdata) # get crypted data from rawdata
 #tracer.TraceInfo("crypted: " + ' '.join(f'{x:02x}' for x in crypted))
@@ -95,7 +84,7 @@ time.sleep(1)
 title = "C1: halfspeed forwards"
 tracer.TraceInfo("\n" + title)
 
-rawdata = hub0.SetChannel(0, 0.5)
+rawdata = hub.SetChannel(0, 0.5)
 time.sleep(1)
 
 #tracer.TraceInfo("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))
@@ -108,7 +97,7 @@ time.sleep(1)
 title = "C1: fullspeed forwards"
 tracer.TraceInfo("\n" + title)
 
-rawdata = hub1.SetChannel(0, 1)
+rawdata = hub.SetChannel(0, 1)
 time.sleep(2)
 
 #tracer.TraceInfo("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))
@@ -121,7 +110,7 @@ time.sleep(2)
 title = "C1: halfspeed backwards"
 tracer.TraceInfo("\n" + title)
 
-rawdata = hub0.SetChannel(0, -0.5)
+rawdata = hub.SetChannel(0, -0.5)
 time.sleep(1)
 
 #tracer.TraceInfo("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))
@@ -134,7 +123,7 @@ time.sleep(1)
 title = "C2: halfspeed backwards"
 tracer.TraceInfo("\n" + title)
 
-rawdata = hub0.SetChannel(1, -0.5)
+rawdata = hub.SetChannel(1, -0.5)
 time.sleep(1)
 
 #tracer.TraceInfo("rawdata: " + ' '.join(f'{x:02x}' for x in rawdata))
@@ -147,9 +136,7 @@ time.sleep(1)
 title = "Disconnect from advertiser"
 tracer.TraceInfo("\n" + title)
 
-hub0.Disconnect()
-hub1.Disconnect()
-hub2.Disconnect()
+hub.Disconnect()
 time.sleep(1)
 
 ############################################################################

@@ -23,5 +23,6 @@ class TracerConsole(Tracer) :
         """
         prints out
         """
-        print(value)
+        # print(value)
+        pass
 
